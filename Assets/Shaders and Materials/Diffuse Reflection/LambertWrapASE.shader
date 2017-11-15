@@ -1,6 +1,6 @@
 // Made with Amplify Shader Editor
 // Available at the Unity Asset Store - http://u3d.as/y3X 
-Shader "Pipeworks_Custom/LambertWrap"
+Shader "Pipeworks_Custom/Lambert Wrap"
 {
 	Properties
 	{
@@ -63,7 +63,7 @@ Shader "Pipeworks_Custom/LambertWrap"
 			float dotResult3_g34 = dot( i.worldNormal , ase_worldlightDir );
 			float temp_output_6_0_g33 = (saturate( max( dotResult3_g34 , 0.0 ) )*0.65 + ( 1.0 - 0.65 ));
 			float2 uv_BaseRGB = i.uv_texcoord * _BaseRGB_ST.xy + _BaseRGB_ST.zw;
-			c.rgb = ( saturate( max( ( temp_output_6_0_g33 * temp_output_6_0_g33 ) , 0.0 ) ) * (_BaseTint).rgb * ((tex2D( _BaseRGB, uv_BaseRGB )).rgb).xyz * _LightColor0.rgb * ase_lightAtten );
+			c.rgb = saturate( ( saturate( max( ( temp_output_6_0_g33 * temp_output_6_0_g33 ) , 0.0 ) ) * (_BaseTint).rgb * ((tex2D( _BaseRGB, uv_BaseRGB )).rgb).xyz * _LightColor0.rgb * ase_lightAtten ) );
 			c.a = 1;
 			return c;
 		}
@@ -153,14 +153,16 @@ Shader "Pipeworks_Custom/LambertWrap"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=13703
-1953;34;1796;1125;1175.023;263.2203;1;True;False
+Version=13706
+1953;34;1796;1125;1178.023;332.2203;1;True;False
 Node;AmplifyShaderEditor.ColorNode;3;-677.786,138.3279;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
 Node;AmplifyShaderEditor.SamplerNode;1;-726.875,-44.0062;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;24;-425.1688,45.30499;Float;False;Lambert Wrap;-1;;32;4;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;1;FLOAT3
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;-4,-1;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/LambertWrap;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;14;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.FunctionNode;24;-425.1688,45.30499;Float;False;Lambert Wrap;-1;;32;31f8f5f80290a284a82e58e8d6bb3fef;4;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;1;FLOAT3
+Node;AmplifyShaderEditor.SaturateNode;25;-81.02295,44.77969;Float;False;1;0;FLOAT3;0.0;False;1;FLOAT3
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;113,-1;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert Wrap;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;14;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;24;0;1;0
 WireConnection;24;1;3;0
-WireConnection;0;2;24;0
+WireConnection;25;0;24;0
+WireConnection;0;2;25;0
 ASEEND*/
-//CHKSM=7DFFA70D04D30A4A8B5117CB194E6206555CF4C7
+//CHKSM=C21D91400790416B0827812A1598E9A55014DBF9

@@ -1,20 +1,23 @@
-Shader "Pipeworks_Custom/HalfLambertToon"
+Shader "Pipeworks_Custom/Half Lambert Toon"
 {
 	Properties
 	{
+		_BaseTint("Base Tint", Color) = (1,1,1,1)
 		[Toggle]_UseRampTex("Use Ramp  Tex", Float) = 1
+		_BaseRGB("Base (RGB)", 2D) = "white" {}
 		_ToonRampRGB("Toon Ramp (RGB)", 2D) = "white" {}
-		[IntRange]_CellShadingLevels("Cell Shading Levels", Range( 2 , 10)) = 2
-		_DiffuseTint("Diffuse Tint", Color) = (0,0,0,0)
+		[IntRange]_CellShadingLevels("Cell Shading Levels", Range( 2 , 10)) = 4
 		_SpecularColor("Specular Color", Color) = (1,1,1,1)
 		_SpecularIntensity("Specular Intensity", Range( 0 , 10)) = 1
-		_GlossSpecPower("Gloss (Spec Power)", Range( 0 , 10)) = 3
+		_GlossSpecPower("Gloss (Spec Power)", Range( 0 , 10)) = 2
+		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 	}
 
 	SubShader
 	{
 		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
 		Cull Back
+		ColorMask RGB
 		CGINCLUDE
 		#include "UnityPBSLighting.cginc"
 		#include "UnityCG.cginc"
@@ -25,7 +28,8 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 		{
 			float3 worldNormal;
 			float3 worldPos;
-			half4 data60;
+			float2 uv_texcoord;
+			half3 data60;
 		};
 
 		struct SurfaceOutputCustomLightingCustom
@@ -44,7 +48,9 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 		uniform fixed _UseRampTex;
 		uniform half _CellShadingLevels;
 		uniform sampler2D _ToonRampRGB;
-		uniform fixed4 _DiffuseTint;
+		uniform sampler2D _BaseRGB;
+		uniform float4 _BaseRGB_ST;
+		uniform fixed4 _BaseTint;
 		uniform half _GlossSpecPower;
 		uniform half _SpecularIntensity;
 		uniform fixed4 _SpecularColor;
@@ -52,13 +58,13 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 		void vertexDataFunc( inout appdata_full v, out Input o )
 		{
 			UNITY_INITIALIZE_OUTPUT( Input, o );
-			half3 ase_worldNormal = UnityObjectToWorldNormal( v.normal );
+			float3 ase_worldNormal = UnityObjectToWorldNormal( v.normal );
 			float3 ase_worldPos = mul( unity_ObjectToWorld, v.vertex );
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			float3 ase_worldViewDir = normalize( UnityWorldSpaceViewDir( ase_worldPos ) );
-			float3 normalizeResult50 = normalize( ( ase_worldlightDir + ase_worldViewDir ) );
-			float dotResult52 = dot( ase_worldNormal , normalizeResult50 );
-			o.data60 = ( pow( max( dotResult52 , 0.0 ) , ( _GlossSpecPower * 128.0 ) ) * _SpecularIntensity * _SpecularColor * _LightColor0 );
+			float3 normalizeResult5_g26 = normalize( ( ase_worldlightDir + ase_worldViewDir ) );
+			float dotResult6_g26 = dot( ase_worldNormal , normalizeResult5_g26 );
+			o.data60 = ( saturate( pow( max( dotResult6_g26 , 0.0 ) , ( _GlossSpecPower * 128.0 ) ) ) * _SpecularIntensity * (_SpecularColor).rgb * _LightColor0.rgb );
 		}
 
 		inline half4 LightingStandardCustomLighting( inout SurfaceOutputCustomLightingCustom s, half3 viewDir, UnityGI gi )
@@ -74,17 +80,17 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 			float3 ase_lightAttenRGB = gi.light.color / ( ( _LightColor0.rgb ) + 0.000001 );
 			float ase_lightAtten = max( max( ase_lightAttenRGB.r, ase_lightAttenRGB.g ), ase_lightAttenRGB.b );
 			#endif
-			float3 normalizeResult6 = normalize( i.worldNormal );
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
-			float dotResult2 = dot( normalizeResult6 , ase_worldlightDir );
-			float temp_output_24_0 = (0.0 + (dotResult2 - -1.0) * (1.0 - 0.0) / (1.0 - -1.0));
-			float temp_output_27_0 = ( temp_output_24_0 * temp_output_24_0 );
-			fixed4 temp_cast_0 = (( floor( ( _CellShadingLevels * temp_output_27_0 ) ) / ( _CellShadingLevels - 0.5 ) )).xxxx;
-			float2 appendResult29 = (half2(temp_output_27_0 , 0.5));
-			fixed4 LIGHTING_DIFFUSE63 = ( lerp(temp_cast_0,tex2D( _ToonRampRGB, appendResult29 ),_UseRampTex) * _LightColor0 * ase_lightAtten * _DiffuseTint );
-			fixed4 LIGHTING_SPECULAR64 = i.data60;
-			c.rgb = saturate( ( LIGHTING_DIFFUSE63 + LIGHTING_SPECULAR64 ) ).xyz;
+			float dotResult3_g24 = dot( i.worldNormal , ase_worldlightDir );
+			float temp_output_6_0_g23 = (saturate( max( dotResult3_g24 , 0.0 ) )*0.65 + ( 1.0 - 0.65 ));
+			float temp_output_92_0 = saturate( max( ( temp_output_6_0_g23 * temp_output_6_0_g23 ) , 0.0 ) );
+			fixed3 temp_cast_0 = (( floor( ( _CellShadingLevels * temp_output_92_0 ) ) / ( _CellShadingLevels - 0.5 ) )).xxx;
+			float2 appendResult29 = (half2(temp_output_92_0 , 0.5));
+			float2 uv_BaseRGB = i.uv_texcoord * _BaseRGB_ST.xy + _BaseRGB_ST.zw;
+			fixed3 DIFFUSE63 = ( lerp(temp_cast_0,(tex2D( _ToonRampRGB, appendResult29 )).rgb,_UseRampTex) * (tex2D( _BaseRGB, uv_BaseRGB )).rgb * (_BaseTint).rgb * ase_lightAtten * _LightColor0.rgb );
+			fixed3 SPECULAR64 = i.data60;
+			c.rgb = saturate( ( DIFFUSE63 + SPECULAR64 ) );
 			c.a = 1;
 			return c;
 		}
@@ -123,12 +129,12 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
 			#include "UnityPBSLighting.cginc"
-			sampler3D _DitherMaskLOD;
 			struct v2f
 			{
 				V2F_SHADOW_CASTER;
 				float3 worldPos : TEXCOORD6;
 				float3 worldNormal : TEXCOORD1;
+				float4 texcoords01 : TEXCOORD4;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 			v2f vert( appdata_full v )
@@ -142,6 +148,7 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 				float3 worldPos = mul( unity_ObjectToWorld, v.vertex ).xyz;
 				fixed3 worldNormal = UnityObjectToWorldNormal( v.normal );
 				o.worldNormal = worldNormal;
+				o.texcoords01 = float4( v.texcoord.xy, v.texcoord1.xy );
 				o.worldPos = worldPos;
 				TRANSFER_SHADOW_CASTER_NORMALOFFSET( o )
 				return o;
@@ -155,6 +162,7 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 				UNITY_SETUP_INSTANCE_ID( IN );
 				Input surfIN;
 				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
+				surfIN.uv_texcoord.xy = IN.texcoords01.xy;
 				float3 worldPos = IN.worldPos;
 				fixed3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
 				surfIN.worldPos = worldPos;
@@ -170,5 +178,5 @@ Shader "Pipeworks_Custom/HalfLambertToon"
 			ENDCG
 		}
 	}
-	Fallback "Diffuse"
+	Fallback "Mobile/Diffuse"
 }

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Phong
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=13706\n1953;34;1796;1125;933;521.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;8;-55,-279.5;Float;False;197;155;V
+    dot R;1;7;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;11;106.9245,178.4781;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.RangedFloatNode;10;-48.7803,235.0082;Float;False;Constant;_Float0;Float
+    0;0;0;128;0;0;0;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;14;-462.2996,172.0793;Float;False;Spec
+    Power;1;0;False;1;0;FLOAT;3.0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionNode;9;-316,16.5;Float;False;Reflection
+    Vector;-1;;2;238f2485d2b293b4ab80b31019ecc882;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.SimpleMaxOpNode;12;179.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;5;-572,38.5;Float;False;1;0;FLOAT;0.0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.WorldNormalVector;3;-528,-94.5;Float;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.DotProductOpNode;7;-5,-229.5;Float;False;2;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT\nNode;AmplifyShaderEditor.ViewDirInputsCoordNode;6;-520,-235.5;Float;False;World;0;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.SaturateNode;15;313,-229.5;Float;False;1;0;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.PowerNode;13;479.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionOutput;0;670,-230;Float;False;True;Phong;0;1;0;FLOAT;0.0;False;0\nWireConnection;11;0;14;0\nWireConnection;11;1;10;0\nWireConnection;9;0;3;0\nWireConnection;9;1;5;0\nWireConnection;12;0;7;0\nWireConnection;7;0;6;0\nWireConnection;7;1;9;0\nWireConnection;15;0;12;0\nWireConnection;13;0;15;0\nWireConnection;13;1;11;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=EB60791C91F7F7AC4AD817E9B8FE9E923A7A60B8"
+  m_functionName: 
+  m_description: "Calculates Phong specular \nlighting."
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_nodeCategory: 3
+  m_customNodeCategory: 

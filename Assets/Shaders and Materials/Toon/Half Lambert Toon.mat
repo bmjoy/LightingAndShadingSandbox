@@ -18,21 +18,30 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseRGB:
+        m_Texture: {fileID: 2800000, guid: a9f953c7353804247b8c3ed6e1c46a2e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _ToonRampRGB:
         m_Texture: {fileID: 2800000, guid: 486dd30ff870d5245b98100c7f27c43e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CellShadingLevels: 6
+    - _CellShadingLevels: 5
     - _Float3: 0.66
     - _Float5: 1
     - _Gloss: 0.66
-    - _GlossSpecPower: 0.78
+    - _GlossSpecPower: 2
     - _Specular: 1
     - _SpecularIntensity: 1
     - _UseRampTex: 1
     - __dirty: 0
     m_Colors:
+    - _BaseTint: {r: 0.9191176, g: 0.5205312, b: 0.28400737, a: 1}
     - _ColorTint: {r: 0.9191176, g: 0.5205312, b: 0.28400737, a: 1}
     - _DiffuseTint: {r: 0.9191176, g: 0.5205312, b: 0.28400737, a: 1}
     - _SpecularColor: {r: 1, g: 0.37241384, b: 0, a: 1}
