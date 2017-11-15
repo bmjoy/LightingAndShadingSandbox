@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Lambert Wrap
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=13703\n1953;34;1796;1125;1395;409.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;14;-586,270.5;Float;False;182;126;Shadows;1;13;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.LightAttenuation;13;-564,320.5;Float;False;0;1;FLOAT\nNode;AmplifyShaderEditor.ComponentMaskNode;3;-833.2292,89.61926;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;9;-108.103,1.540751;Float;False;5;5;0;FLOAT;0,0,0;False;1;FLOAT3;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionInput;17;-382,315.5;Float;False;Light
+    Atten;1;3;False;1;0;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;15;-384,178.5;Float;False;Light
+    Color;3;2;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.LightColorNode;12;-547,160.5;Float;False;0;3;COLOR;FLOAT3;FLOAT\nNode;AmplifyShaderEditor.FunctionNode;11;-623,-193.5;Float;False;Lambert
+    Wrap Base;-1;;8;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;5;-987.8119,90.15194;Float;False;Base;5;0;False;1;0;COLOR;1,1,1,1;False;1;COLOR\nNode;AmplifyShaderEditor.FunctionInput;6;-988.8119,18.15194;Float;False;Base
+    Tint;5;1;False;1;0;COLOR;1,1,1,1;False;1;COLOR\nNode;AmplifyShaderEditor.ComponentMaskNode;7;-596.7971,88.49325;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.ComponentMaskNode;4;-834.9763,18.15236;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.WorldNormalVector;1;-817.2292,-123.3807;Float;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;2;-865.2292,-256.3808;Float;False;1;0;FLOAT;0.0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.FunctionOutput;0;142,2;Float;False;True;Lambert
+    Wrap RGB;0;1;0;FLOAT3;0,0,0;False;0\nWireConnection;3;0;5;0\nWireConnection;9;0;11;0\nWireConnection;9;1;4;0\nWireConnection;9;2;7;0\nWireConnection;9;3;15;0\nWireConnection;9;4;17;0\nWireConnection;17;0;13;0\nWireConnection;15;0;12;1\nWireConnection;11;0;2;0\nWireConnection;11;1;1;0\nWireConnection;7;0;3;0\nWireConnection;4;0;6;0\nWireConnection;0;0;9;0\nASEEND*/\n//CHKSM=68C2842F80BC31515B8934C4916567352E457691"
+  m_functionName: 
+  m_description: 
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []

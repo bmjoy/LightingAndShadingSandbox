@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Lambert
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=13703\n1953;34;1796;1125;1260;425.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;27;-692,274.5;Float;False;186;128;Shadows;1;25;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.LightColorNode;26;-649,159.5;Float;False;0;3;COLOR;FLOAT3;FLOAT\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;10;-222.2911,-1.111187;Float;False;5;5;0;FLOAT;0,0,0;False;1;FLOAT3;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.ComponentMaskNode;9;-568.9852,87.84131;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionInput;22;-477,177.5;Float;False;Light
+    Color;3;2;True;1;0;FLOAT3;1,1,1;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionInput;21;-476,319.5;Float;False;Light
+    Atten;1;3;True;1;0;FLOAT;1.0;False;1;FLOAT\nNode;AmplifyShaderEditor.LightAttenuation;25;-673,324.5;Float;False;0;1;FLOAT\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;4;-837.4173,-257.0327;Float;False;1;0;FLOAT;0.0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.FunctionNode;18;-597,-201.5;Float;False;Lambert
+    Base;-1;;7;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT\nNode;AmplifyShaderEditor.ComponentMaskNode;3;-805.4173,88.96732;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionInput;12;-961,17.5;Float;False;Base
+    Tint;5;1;False;1;0;COLOR;1,1,1,1;False;1;COLOR\nNode;AmplifyShaderEditor.ComponentMaskNode;7;-807.1644,17.50042;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.WorldNormalVector;2;-789.4173,-124.0326;Float;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;14;-960,89.5;Float;False;Base;5;0;False;1;0;COLOR;1,1,1,1;False;1;COLOR\nNode;AmplifyShaderEditor.FunctionOutput;0;0,-2;Float;False;True;Lambert
+    RGB;0;1;0;FLOAT3;0,0,0;False;0\nWireConnection;10;0;18;0\nWireConnection;10;1;7;0\nWireConnection;10;2;9;0\nWireConnection;10;3;22;0\nWireConnection;10;4;21;0\nWireConnection;9;0;3;0\nWireConnection;22;0;26;1\nWireConnection;21;0;25;0\nWireConnection;18;0;4;0\nWireConnection;18;1;2;0\nWireConnection;3;0;14;0\nWireConnection;7;0;12;0\nWireConnection;0;0;10;0\nASEEND*/\n//CHKSM=5BD99C085F9176A5588C751572C7FD5D2764B4BE"
+  m_functionName: 
+  m_description: Calculates basic Lambert shading.
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []

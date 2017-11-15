@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Half Lambert Toon ASE
+  m_Shader: {fileID: 4800000, guid: b5105a5b84b82054785506952e8d7935, type: 3}
+  m_ShaderKeywords: _USERAMPTEX_ON
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseRGB:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ToonRampRGB:
+        m_Texture: {fileID: 2800000, guid: 486dd30ff870d5245b98100c7f27c43e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _CellShadingLevels: 2
+    - _GlossSpecPower: 0.8
+    - _SpecularIntensity: 1
+    - _UseRampTex: 1
+    - __dirty: 0
+    m_Colors:
+    - _BaseTint: {r: 0.9191176, g: 0.5205312, b: 0.28400737, a: 1}
+    - _DiffuseTint: {r: 0.9191176, g: 0.5205312, b: 0.28400737, a: 1}
+    - _SpecularColor: {r: 1, g: 0.37241384, b: 0, a: 1}
