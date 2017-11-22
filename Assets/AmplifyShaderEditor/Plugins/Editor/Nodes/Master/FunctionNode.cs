@@ -1,3 +1,6 @@
+// Amplify Shader Editor - Visual Shader Editing Tool
+// Copyright (c) Amplify Creations, Lda <info@amplify.pt>
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -42,10 +45,14 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private string m_functionGUID = string.Empty;
 
+		[SerializeField]
 		private List<string> m_includes = new List<string>();
 
 		private bool m_parametersFoldout = true;
 		private ParentGraph m_outsideGraph = null;
+
+		[SerializeField]
+		private FunctionOutput m_mainPreviewNode;
 
 		string LastLine( string text )
 		{
@@ -84,24 +91,11 @@ namespace AmplifyShaderEditor
 			AmplifyShaderEditorWindow.LoadFromMeta( ref m_functionGraph, ContainerGraph.ParentWindow.ContextMenuInstance, ContainerGraph.ParentWindow.CurrentVersionInfo, Function.FunctionInfo );
 			//m_functionCheckSum = LastLine( m_function.FunctionInfo );
 			m_functionCheckSum = AssetDatabase.GetAssetDependencyHash( AssetDatabase.GetAssetPath( m_function ) ).ToString();
-			List<ParentNode> propertyList = UIUtils.PropertyNodesList();
+			List<PropertyNode> propertyList = UIUtils.PropertyNodesList();
+			m_allFunctionInputs = UIUtils.FunctionInputList();
+			m_allFunctionOutputs = UIUtils.FunctionOutputList();
 
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
-
-			m_allFunctionInputs = new List<FunctionInput>();
-			m_allFunctionOutputs = new List<FunctionOutput>();
-
-			for( int i = 0; i < m_functionGraph.AllNodes.Count; i++ )
-			{
-				if( m_functionGraph.AllNodes[ i ].GetType() == typeof( FunctionInput ) )
-				{
-					m_allFunctionInputs.Add( m_functionGraph.AllNodes[ i ] as FunctionInput );
-				}
-				else if( m_functionGraph.AllNodes[ i ].GetType() == typeof( FunctionOutput ) )
-				{
-					m_allFunctionOutputs.Add( m_functionGraph.AllNodes[ i ] as FunctionOutput );
-				}
-			}
 
 			m_allFunctionInputs.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 			m_allFunctionOutputs.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
@@ -114,11 +108,23 @@ namespace AmplifyShaderEditor
 			}
 
 			int outputCount = m_allFunctionOutputs.Count;
+			FunctionOutput first = null;
 			for( int i = 0; i < outputCount; i++ )
 			{
+				if( i == 0 )
+					first = m_allFunctionOutputs[ i ];
+
+				if( m_allFunctionOutputs[ i ].PreviewNode )
+				{
+					m_mainPreviewNode = m_allFunctionOutputs[ i ];
+				}
+
 				AddOutputPort( m_allFunctionOutputs[ i ].AutoOutputType, m_allFunctionOutputs[ i ].OutputName );
 				PortSwitchRestriction( m_outputPorts[ i ] );
 			}
+
+			if( m_mainPreviewNode == null )
+				m_mainPreviewNode = first;
 
 			//create reordenator to main graph
 			bool inside = false;
@@ -145,6 +151,76 @@ namespace AmplifyShaderEditor
 			m_textLabelWidth = 100;
 
 			UIUtils.RegisterFunctionNode( this );
+
+			m_previewShaderGUID = "aca70c900c50c004e8ef0b47c4fac4d4";
+		}
+
+		public override void SetPreviewInputs()
+		{
+			//base.SetPreviewInputs();
+			if( !m_initialized )
+				return;
+
+			int count = m_inputPorts.Count;
+			for( int i = 0; i < count; i++ )
+			{
+				if( m_inputPorts[ i ].IsConnected && m_inputPorts[ i ].InputNodeHasPreview() )
+				{
+					m_allFunctionInputs[ i ].m_ignoreConnection = true;
+					m_allFunctionInputs[ i ].InputPorts[ 0 ].PreparePortCacheID();
+					m_allFunctionInputs[ i ].PreviewMaterial.SetTexture( m_allFunctionInputs[ i ].InputPorts[ 0 ].CachedPropertyId, m_inputPorts[ i ].GetOutputConnection( 0 ).OutputPreviewTexture );
+				}
+				else
+				{
+					m_allFunctionInputs[ i ].m_ignoreConnection = false;
+				}
+			}
+
+			if( m_mainPreviewNode != null )
+			{
+				if( m_drawPreviewAsSphere != m_mainPreviewNode.SpherePreview )
+				{
+					m_drawPreviewAsSphere = m_mainPreviewNode.SpherePreview;
+					OnNodeChange();
+				}
+			}
+		}
+
+		public override void RenderNodePreview()
+		{
+			ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
+			ContainerGraph.ParentWindow.CustomGraph = m_functionGraph;
+			if( m_functionGraph != null )
+			{
+				for( int i = 0; i < m_functionGraph.AllNodes.Count; i++ )
+				{
+					ParentNode node = m_functionGraph.AllNodes[ i ];
+					if( node != null )
+					{
+						node.RenderNodePreview();
+					}
+				}
+			}
+			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
+
+			SetPreviewInputs();
+
+			int count = m_outputPorts.Count;
+			for( int i = 0; i < count; i++ )
+			{
+				m_outputPorts[ i ].OutputPreviewTexture = m_allFunctionOutputs[ i ].PreviewTexture;
+			}
+		}
+
+		public override RenderTexture PreviewTexture
+		{
+			get
+			{
+				if( m_mainPreviewNode != null )
+					return m_mainPreviewNode.PreviewTexture;
+				else
+					return base.PreviewTexture;
+			}
 		}
 
 		public override void RefreshExternalReferences()
@@ -280,6 +356,8 @@ namespace AmplifyShaderEditor
 
 		public override void Destroy()
 		{
+			m_mainPreviewNode = null;
+
 			base.Destroy();
 
 			if( ContainerGraph.ParentWindow.OutsideGraph.CurrentStandardSurface != null )
@@ -325,10 +403,32 @@ namespace AmplifyShaderEditor
 			m_function = null;
 		}
 
+		[SerializeField]
+		bool m_initialGraphDraw = false;
+
 		public override void Draw( DrawInfo drawInfo )
 		{
 			//CheckForChanges();
 			CheckForChangesRecursively();
+
+			if( !m_initialGraphDraw && drawInfo.CurrentEventType == EventType.Repaint )
+			{
+				m_initialGraphDraw = true;
+				ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
+				ContainerGraph.ParentWindow.CustomGraph = m_functionGraph;
+				if( m_functionGraph != null )
+				{
+					for( int i = 0; i < m_functionGraph.AllNodes.Count; i++ )
+					{
+						ParentNode node = m_functionGraph.AllNodes[ i ];
+						if( node != null )
+						{
+							node.OnNodeLayout( drawInfo );
+						}
+					}
+				}
+				ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
+			}
 
 			base.Draw( drawInfo );
 		}
@@ -354,7 +454,7 @@ namespace AmplifyShaderEditor
 			bool result = false;
 			for( int i = 0; i < m_functionGraph.FunctionNodes.NodesList.Count; i++ )
 			{
-				if( ( m_functionGraph.FunctionNodes.NodesList[ i ] as FunctionNode ).CheckForChangesRecursively() )
+				if( m_functionGraph.FunctionNodes.NodesList[ i ].CheckForChangesRecursively() )
 					result = true;
 			}
 			if( CheckForChanges( false, result ) )
@@ -365,6 +465,7 @@ namespace AmplifyShaderEditor
 
 		public void DuplicateMe()
 		{
+			bool previewOpen = m_showPreview;
 			ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
 			ContainerGraph.ParentWindow.CustomGraph = null;
 			if( ContainerGraph.ParentWindow.CurrentGraph.CurrentStandardSurface != null )
@@ -372,6 +473,7 @@ namespace AmplifyShaderEditor
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
 
 			ParentNode newNode = ContainerGraph.CreateNode( m_function, false, Vec2Position );
+			newNode.ShowPreview = previewOpen;
 			if( ( newNode as FunctionNode ).m_reordenator && m_reordenator )
 				( newNode as FunctionNode ).m_reordenator.OrderIndex = m_reordenator.OrderIndex;
 			for( int i = 0; i < m_outputPorts.Count; i++ )
@@ -422,7 +524,7 @@ namespace AmplifyShaderEditor
 
 			if( m_reordenator != null && m_reordenator.RecursiveCount() > 0 && m_reordenator.HasTitle )
 			{
-				dataCollector.AddToProperties( UniqueId, "[Header(" + m_reordenator.HeaderTitle.Replace("-", " ") + ")]", m_reordenator.OrderIndex );
+				dataCollector.AddToProperties( UniqueId, "[Header(" + m_reordenator.HeaderTitle.Replace( "-", " " ) + ")]", m_reordenator.OrderIndex );
 			}
 			string result = string.Empty;
 			for( int i = 0; i < m_allFunctionInputs.Count; i++ )
@@ -483,7 +585,7 @@ namespace AmplifyShaderEditor
 			{
 				m_functionGraphId = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
 			}
-			
+
 			if( UIUtils.CurrentShaderVersion() > 13704 )
 			{
 				m_functionGUID = GetCurrentParam( ref nodeParams );

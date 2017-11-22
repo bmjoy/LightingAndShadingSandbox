@@ -1,0 +1,230 @@
+fileFormatVersion: 2
+guid: d1a0ba48b501bb846b0e89c8651dab78
+timeCreated: 1511291648
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: default
+    100004: default003
+    100006: default004
+    100008: default005
+    100010: default005_MeshPart0
+    100012: default005_MeshPart1
+    100014: default006
+    100016: default007
+    100018: default008
+    100020: default008_MeshPart0
+    100022: default008_MeshPart1
+    100024: default009
+    100026: default_MeshPart0
+    100028: default_MeshPart1
+    100030: default_MeshPart2
+    100032: default_MeshPart3
+    100034: default_MeshPart4
+    100036: Group005
+    100038: Group006
+    100040: Group007
+    100042: Group013
+    100044: Group014
+    100046: Group015
+    100048: Group016
+    100050: Group017
+    100052: Line004
+    100054: Line005
+    100056: Line006
+    100058: Object001
+    100060: Object002
+    400000: //RootNode
+    400002: default
+    400004: default003
+    400006: default004
+    400008: default005
+    400010: default005_MeshPart0
+    400012: default005_MeshPart1
+    400014: default006
+    400016: default007
+    400018: default008
+    400020: default008_MeshPart0
+    400022: default008_MeshPart1
+    400024: default009
+    400026: default_MeshPart0
+    400028: default_MeshPart1
+    400030: default_MeshPart2
+    400032: default_MeshPart3
+    400034: default_MeshPart4
+    400036: Group005
+    400038: Group006
+    400040: Group007
+    400042: Group013
+    400044: Group014
+    400046: Group015
+    400048: Group016
+    400050: Group017
+    400052: Line004
+    400054: Line005
+    400056: Line006
+    400058: Object001
+    400060: Object002
+    2300000: default003
+    2300002: default004
+    2300004: default005_MeshPart0
+    2300006: default005_MeshPart1
+    2300008: default006
+    2300010: default007
+    2300012: default008_MeshPart0
+    2300014: default008_MeshPart1
+    2300016: default009
+    2300018: default_MeshPart0
+    2300020: default_MeshPart1
+    2300022: default_MeshPart2
+    2300024: default_MeshPart3
+    2300026: default_MeshPart4
+    2300028: Line004
+    2300030: Line005
+    2300032: Line006
+    2300034: Object001
+    2300036: Object002
+    3300000: default003
+    3300002: default004
+    3300004: default005_MeshPart0
+    3300006: default005_MeshPart1
+    3300008: default006
+    3300010: default007
+    3300012: default008_MeshPart0
+    3300014: default008_MeshPart1
+    3300016: default009
+    3300018: default_MeshPart0
+    3300020: default_MeshPart1
+    3300022: default_MeshPart2
+    3300024: default_MeshPart3
+    3300026: default_MeshPart4
+    3300028: Line004
+    3300030: Line005
+    3300032: Line006
+    3300034: Object001
+    3300036: Object002
+    4300000: default004
+    4300002: default003
+    4300004: Object001
+    4300006: Object002
+    4300008: default008_MeshPart0
+    4300010: default008_MeshPart1
+    4300012: default009
+    4300014: default005_MeshPart0
+    4300016: default005_MeshPart1
+    4300018: default006
+    4300020: default007
+    4300022: Line004
+    4300024: Line005
+    4300026: Line006
+    4300028: default_MeshPart0
+    4300030: default_MeshPart1
+    4300032: default_MeshPart2
+    4300034: default_MeshPart3
+    4300036: default_MeshPart4
+    9500000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 6tccn2
+    second: {fileID: 2100000, guid: 24987cdb6fc577b41a4438816de8548b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #20jjxbh'
+    second: {fileID: 2100000, guid: f65f287af4ec28d4082d432c6838b99f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #20jjxbhjgk'
+    second: {fileID: 2100000, guid: 9e3cf4994ffa64445832fa049e0ca61c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #20jjxbhjgkfh'
+    second: {fileID: 2100000, guid: cbd7e4a98624cf841a619646f43ef877, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #20jjxbhjgkfhfd'
+    second: {fileID: 2100000, guid: 4199556db85a2754da665bc71d778b99, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 0
+    importBlendShapes: 0
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 90
+    normalImportMode: 0
+    tangentImportMode: 0
+    normalCalculationMode: 4
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

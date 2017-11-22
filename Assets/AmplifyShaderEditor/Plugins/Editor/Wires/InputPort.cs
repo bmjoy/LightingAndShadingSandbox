@@ -829,12 +829,17 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		public int CachedPropertyId
+		{
+			get { return m_cachedPropertyId; }
+		}
+
 		public bool InputNodeHasPreview()
 		{
 			return GetOutputNode( 0 ).HasPreviewShader;
 		}
 
-		public void SetPreviewInputTexture()
+		public void PreparePortCacheID()
 		{
 			if( m_propertyNameInt != PortId || string.IsNullOrEmpty( m_propertyName ) )
 			{
@@ -845,6 +850,11 @@ namespace AmplifyShaderEditor
 
 			if( m_cachedPropertyId == -1 )
 				m_cachedPropertyId = Shader.PropertyToID( m_propertyName );
+		}
+
+		public void SetPreviewInputTexture()
+		{
+			PreparePortCacheID();
 
 			if( (object)m_node == null )
 				m_node = UIUtils.GetNode( NodeId );
@@ -961,16 +971,7 @@ namespace AmplifyShaderEditor
 			Graphics.Blit( null, m_inputPreviewTexture, InputPreviewMaterial );
 			RenderTexture.active = temp;
 
-
-			if( m_propertyNameInt != PortId || string.IsNullOrEmpty( m_propertyName ) )
-			{
-				m_propertyNameInt = PortId;
-				m_propertyName = "_" + Convert.ToChar( PortId + 65 );
-				m_cachedPropertyId = Shader.PropertyToID( m_propertyName );
-			}
-
-			if( m_cachedPropertyId == -1 )
-				m_cachedPropertyId = Shader.PropertyToID( m_propertyName );
+			PreparePortCacheID();
 
 			if( (object)m_node == null )
 				m_node = UIUtils.GetNode( NodeId );

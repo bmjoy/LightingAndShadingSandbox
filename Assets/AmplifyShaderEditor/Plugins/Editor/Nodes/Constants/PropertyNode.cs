@@ -671,7 +671,7 @@ namespace AmplifyShaderEditor
 
 		public void RegisterFirstAvailablePropertyName( bool releaseOldOne )
 		{
-			if( m_lockRegister )
+			if( m_isNodeBeingCopied )
 				return;
 
 			if ( releaseOldOne )
@@ -917,7 +917,7 @@ namespace AmplifyShaderEditor
 			m_propertyNameIsDirty = true;
 			m_reRegisterName = false;
 
-			if( !m_lockRegister )
+			if( !m_isNodeBeingCopied )
 			{
 				UIUtils.ReleaseUniformName( UniqueId, m_oldName );
 				UIUtils.RegisterUniformName( UniqueId, m_propertyName );

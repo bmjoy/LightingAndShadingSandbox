@@ -1,12 +1,14 @@
+// Amplify Shader Editor - Visual Shader Editing Tool
+// Copyright (c) Amplify Creations, Lda <info@amplify.pt>
+
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System;
 
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Function Input", "Functions", "Function Input adds an input port to the shader function", NodeAvailabilityFlags = ( int ) NodeAvailability.ShaderFunction )]
+	[NodeAttributes( "Function Input", "Functions", "Function Input adds an input port to the shader function", NodeAvailabilityFlags = (int)NodeAvailability.ShaderFunction )]
 	public sealed class FunctionInput : ParentNode
 	{
 		private const string InputTypeStr = "Input Type";
@@ -37,7 +39,11 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private int m_orderIndex = -1;
 
-		public delegate string PortGeneration(ref MasterNodeDataCollector dataCollector, int index, ParentGraph graph);
+		private int m_typeId = -1;
+
+		public bool m_ignoreConnection = false;
+
+		public delegate string PortGeneration( ref MasterNodeDataCollector dataCollector, int index, ParentGraph graph );
 		public PortGeneration OnPortGeneration = null;
 
 		protected override void CommonInit( int uniqueId )
@@ -51,6 +57,26 @@ namespace AmplifyShaderEditor
 			SetTitleText( m_inputName );
 			UpdatePorts();
 			SetAdditonalTitleText( "( " + m_inputValueTypes[ m_selectedInputTypeInt ] + " )" );
+			m_previewShaderGUID = "04bc8e7b317dccb4d8da601680dd8140";
+		}
+
+		public override void SetPreviewInputs()
+		{
+			if( !m_ignoreConnection )
+				base.SetPreviewInputs();
+
+			if( m_typeId == -1 )
+				m_typeId = Shader.PropertyToID( "_Type" );
+
+			if( m_inputPorts[ 0 ].DataType == WirePortDataType.FLOAT || m_inputPorts[ 0 ].DataType == WirePortDataType.INT )
+				PreviewMaterial.SetInt( m_typeId, 1 );
+			else if( m_inputPorts[ 0 ].DataType == WirePortDataType.FLOAT2 )
+				PreviewMaterial.SetInt( m_typeId, 2 );
+			else if( m_inputPorts[ 0 ].DataType == WirePortDataType.FLOAT3 )
+				PreviewMaterial.SetInt( m_typeId, 3 );
+			else
+				PreviewMaterial.SetInt( m_typeId, 0 );
+
 		}
 
 		protected override void OnUniqueIDAssigned()
@@ -117,23 +143,23 @@ namespace AmplifyShaderEditor
 			EditorGUILayout.BeginVertical();
 			EditorGUI.BeginChangeCheck();
 			m_inputName = EditorGUILayoutTextField( "Name", m_inputName );
-			if ( EditorGUI.EndChangeCheck() )
+			if( EditorGUI.EndChangeCheck() )
 			{
 				SetTitleText( m_inputName );
 				UIUtils.UpdateFunctionInputData( UniqueId, m_inputName );
 			}
 			EditorGUI.BeginChangeCheck();
 			m_selectedInputTypeInt = EditorGUILayoutPopup( InputTypeStr, m_selectedInputTypeInt, m_inputValueTypes );
-			if ( EditorGUI.EndChangeCheck() )
+			if( EditorGUI.EndChangeCheck() )
 			{
 				UpdatePorts();
-				SetAdditonalTitleText( "( "+ m_inputValueTypes[ m_selectedInputTypeInt ]+" )" );
+				SetAdditonalTitleText( "( " + m_inputValueTypes[ m_selectedInputTypeInt ] + " )" );
 			}
 
 			m_autoCast = EditorGUILayoutToggle( "Auto Cast", m_autoCast );
 
 			EditorGUILayout.Separator();
-			if ( !m_inputPorts[ 0 ].IsConnected && m_inputPorts[ 0 ].ValidInternalData )
+			if( !m_inputPorts[ 0 ].IsConnected && m_inputPorts[ 0 ].ValidInternalData )
 			{
 				m_inputPorts[ 0 ].ShowInternalData( this, true, "Default Value" );
 			}
@@ -164,7 +190,7 @@ namespace AmplifyShaderEditor
 			//	//case 11: m_selectedInputType = WirePortDataType.SAMPLERCUBE; break;
 			//}
 
-			switch ( m_selectedInputTypeInt )
+			switch( m_selectedInputTypeInt )
 			{
 				case 0: m_selectedInputType = WirePortDataType.INT; break;
 				default:
@@ -182,7 +208,7 @@ namespace AmplifyShaderEditor
 			}
 
 			ChangeInputType( m_selectedInputType, false );
-			
+
 			//This node doesn't have any restrictions but changing types should be restricted to prevent invalid connections
 			m_outputPorts[ 0 ].ChangeTypeWithRestrictions( m_selectedInputType, PortCreateRestriction( m_selectedInputType ) );
 			m_sizeIsDirty = true;
@@ -192,7 +218,7 @@ namespace AmplifyShaderEditor
 		{
 			int restrictions = 0;
 			WirePortDataType[] types = null;
-			switch ( dataType )
+			switch( dataType )
 			{
 				case WirePortDataType.OBJECT:
 				break;
@@ -224,9 +250,9 @@ namespace AmplifyShaderEditor
 				break;
 			}
 
-			if ( types != null )
+			if( types != null )
 			{
-				for ( int i = 0; i < types.Length; i++ )
+				for( int i = 0; i < types.Length; i++ )
 				{
 					restrictions = restrictions | (int)types[ i ];
 				}
@@ -241,7 +267,7 @@ namespace AmplifyShaderEditor
 				return m_outputPorts[ outputId ].LocalValue;
 
 			string result = string.Empty;
-			if ( OnPortGeneration != null )
+			if( OnPortGeneration != null )
 				result = OnPortGeneration( ref dataCollector, m_orderIndex, ContainerGraph.ParentWindow.CustomGraph );
 			else
 				result = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );

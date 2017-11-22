@@ -217,26 +217,10 @@ namespace AmplifyShaderEditor
 
 		public void DrawFunctionInputs()
 		{
-			List<ParentNode> nodes = UIUtils.FunctionInputList();
+			List<FunctionInput> functionInputNodes = UIUtils.FunctionInputList();
 
-			if ( m_functionInputsReordableList == null || nodes.Count != m_functionInputsLastCount )
+			if ( m_functionInputsReordableList == null || functionInputNodes.Count != m_functionInputsLastCount )
 			{
-				//List<FunctionInput> functionInputNodes = new List<FunctionInput>();
-				//for ( int i = 0; i < nodes.Count; i++ )
-				//{
-				//	FunctionInput node = nodes[ i ] as FunctionInput;
-				//	if ( node != null )
-				//	{
-				//		functionInputNodes.Add( node );
-				//	}
-				//}
-
-				List<FunctionInput> functionInputNodes = new List<FunctionInput>();
-				foreach ( FunctionInput y in UIUtils.FunctionInputList() )
-				{
-					functionInputNodes.Add( y );
-				}
-
 				functionInputNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 
 				m_functionInputsReordableList = new ReorderableList( functionInputNodes, typeof( FunctionInput ), true, false, false, false );
@@ -275,20 +259,10 @@ namespace AmplifyShaderEditor
 
 		public void DrawFunctionOutputs()
 		{
-			List<ParentNode> nodes = UIUtils.FunctionOutputList();
+			List<FunctionOutput> functionOutputNodes = UIUtils.FunctionOutputList();
 
-			if ( m_functionOutputsReordableList == null || nodes.Count != m_functionOutputsLastCount )
+			if ( m_functionOutputsReordableList == null || functionOutputNodes.Count != m_functionOutputsLastCount )
 			{
-				List<FunctionOutput> functionOutputNodes = new List<FunctionOutput>();
-				for ( int i = 0; i < nodes.Count; i++ )
-				{
-					FunctionOutput node = nodes[ i ] as FunctionOutput;
-					if ( node != null )
-					{
-						functionOutputNodes.Add( node );
-					}
-				}
-
 				functionOutputNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 
 				m_functionOutputsReordableList = new ReorderableList( functionOutputNodes, typeof( FunctionOutput ), true, false, false, false );
@@ -327,20 +301,16 @@ namespace AmplifyShaderEditor
 
 		public void DrawFunctionProperties()
 		{
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
 			if ( m_propertyReordableList == null || nodes.Count != m_lastCount )
 			{
 				m_propertyReordableNodes.Clear();
 
 				for ( int i = 0; i < nodes.Count; i++ )
 				{
-					PropertyNode node = nodes[ i ] as PropertyNode;
-					if ( node != null )
-					{
-						ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
-						if ( ( rnode == null || !rnode.IsInside ) && ( !m_propertyReordableNodes.Exists( x => x.PropertyName.Equals( node.PropertyName ) ) ) )
-							m_propertyReordableNodes.Add( node );
-					}
+					ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
+					if ( ( rnode == null || !rnode.IsInside ) && ( !m_propertyReordableNodes.Exists( x => x.PropertyName.Equals( nodes[ i ].PropertyName ) ) ) )
+						m_propertyReordableNodes.Add( nodes[ i ] );
 				}
 
 				m_propertyReordableNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
@@ -380,26 +350,26 @@ namespace AmplifyShaderEditor
 
 		public void ForceReordering()
 		{
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
 			ReorderList( ref nodes );
 			//RecursiveLog();
 		}
 
 		private void RecursiveLog()
 		{
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
-			nodes.Sort( ( x, y ) => { return ( x as PropertyNode ).OrderIndex.CompareTo( ( y as PropertyNode ).OrderIndex ); } );
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
+			nodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 			for( int i = 0; i < nodes.Count; i++ )
 			{
 				if( ( nodes[ i ] is ReordenatorNode ) )
 					( nodes[ i ] as ReordenatorNode ).RecursiveLog();
 				else
-					Debug.Log( ( nodes[ i ] as PropertyNode ).OrderIndex + " " + ( nodes[ i ] as PropertyNode ).PropertyName );
+					Debug.Log( nodes[ i ].OrderIndex + " " + nodes[ i ].PropertyName );
 			}
 		}
 
 
-		private void ReorderList( ref List<ParentNode> nodes )
+		private void ReorderList( ref List<PropertyNode> nodes )
 		{
 			// clear lock list before reordering because of multiple sf being used
 			for( int i = 0; i < nodes.Count; i++ )

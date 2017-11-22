@@ -291,7 +291,7 @@ namespace AmplifyShaderEditor
 
 		protected bool m_dropdownEditing = false;
 
-		protected bool m_lockRegister = false;
+		protected bool m_isNodeBeingCopied = false;
 
 		public ParentNode()
 		{
@@ -2902,6 +2902,14 @@ namespace AmplifyShaderEditor
 			set { m_paddingTitleLeft += value; }
 		}
 
+		public int CachedPortsId
+		{
+			get
+			{
+				return m_cachedPortsId;
+			}
+		}
+
 		public virtual void RenderNodePreview()
 		{
 			//Runs at least one time
@@ -3150,6 +3158,12 @@ namespace AmplifyShaderEditor
 			set { m_spherePreview = value; }
 		}
 
+		public bool ShowPreview
+		{
+			get { return m_showPreview; }
+			set { m_showPreview = value; }
+		}
+
 		public bool InsideShaderFunction
 		{
 			get { return ContainerGraph != ContainerGraph.ParentWindow.CurrentGraph; }
@@ -3175,7 +3189,7 @@ namespace AmplifyShaderEditor
 
 		public virtual bool Contains( Vector2 pos ) { return m_globalPosition.Contains( pos ); }
 		public virtual bool Contains( Vector3 pos ) { return m_globalPosition.Contains( pos ); }
-		public bool LockRegister { get { return m_lockRegister; } set { m_lockRegister = value; } }
+		public bool IsNodeBeingCopied { get { return m_isNodeBeingCopied; } set { m_isNodeBeingCopied = value; } }
 
 		public virtual WirePortDataType GetInputPortVisualDataTypeByArrayIdx( int portArrayIdx )
 		{

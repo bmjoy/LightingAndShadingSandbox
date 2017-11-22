@@ -120,9 +120,9 @@ public class ShaderFunctionDetector : AssetPostprocessor
 			markForRefresh = false;
 			if( function != null )
 			{
-				IOUtils.UpdateShaderFunctionOnWindow( function );
+				IOUtils.UpdateSFandRefreshWindows( function );
 			}
-			UIUtils.CurrentWindow.RefreshAvaibleNodes();
+			UIUtils.CurrentWindow.LateRefreshAvailableNodes();
 		}
 	}
 }

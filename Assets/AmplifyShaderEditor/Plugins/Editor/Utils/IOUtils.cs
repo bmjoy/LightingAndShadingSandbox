@@ -281,10 +281,11 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public static void UpdateShaderFunctionOnWindow( AmplifyShaderFunction function )
+		public static void UpdateSFandRefreshWindows( AmplifyShaderFunction function )
 		{
 			for( int i = 0; i < AllOpenedWindows.Count; i++ )
 			{
+				AllOpenedWindows[ i ].LateRefreshAvailableNodes();
 				if( AllOpenedWindows[ i ].IsShaderFunctionWindow )
 				{
 					if( AllOpenedWindows[ i ].OpenedShaderFunction == function )

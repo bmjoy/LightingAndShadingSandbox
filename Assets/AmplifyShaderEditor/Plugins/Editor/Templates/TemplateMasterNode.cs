@@ -16,6 +16,9 @@ namespace AmplifyShaderEditor
 		private const string WarningMessage = "Templates is a feature that is still heavily under development and users may experience some problems.\nPlease email support@amplify.pt if any issue occurs.";
 		private const string CurrentTemplateLabel = "Current Template";
 		private const string OpenTemplateStr = "Edit Template";
+
+		private const string BlendModeStr = "Blend Mode";
+
 		//protected const string SnippetsFoldoutStr = " Snippets";
 		//[SerializeField]
 		//private bool m_snippetsFoldout = true;
@@ -33,6 +36,9 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private string m_templateName = string.Empty;
 
+		//[SerializeField]
+		//private TemplatesBlendModule m_blendOpHelper = new TemplatesBlendModule();
+
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -40,7 +46,7 @@ namespace AmplifyShaderEditor
 			m_marginPreviewLeft = 20;
 			m_insideSize.y = 60;
 		}
-		
+
 		public override void ReleaseResources()
 		{
 			if( m_currentTemplate != null && m_currentTemplate.AvailableShaderProperties != null )
@@ -53,11 +59,16 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-		
+
 		public override void OnEnable()
 		{
 			base.OnEnable();
 			m_reRegisterTemplateData = true;
+		}
+
+		void FetchInfoFromTemplate()
+		{
+			//m_blendOpHelper.ConfigureFromTemplateData( m_currentTemplate.BlendData );
 		}
 
 		void FetchCurrentTemplate()
@@ -68,16 +79,30 @@ namespace AmplifyShaderEditor
 				m_currentTemplate = TemplatesManager.GetTemplate( m_templateName );
 			}
 
-			if( m_currentTemplate != null && m_inputPorts.Count != m_currentTemplate.InputDataList.Count )
+			if( m_currentTemplate != null )
 			{
-				DeleteAllInputConnections( true );
-
-				List<TemplateInputData> inputDataList = m_currentTemplate.InputDataList;
-				int count = inputDataList.Count;
-				for( int i = 0; i < count; i++ )
+				if( m_inputPorts.Count != m_currentTemplate.InputDataList.Count )
 				{
-					AddInputPort( inputDataList[ i ].DataType, false, inputDataList[ i ].PortName, inputDataList[ i ].OrderId, inputDataList[ i ].PortCategory, inputDataList[ i ].PortUniqueId );
+					DeleteAllInputConnections( true );
+
+					List<TemplateInputData> inputDataList = m_currentTemplate.InputDataList;
+					int count = inputDataList.Count;
+					for( int i = 0; i < count; i++ )
+					{
+						AddInputPort( inputDataList[ i ].DataType, false, inputDataList[ i ].PortName, inputDataList[ i ].OrderId, inputDataList[ i ].PortCategory, inputDataList[ i ].PortUniqueId );
+					}
+					FetchInfoFromTemplate();
 				}
+				else
+				{
+					List<TemplateInputData> inputDataList = m_currentTemplate.InputDataList;
+					int count = inputDataList.Count;
+					for( int i = 0; i < count; i++ )
+					{
+						m_inputPorts[ i ].ChangeProperties( inputDataList[ i ].PortName, inputDataList[ i ].DataType, false );
+					}
+				}
+				
 			}
 		}
 
@@ -150,8 +175,9 @@ namespace AmplifyShaderEditor
 			m_fireTemplateChange = true;
 			m_templateGUID = newTemplate.GUID;
 			m_templateName = newTemplate.DefaultShaderName;
+			FetchInfoFromTemplate();
 		}
-		
+
 		void RegisterProperties()
 		{
 			if( m_currentTemplate != null )
@@ -181,13 +207,25 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-		
+
 		public override void DrawProperties()
 		{
 			base.DrawProperties();
 			bool generalIsVisible = EditorVariablesManager.ExpandedGeneralShaderOptions.Value;
 			NodeUtils.DrawPropertyGroup( ref generalIsVisible, GeneralFoldoutStr, DrawGeneralOptions );
 			EditorVariablesManager.ExpandedGeneralShaderOptions.Value = generalIsVisible;
+
+			//if( m_currentTemplate != null && m_currentTemplate.BlendData.ValidBlendMode )
+			//{
+			//	bool blendModeIsVisible = EditorVariablesManager.ExpandedBlendModeModule.Value;
+			//	NodeUtils.DrawPropertyGroup( ref blendModeIsVisible, BlendModeStr,
+			//	() =>
+			//	{
+			//		m_blendOpHelper.Draw( this );
+			//	} );
+			//	EditorVariablesManager.ExpandedBlendModeModule.Value = blendModeIsVisible;
+			//}
+
 			//	NodeUtils.DrawPropertyGroup( ref m_snippetsFoldout, SnippetsFoldoutStr, DrawSnippetOptions );
 			if( GUILayout.Button( OpenTemplateStr ) && m_currentTemplate != null )
 			{
@@ -232,7 +270,7 @@ namespace AmplifyShaderEditor
 					if( m_currentDataCollector.DirtySpecialLocalVariables )
 					{
 						string cleanVariables = m_currentDataCollector.SpecialLocalVariables.Replace( "\t", string.Empty );
-						m_currentDataCollector.AddInstructions( cleanVariables, false);
+						m_currentDataCollector.AddInstructions( cleanVariables, false );
 						m_currentDataCollector.ClearSpecialLocalVariables();
 					}
 
@@ -263,8 +301,7 @@ namespace AmplifyShaderEditor
 			}
 			return isValid;
 		}
-
-
+		
 		public override void OnNodeLayout( DrawInfo drawInfo )
 		{
 			if( m_currentTemplate == null )
@@ -279,7 +316,7 @@ namespace AmplifyShaderEditor
 				RegisterProperties();
 			}
 		}
-		
+
 		public override void Draw( DrawInfo drawInfo )
 		{
 			base.Draw( drawInfo );
@@ -304,7 +341,7 @@ namespace AmplifyShaderEditor
 				m_containerGraph.FireMasterNodeReplacedEvent();
 			}
 		}
-
+		
 		public override void UpdateFromShader( Shader newShader )
 		{
 			if( m_currentMaterial != null )
@@ -389,6 +426,18 @@ namespace AmplifyShaderEditor
 			validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.VertexDataId, ref shaderBody, m_currentDataCollector.VertexInputList.ToArray() ) && validBody;
 			validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.InterpDataId, ref shaderBody, m_currentDataCollector.InterpolatorList.ToArray() ) && validBody;
 
+			//if( m_currentTemplate.BlendData.ValidBlendMode )
+			//{
+			//	string blendMode = m_blendOpHelper.CurrentBlendFactor;
+			//	Debug.Log("Blend Mode: "+ blendMode );
+			//}
+			//
+			//if( m_currentTemplate.BlendData.ValidBlendOp )
+			//{
+			//	string blendOp = m_blendOpHelper.CurrentBlendOp;
+			//	Debug.Log( "Blend Op: " + blendOp );
+			//}
+
 			if( m_currentDataCollector.TemplateDataCollectorInstance.HasVertexInputParams )
 			{
 				validBody = m_currentTemplate.FillTemplateBody( TemplatesManager.TemplateInputsVertParamsTag, ref shaderBody, m_currentDataCollector.TemplateDataCollectorInstance.VertexInputParamsStr ) && validBody;
@@ -427,11 +476,11 @@ namespace AmplifyShaderEditor
 
 				string templateGUID = GetCurrentParam( ref nodeParams );
 				string templateShaderName = string.Empty;
-				if(UIUtils.CurrentShaderVersion() > 13601 )
+				if( UIUtils.CurrentShaderVersion() > 13601 )
 				{
 					templateShaderName = GetCurrentParam( ref nodeParams );
 				}
-				
+
 				TemplateData template = TemplatesManager.GetTemplate( templateGUID );
 				if( template != null )
 				{
@@ -449,6 +498,17 @@ namespace AmplifyShaderEditor
 						m_masterNodeCategory = -1;
 					}
 				}
+				
+				////BLEND MODULE
+				//if( m_currentTemplate.BlendData.ValidBlendMode )
+				//{
+				//	m_blendOpHelper.ReadBlendModeFromString( ref m_currentReadParamIdx, ref nodeParams );
+				//}
+				//
+				//if( m_currentTemplate.BlendData.ValidBlendOp )
+				//{
+				//	m_blendOpHelper.ReadBlendOpFromString( ref m_currentReadParamIdx, ref nodeParams );
+				//}
 			}
 			catch( Exception e )
 			{
@@ -461,6 +521,7 @@ namespace AmplifyShaderEditor
 		{
 			base.Destroy();
 			m_currentTemplate = null;
+			//m_blendOpHelper = null;
 		}
 
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
@@ -469,6 +530,17 @@ namespace AmplifyShaderEditor
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_shaderName );
 			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_currentTemplate != null ) ? m_currentTemplate.GUID : string.Empty );
 			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_currentTemplate != null ) ? m_currentTemplate.DefaultShaderName : string.Empty );
+			
+			////BLEND MODULE
+			//if( m_currentTemplate.BlendData.ValidBlendMode )
+			//{
+			//	m_blendOpHelper.WriteBlendModeToString( ref nodeInfo );
+			//}
+			//
+			//if( m_currentTemplate.BlendData.ValidBlendOp )
+			//{
+			//	m_blendOpHelper.WriteBlendOpToString( ref nodeInfo );
+			//}
 		}
 
 		public TemplateData CurrentTemplate { get { return m_currentTemplate; } }

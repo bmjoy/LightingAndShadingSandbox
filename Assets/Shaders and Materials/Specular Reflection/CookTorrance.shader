@@ -7,7 +7,7 @@ Shader "Pipeworks_Custom/Cook Torrance"
 		_base("Diffuse Color (RGB) Spec (A)", 2D) = "white" {}
 		_specularColor("Specular Color", Color) = (1,1,1,1)
 		_roughness("Roughness", Range(0.0, 1.0)) = 0
-		_schlick("Frensel Multiplier", Range(0.0, 1.0)) = 0
+		_fresnelPower("Frensel Power", Range(0.0, 1.0)) = 0
 		_normalMap("Normal", 2D) = "bump" {}
 		_normalScale("Normal Scale", Range(0 , 5)) = 1
 	}
@@ -36,7 +36,7 @@ Shader "Pipeworks_Custom/Cook Torrance"
 	uniform half4 _normalMap_ST;
 	uniform float _normalScale;
 	uniform fixed _roughness;
-	uniform fixed _schlick;
+	uniform fixed _fresnelPower;
 
 	struct app2vert
 	{
@@ -48,13 +48,13 @@ Shader "Pipeworks_Custom/Cook Torrance"
 
 	struct vert2frag
 	{
-		float4 pos 				: 	SV_POSITION;
-		fixed2 uvs : TEXCOORD0;
-		half3 tspace0			:	TEXCOORD1;
-		half3 tspace1			:	TEXCOORD2;
-		half3 tspace2			:	TEXCOORD3;
-		half3 posWorld			:	TEXCOORD4;
-		fixed3 viewDir : TEXCOORD5;
+		float4 pos 		: 	SV_POSITION;
+		fixed2 uvs		:	TEXCOORD0;
+		half3 tspace0	:	TEXCOORD1;
+		half3 tspace1	:	TEXCOORD2;
+		half3 tspace2	:	TEXCOORD3;
+		half3 posWorld	:	TEXCOORD4;
+		fixed3 viewDir	:	TEXCOORD5;
 
 		// The LIGHTING_COORDS macro (defined in AutoLight.cginc) defines the parameters needed to sample
 		// the shadow map. The (6,7) specifies which unused TEXCOORD semantics to hold the sampled values.
@@ -68,13 +68,33 @@ Shader "Pipeworks_Custom/Cook Torrance"
 		return saturate(dot(N, L));
 	}
 
-	// Valve Half-Lambert shading model (i.e. Lambert Wrap).
+	// Valve Half-Lambert lighting model (i.e. Lambert Wrap).
 	fixed halfLambert(fixed3 N, fixed3 L)
 	{
 		half wrapConst = 0.5;
 		half wrapped_NdotL = dot(N, L) * wrapConst + (1.0 - wrapConst);
 		wrapped_NdotL *= wrapped_NdotL;
 		return saturate( wrapped_NdotL );
+	}
+
+	// Calculate fresnel falloff using Schlick's approximation.
+	fixed fresnel(fixed3 V, fixed3 L, float P)
+	{
+		// Precalculate 1/2-vector
+		fixed3 halfV = normalize(V + L);
+
+		// Precalculate 1/2-vector falloff.
+		fixed hdotV = dot(halfV, V);
+
+		// Fresnel term at normal incidence
+		float F0 = pow((1.0f - (1.0f / 1.31f)), 2) / pow((1.0f + (1.0f / 1.31f)), 2);
+
+		// Calculate fresnel falloff using Schlick's approximation.
+		fixed base = 1.0 - hdotV;
+		float exponential = pow(base, P);
+		float fresnel = exponential + F0 * (1.0 - exponential);
+
+		return fresnel;
 	}
 
 	// Cook Torrance lighting.
@@ -117,14 +137,8 @@ Shader "Pipeworks_Custom/Cook Torrance"
 		fixed roughness = 1.0 / (4.0 * roughSq * ndotHQuad);
 		roughness *= exp((ndotHSq - 1) / (ndotHSq * roughSq));
 
-		// Calculate fresnel falloff using Schlick's approximation.
-		fixed fresnel = 1 - hdotV;
-		fresnel = fresnel * fresnel * fresnel * fresnel * fresnel;
-		fresnel *= (1 - _schlick);
-		fresnel += _schlick;
-
 		// Final specular calculation.
-		fixed specular = fresnel * shadow * roughness;
+		fixed specular = fresnel(V, L, _fresnelPower) * shadow * roughness;
 		specular /= (ndotV * ndotL);
 
 		return saturate(specular);

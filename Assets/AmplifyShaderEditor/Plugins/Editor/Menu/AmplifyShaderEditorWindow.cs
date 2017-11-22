@@ -135,7 +135,7 @@ namespace AmplifyShaderEditor
 		private bool m_forceAutoPanDir = false;
 		private bool m_refreshOnUndo = false;
 		private bool m_loadShaderOnSelection = false;
-
+		private bool m_refreshAvailableNodes = false;
 		private double m_time;
 
 		//Context Menu
@@ -1354,24 +1354,14 @@ namespace AmplifyShaderEditor
 				//m_nodeParametersWindow.ForceReordering();
 				m_mainGraphInstance.ResetNodesLocalVariables();
 
-				List<FunctionInput> functionInputNodes = new List<FunctionInput>();
-				foreach( FunctionInput y in UIUtils.FunctionInputList() )
-				{
-					functionInputNodes.Add( y );
-				}
-
+				List<FunctionInput> functionInputNodes = UIUtils.FunctionInputList();
 				functionInputNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 				for( int i = 0; i < functionInputNodes.Count; i++ )
 				{
 					functionInputNodes[ i ].OrderIndex = i;
 				}
 
-				List<FunctionOutput> functionOutputNodes = new List<FunctionOutput>();
-				foreach( FunctionOutput y in UIUtils.FunctionOutputList() )
-				{
-					functionOutputNodes.Add( y );
-				}
-
+				List<FunctionOutput> functionOutputNodes = UIUtils.FunctionOutputList();
 				functionOutputNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 				for( int i = 0; i < functionOutputNodes.Count; i++ )
 				{
@@ -2415,25 +2405,21 @@ namespace AmplifyShaderEditor
 
 		public bool SearchFunctionNodeRecursively( AmplifyShaderFunction function )
 		{
-			List<ParentNode> graphList = UIUtils.FunctionList();
+			List<FunctionNode> graphList = UIUtils.FunctionList();
 
 			bool nodeFind = false;
 
 			for( int i = 0; i < graphList.Count; i++ )
 			{
-				FunctionNode node = graphList[ i ] as FunctionNode;
-				if( node != null )
-				{
-					ParentGraph temp = CustomGraph;
-					CustomGraph = node.FunctionGraph;
-					nodeFind = SearchFunctionNodeRecursively( function );
-					CustomGraph = temp;
+				ParentGraph temp = CustomGraph;
+				CustomGraph = graphList[ i ].FunctionGraph;
+				nodeFind = SearchFunctionNodeRecursively( function );
+				CustomGraph = temp;
 
-					//Debug.Log( "tested = " + node.Function.FunctionName + " : " + function.FunctionName );
+				//Debug.Log( "tested = " + node.Function.FunctionName + " : " + function.FunctionName );
 
-					if( node.Function == function )
-						return true;
-				}
+				if( graphList[ i ].Function == function )
+					return true;
 			}
 
 			return nodeFind;
@@ -2933,12 +2919,12 @@ namespace AmplifyShaderEditor
 				return null;
 
 			ParentNode newNode = (ParentNode)ScriptableObject.CreateInstance( nodeType );
-			newNode.LockRegister = true;
+			newNode.IsNodeBeingCopied = true;
 			if( newNode != null )
 			{
 				newNode.ContainerGraph = m_mainGraphInstance;
 				newNode.ClipboardFullReadFromString( ref parameters );
-				newNode.LockRegister = false;
+				newNode.IsNodeBeingCopied = false;
 				m_mainGraphInstance.AddNode( newNode, true, true, true, false );
 				m_clipboard.CurrentClipboardStrData[ clipId ].NewNodeId = newNode.UniqueId;
 				return newNode;
@@ -3710,7 +3696,7 @@ namespace AmplifyShaderEditor
 							if( UIUtils.CurrentWindow.CurrentGraph.CurrentFunctionOutput == null )
 							{
 								//Fix in case a function output node is not marked as main node
-								UIUtils.CurrentWindow.CurrentGraph.AssignMasterNode( UIUtils.FunctionOutputList()[ 0 ] as FunctionOutput, false );
+								UIUtils.CurrentWindow.CurrentGraph.AssignMasterNode( UIUtils.FunctionOutputList()[ 0 ], false );
 							}
 
 							UIUtils.CurrentWindow.CurrentGraph.CurrentShaderFunction = shaderFunction;
@@ -3878,6 +3864,11 @@ namespace AmplifyShaderEditor
 			{
 				m_refreshOnUndo = false;
 				m_mainGraphInstance.RefreshOnUndo();
+			}
+
+			if( m_refreshAvailableNodes )
+			{
+				RefreshAvaibleNodes();
 			}
 
 			if( m_previousShaderFunction != CurrentGraph.CurrentShaderFunction )
@@ -4796,7 +4787,7 @@ namespace AmplifyShaderEditor
 					this.titleContent.text = GenerateTabTitle( m_mainGraphInstance.CurrentShader.name );
 				}
 			}
-		}	
+		}
 
 		public ParentGraph CustomGraph
 		{
@@ -4814,15 +4805,7 @@ namespace AmplifyShaderEditor
 				return m_mainGraphInstance;
 			}
 		}
-
-		public ParentGraph OutsideGraph
-		{
-			get
-			{
-				return m_mainGraphInstance;
-			}
-		}
-
+		
 		public void RefreshAvaibleNodes()
 		{
 			if( m_contextMenu != null && m_mainGraphInstance != null )
@@ -4830,8 +4813,16 @@ namespace AmplifyShaderEditor
 				m_contextMenu.RefreshNodes( m_mainGraphInstance );
 				m_paletteWindow.ForceUpdate = true;
 				m_contextPalette.ForceUpdate = true;
+				m_refreshAvailableNodes = false;
 			}
 		}
+
+		public void LateRefreshAvailableNodes()
+		{
+			m_refreshAvailableNodes = true;
+		}
+
+		public ParentGraph OutsideGraph { get { return m_mainGraphInstance; } }
 
 		public bool ShaderIsModified
 		{

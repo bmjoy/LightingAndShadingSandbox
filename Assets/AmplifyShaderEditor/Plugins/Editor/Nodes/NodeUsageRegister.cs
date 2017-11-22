@@ -4,20 +4,30 @@ using System.Collections.Generic;
 
 namespace AmplifyShaderEditor
 {
+	[Serializable] public class UsageListSamplerNodes : NodeUsageRegister<SamplerNode> { }
+	[Serializable] public class UsageListTexturePropertyNodes : NodeUsageRegister<TexturePropertyNode> { }
+	[Serializable] public class UsageListTextureArrayNodes : NodeUsageRegister<TextureArrayNode> { }
+	[Serializable] public class UsageListPropertyNodes : NodeUsageRegister<PropertyNode> { }
+	[Serializable] public class UsageListScreenColorNodes : NodeUsageRegister<ScreenColorNode> { }
+	[Serializable] public class UsageListRegisterLocalVarNodes : NodeUsageRegister<RegisterLocalVarNode> { }
+	[Serializable] public class UsageListFunctionInputNodes : NodeUsageRegister<FunctionInput> { }
+	[Serializable] public class UsageListFunctionNodes : NodeUsageRegister<FunctionNode> { }
+	[Serializable] public class UsageListFunctionOutputNodes : NodeUsageRegister<FunctionOutput> { }
+
 	[Serializable]
-	public class NodeUsageRegister
+	public class NodeUsageRegister<T> where T : ParentNode
 	{
 		// Sampler Nodes registry
 		[SerializeField]
-		private List<ParentNode> m_nodes;
+		private List<T> m_nodes;
 
 		[SerializeField]
 		private string[] m_nodesArr;
 
 		public NodeUsageRegister()
 		{
-			m_nodes = new List<ParentNode>();
-			m_nodesArr = new string[0];
+			m_nodesArr = new string[ 0 ];
+			m_nodes = new List<T>();
 		}
 
 		public void Destroy()
@@ -33,7 +43,7 @@ namespace AmplifyShaderEditor
 			m_nodes.Clear();
 		}
 
-		public int AddNode( ParentNode node )
+		public int AddNode( T node )
 		{
 			if ( !m_nodes.Contains( node ) )
 			{
@@ -44,7 +54,7 @@ namespace AmplifyShaderEditor
 			return -1;
 		}
 
-		public void RemoveNode( ParentNode node )
+		public void RemoveNode( T node )
 		{
 			if ( m_nodes.Contains( node ) )
 			{
@@ -63,7 +73,7 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public ParentNode GetNode( int idx )
+		public T GetNode( int idx )
 		{
 			if ( idx > -1 && idx < m_nodes.Count )
 			{
@@ -109,6 +119,6 @@ namespace AmplifyShaderEditor
 		}
 
 		public string[] NodesArr { get { return m_nodesArr; } }
-		public List<ParentNode> NodesList { get { return m_nodes; } }
+		public List<T> NodesList { get { return m_nodes; } }
 	}
 }

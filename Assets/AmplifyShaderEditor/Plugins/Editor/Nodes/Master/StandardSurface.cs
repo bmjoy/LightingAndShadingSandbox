@@ -652,20 +652,16 @@ namespace AmplifyShaderEditor
 			GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, ( EditorGUIUtility.isProSkin ? 0.5f : 0.25f ) );
 			EditorGUILayout.BeginVertical( UIUtils.MenuItemBackgroundStyle );
 			GUI.color = cachedColor;
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
 			if ( m_propertyReordableList == null || nodes.Count != m_lastCount )
 			{
 				m_propertyNodes.Clear();
 
 				for ( int i = 0; i < nodes.Count; i++ )
 				{
-					PropertyNode node = nodes[ i ] as PropertyNode;
-					if ( node != null )
-					{
-						ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
-						if ( ( rnode == null || !rnode.IsInside ) && ( !m_propertyNodes.Exists( x => x.PropertyName.Equals( node.PropertyName ) ) ) )
-							m_propertyNodes.Add( node );
-					}
+					ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
+					if ( ( rnode == null || !rnode.IsInside ) && ( !m_propertyNodes.Exists( x => x.PropertyName.Equals( nodes[ i ].PropertyName ) ) ) )
+						m_propertyNodes.Add( nodes[ i ] );
 				}
 
 				m_propertyNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
@@ -709,25 +705,25 @@ namespace AmplifyShaderEditor
 
 		public void ForceReordering()
 		{
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
 			ReorderList( ref nodes );
 			//RecursiveLog();
 		}
 
 		private void RecursiveLog()
 		{
-			List<ParentNode> nodes = UIUtils.PropertyNodesList();
-			nodes.Sort( ( x, y ) => { return ( x as PropertyNode ).OrderIndex.CompareTo( ( y as PropertyNode ).OrderIndex ); } );
+			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
+			nodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 			for( int i = 0; i < nodes.Count; i++ )
 			{
 				if( ( nodes[ i ] is ReordenatorNode ) )
 					( nodes[ i ] as ReordenatorNode ).RecursiveLog();
 				else
-					Debug.Log( ( nodes[ i ] as PropertyNode ).OrderIndex + " " + ( nodes[ i ] as PropertyNode ).PropertyName );
+					Debug.Log( nodes[ i ].OrderIndex + " " + nodes[ i ].PropertyName );
 			}
 		}
 
-		private void ReorderList( ref List<ParentNode> nodes )
+		private void ReorderList( ref List<PropertyNode> nodes )
 		{
 			// clear lock list before reordering because of multiple sf being used
 			for( int i = 0; i < nodes.Count; i++ )
@@ -1084,7 +1080,7 @@ namespace AmplifyShaderEditor
 				{
 					if ( m_translucencyReorder == null )
 					{
-						List<ParentNode> translucencyList = new List<ParentNode>();
+						List<PropertyNode> translucencyList = new List<PropertyNode>();
 						for ( int i = 0; i < 6; i++ )
 						{
 							translucencyList.Add( m_dummyProperty );
@@ -1108,7 +1104,7 @@ namespace AmplifyShaderEditor
 				{
 					if ( m_refractionReorder == null )
 					{
-						List<ParentNode> refractionList = new List<ParentNode>();
+						List<PropertyNode> refractionList = new List<PropertyNode>();
 						for ( int i = 0; i < 1; i++ )
 						{
 							refractionList.Add( m_dummyProperty );
@@ -1132,7 +1128,7 @@ namespace AmplifyShaderEditor
 				{
 					if ( m_tessellationReorder == null )
 					{
-						List<ParentNode> tessellationList = new List<ParentNode>();
+						List<PropertyNode> tessellationList = new List<PropertyNode>();
 						for ( int i = 0; i < 4; i++ )
 						{
 							tessellationList.Add( m_dummyProperty );
@@ -1752,7 +1748,10 @@ namespace AmplifyShaderEditor
 			}
 
 
-			if ( ( m_castShadows && m_alphaToCoverage ) || ( m_castShadows && hasOpacity ) || ( m_castShadows && ( m_currentDataCollector.UsingWorldNormal || m_currentDataCollector.UsingWorldReflection || m_currentDataCollector.UsingViewDirection ) ) )
+			if ( ( m_castShadows && m_alphaToCoverage ) || 
+				( m_castShadows && hasOpacity ) || 
+				( m_castShadows && ( m_currentDataCollector.UsingWorldNormal || m_currentDataCollector.UsingWorldReflection || m_currentDataCollector.UsingViewDirection ) ) || 
+				( m_castShadows && m_inputPorts[ m_discardPortId ].Available && m_inputPorts[ m_discardPortId ].IsConnected && m_currentLightModel == StandardShaderLightModel.CustomLighting) )
 				m_customShadowCaster = true;
 			else
 				m_customShadowCaster = false;
@@ -2413,6 +2412,12 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t\t" + outputStruct + " o;\n";
 						ShaderBody += "\t\t\t\tUNITY_INITIALIZE_OUTPUT( " + outputStruct + ", o )\n";
 						ShaderBody += "\t\t\t\tsurf( surfIN, o );\n";
+						if( m_inputPorts[ m_discardPortId ].IsConnected && m_inputPorts[ m_discardPortId ].Visible && m_currentLightModel == StandardShaderLightModel.CustomLighting )
+						{
+							ShaderBody += "\t\t\t\tUnityGI gi;\n";
+							ShaderBody += "\t\t\t\tUNITY_INITIALIZE_OUTPUT( UnityGI, gi );\n";
+							ShaderBody += "\t\t\t\tLightingStandardCustomLighting( o, worldViewDir, gi );\n";
+						}
 						ShaderBody += "\t\t\t\t#if defined( CAN_SKIP_VPOS )\n";
 						ShaderBody += "\t\t\t\tfloat2 vpos = IN.pos;\n";
 						ShaderBody += "\t\t\t\t#endif\n";

@@ -1,4 +1,13 @@
 Release Notes:
+v1.3.7 dev 07:
+* Improvements:
+    * Added Shader Function previews
+    * Improved node list update on current focused window when renaming a shader function
+
+* Fixes:
+    * Fixed issue on tabs node list not being updated with shader function renaming
+    * Fixed issue with opacity mask not working correctly in custom lighting mode
+
 v1.3.7 dev 05/06:
 * New Shader Functions:
     * Half Lambert Term

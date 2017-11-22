@@ -1,6 +1,9 @@
+// Amplify Shader Editor - Visual Shader Editing Tool
+// Copyright (c) Amplify Creations, Lda <info@amplify.pt>
+
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 namespace AmplifyShaderEditor
@@ -11,6 +14,9 @@ namespace AmplifyShaderEditor
 	{
 		public FunctionOutput() : base() { CommonInit(); }
 		public FunctionOutput( int uniqueId, float x, float y, float width, float height ) : base( uniqueId, x, y, width, height ) { CommonInit(); }
+
+		[SerializeField]
+		private bool m_previewNode = false;
 
 		[SerializeField]
 		private string m_outputName = "Output";
@@ -35,7 +41,10 @@ namespace AmplifyShaderEditor
 			m_textLabelWidth = 100;
 			m_autoWrapProperties = true;
 			AddInputPort( WirePortDataType.FLOAT, false, "  " );
+			AddOutputPort( WirePortDataType.FLOAT, "  " );
+			m_outputPorts[ 0 ].Visible = false;
 			SetTitleText( m_outputName );
+			m_previewShaderGUID = "e6d5f64114b18e24f99dc65290c0fe98";
 		}
 
 		public override void SetupNodeCategories()
@@ -77,12 +86,14 @@ namespace AmplifyShaderEditor
 		{
 			base.OnInputPortConnected( portId, otherNodeId, otherPortId, activateNode );
 			m_inputPorts[ 0 ].MatchPortToConnection();
+			m_outputPorts[ 0 ].ChangeType( m_inputPorts[ 0 ].DataType, false );
 		}
 
 		public override void OnConnectedOutputNodeChanges( int outputPortId, int otherNodeId, int otherPortId, string name, WirePortDataType type )
 		{
 			base.OnConnectedOutputNodeChanges( outputPortId, otherNodeId, otherPortId, name, type );
 			m_inputPorts[ 0 ].MatchPortToConnection();
+			m_outputPorts[ 0 ].ChangeType( m_inputPorts[ 0 ].DataType, false );
 		}
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
@@ -95,12 +106,34 @@ namespace AmplifyShaderEditor
 		{
 			base.DrawProperties();
 			EditorGUI.BeginChangeCheck();
-			m_outputName = EditorGUILayout.TextField( "Name", m_outputName );
-			if ( EditorGUI.EndChangeCheck() )
+			m_outputName = EditorGUILayoutTextField( "Name", m_outputName );
+
+			if( EditorGUI.EndChangeCheck() )
 			{
 				SetTitleText( m_outputName );
 				UIUtils.UpdateFunctionOutputData( UniqueId, m_outputName );
 			}
+
+			EditorGUI.BeginDisabledGroup( m_previewNode );
+			if( GUILayout.Button( "Set as Preview" ) )
+			{
+				List<FunctionOutput> allOutputs = UIUtils.FunctionOutputList();
+
+				foreach( FunctionOutput item in allOutputs )
+					item.PreviewNode = false;
+
+				m_previewNode = true;
+			}
+			EditorGUI.EndDisabledGroup();
+		}
+
+		public override void Draw( DrawInfo drawInfo )
+		{
+			base.Draw( drawInfo );
+			if( m_previewNode )
+				m_additionalContent.text = "Preview";
+			else
+				m_additionalContent.text = "";
 		}
 
 		public WirePortDataType AutoOutputType
@@ -113,6 +146,7 @@ namespace AmplifyShaderEditor
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_outputName );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_orderIndex );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_previewNode );
 		}
 
 		public override void ReadFromString( ref string[] nodeParams )
@@ -121,7 +155,13 @@ namespace AmplifyShaderEditor
 			m_outputName = GetCurrentParam( ref nodeParams );
 			m_orderIndex = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
 
-			if ( m_function == null )
+			if( UIUtils.CurrentShaderVersion() > 13706 )
+				m_previewNode = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
+
+			if( IsNodeBeingCopied )
+				PreviewNode = false;
+
+			if( m_function == null )
 				m_function = UIUtils.CurrentWindow.OpenedShaderFunction;
 			SetTitleText( m_outputName );
 			UIUtils.UpdateFunctionOutputData( UniqueId, m_outputName );
@@ -136,6 +176,24 @@ namespace AmplifyShaderEditor
 		{
 			get { return m_orderIndex; }
 			set { m_orderIndex = value; }
+		}
+
+		public bool PreviewNode
+		{
+			get { return m_previewNode; }
+			set
+			{
+				m_previewNode = value;
+				m_sizeIsDirty = true;
+				if( m_previewNode )
+				{
+					m_additionalContent.text = "Preview";
+				}
+				else
+				{
+					m_additionalContent.text = "";
+				}
+			}
 		}
 	}
 }

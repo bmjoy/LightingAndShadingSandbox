@@ -21,9 +21,18 @@ Shader "Pipeworks_Custom/Lambert"
 		#include "UnityShaderVariables.cginc"
 		#include "Lighting.cginc"
 		#pragma target 3.0
+		#ifdef UNITY_PASS_SHADOWCASTER
+			#undef INTERNAL_DATA
+			#undef WorldReflectionVector
+			#undef WorldNormalVector
+			#define INTERNAL_DATA half3 internalSurfaceTtoW0; half3 internalSurfaceTtoW1; half3 internalSurfaceTtoW2;
+			#define WorldReflectionVector(data,normal) reflect (data.worldRefl, half3(dot(data.internalSurfaceTtoW0,normal), dot(data.internalSurfaceTtoW1,normal), dot(data.internalSurfaceTtoW2,normal)))
+			#define WorldNormalVector(data,normal) fixed3(dot(data.internalSurfaceTtoW0,normal), dot(data.internalSurfaceTtoW1,normal), dot(data.internalSurfaceTtoW2,normal))
+		#endif
 		struct Input
 		{
 			float3 worldNormal;
+			INTERNAL_DATA
 			float3 worldPos;
 			float2 uv_texcoord;
 		};
@@ -58,11 +67,17 @@ Shader "Pipeworks_Custom/Lambert"
 			float3 ase_lightAttenRGB = gi.light.color / ( ( _LightColor0.rgb ) + 0.000001 );
 			float ase_lightAtten = max( max( ase_lightAttenRGB.r, ase_lightAttenRGB.g ), ase_lightAttenRGB.b );
 			#endif
+			float3 newWorldNormal2_g46 = WorldNormalVector( i , float3(0,0,1) );
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
-			float dotResult3_g47 = dot( i.worldNormal , ase_worldlightDir );
+			float dotResult3_g47 = dot( newWorldNormal2_g46 , ase_worldlightDir );
+			float3 normalizeResult31_g46 = normalize( newWorldNormal2_g46 );
+			UnityGI gi28_g46 = gi;
+			gi28_g46 = UnityGI_Base( data, 1, normalizeResult31_g46 );
+			float3 indirectDiffuse28_g46 = gi28_g46.indirect.diffuse;
 			float2 uv_BaseRGB = i.uv_texcoord * _BaseRGB_ST.xy + _BaseRGB_ST.zw;
-			c.rgb = saturate( ( saturate( max( dotResult3_g47 , 0.0 ) ) * (_BaseTint).rgb * ((tex2D( _BaseRGB, uv_BaseRGB )).rgb).xyz * _LightColor0.rgb * ase_lightAtten ) );
+			float4 temp_output_14_0_g46 = tex2D( _BaseRGB, uv_BaseRGB );
+			c.rgb = saturate( ( ( ( saturate( max( dotResult3_g47 , 0.0 ) ) * ( _LightColor0.rgb * ase_lightAtten ) ) + indirectDiffuse28_g46 ) * (_BaseTint).rgb * (temp_output_14_0_g46).rgb ) );
 			c.a = 1;
 			return c;
 		}
@@ -75,6 +90,7 @@ Shader "Pipeworks_Custom/Lambert"
 		void surf( Input i , inout SurfaceOutputCustomLightingCustom o )
 		{
 			o.SurfInput = i;
+			o.Normal = float3(0,0,1);
 		}
 
 		ENDCG
@@ -104,8 +120,9 @@ Shader "Pipeworks_Custom/Lambert"
 			struct v2f
 			{
 				V2F_SHADOW_CASTER;
-				float3 worldPos : TEXCOORD6;
-				float3 worldNormal : TEXCOORD1;
+				float4 tSpace0 : TEXCOORD1;
+				float4 tSpace1 : TEXCOORD2;
+				float4 tSpace2 : TEXCOORD3;
 				float4 texcoords01 : TEXCOORD4;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
@@ -117,9 +134,13 @@ Shader "Pipeworks_Custom/Lambert"
 				UNITY_TRANSFER_INSTANCE_ID( v, o );
 				float3 worldPos = mul( unity_ObjectToWorld, v.vertex ).xyz;
 				fixed3 worldNormal = UnityObjectToWorldNormal( v.normal );
-				o.worldNormal = worldNormal;
+				fixed3 worldTangent = UnityObjectToWorldDir( v.tangent.xyz );
+				fixed tangentSign = v.tangent.w * unity_WorldTransformParams.w;
+				fixed3 worldBinormal = cross( worldNormal, worldTangent ) * tangentSign;
+				o.tSpace0 = float4( worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x );
+				o.tSpace1 = float4( worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y );
+				o.tSpace2 = float4( worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z );
 				o.texcoords01 = float4( v.texcoord.xy, v.texcoord1.xy );
-				o.worldPos = worldPos;
 				TRANSFER_SHADOW_CASTER_NORMALOFFSET( o )
 				return o;
 			}
@@ -133,10 +154,13 @@ Shader "Pipeworks_Custom/Lambert"
 				Input surfIN;
 				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
 				surfIN.uv_texcoord.xy = IN.texcoords01.xy;
-				float3 worldPos = IN.worldPos;
+				float3 worldPos = float3( IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w );
 				fixed3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
 				surfIN.worldPos = worldPos;
-				surfIN.worldNormal = IN.worldNormal;
+				surfIN.worldNormal = float3( IN.tSpace0.z, IN.tSpace1.z, IN.tSpace2.z );
+				surfIN.internalSurfaceTtoW0 = IN.tSpace0.xyz;
+				surfIN.internalSurfaceTtoW1 = IN.tSpace1.xyz;
+				surfIN.internalSurfaceTtoW2 = IN.tSpace2.xyz;
 				SurfaceOutputCustomLightingCustom o;
 				UNITY_INITIALIZE_OUTPUT( SurfaceOutputCustomLightingCustom, o )
 				surf( surfIN, o );
@@ -154,9 +178,9 @@ Shader "Pipeworks_Custom/Lambert"
 /*ASEBEGIN
 Version=13706
 1953;34;1796;1125;1315.486;240.9391;1;True;False
-Node;AmplifyShaderEditor.SamplerNode;5;-751.454,69.267;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
 Node;AmplifyShaderEditor.ColorNode;6;-700.365,252.601;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;51;-441.486,154.0609;Float;False;Lambert;-1;;46;219de6595bdc9994abce6a464acc9397;4;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;1;FLOAT3
+Node;AmplifyShaderEditor.SamplerNode;5;-751.454,69.267;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.FunctionNode;51;-441.486,154.0609;Float;False;Lambert;-1;;46;219de6595bdc9994abce6a464acc9397;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
 Node;AmplifyShaderEditor.SaturateNode;50;-115.486,154.0609;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;16;56.1386,107.3465;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;14;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;51;0;5;0
@@ -164,4 +188,4 @@ WireConnection;51;1;6;0
 WireConnection;50;0;51;0
 WireConnection;16;2;50;0
 ASEEND*/
-//CHKSM=0576645B3BAA14D277ACDC908E98754C73ACFE7C
+//CHKSM=24F878183033E97A91C482B3A46B61E26DA8F36A

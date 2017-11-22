@@ -57,32 +57,31 @@ namespace AmplifyShaderEditor
 
 		// Sampler Nodes registry
 		[SerializeField]
-		private NodeUsageRegister m_samplerNodes;
+		private UsageListSamplerNodes m_samplerNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_texturePropertyNodes;
+		private UsageListTexturePropertyNodes m_texturePropertyNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_textureArrayNodes;
-
-		// Screen Color Nodes registry
-		[SerializeField]
-		private NodeUsageRegister m_screenColorNodes;
+		private UsageListTextureArrayNodes m_textureArrayNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_localVarNodes;
+		private UsageListPropertyNodes m_propertyNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_propertyNodes;
+		private UsageListScreenColorNodes m_screenColorNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_functionInputNodes;
+		private UsageListRegisterLocalVarNodes m_localVarNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_functionNodes;
+		private UsageListFunctionInputNodes m_functionInputNodes;
 
 		[SerializeField]
-		private NodeUsageRegister m_functionOutputNodes;
+		private UsageListFunctionNodes m_functionNodes;
+
+		[SerializeField]
+		private UsageListFunctionOutputNodes m_functionOutputNodes;
 
 		[SerializeField]
 		private int m_masterNodeId = Constants.INVALID_NODE_ID;
@@ -154,15 +153,15 @@ namespace AmplifyShaderEditor
 			m_normalDependentCount = 0;
 			m_nodeGrid = new NodeGrid();
 			m_nodes = new List<ParentNode>();
-			m_samplerNodes = new NodeUsageRegister();
-			m_propertyNodes = new NodeUsageRegister();
-			m_functionInputNodes = new NodeUsageRegister();
-			m_functionNodes = new NodeUsageRegister();
-			m_functionOutputNodes = new NodeUsageRegister();
-			m_texturePropertyNodes = new NodeUsageRegister();
-			m_textureArrayNodes = new NodeUsageRegister();
-			m_screenColorNodes = new NodeUsageRegister();
-			m_localVarNodes = new NodeUsageRegister();
+			m_samplerNodes = new UsageListSamplerNodes();
+			m_texturePropertyNodes = new UsageListTexturePropertyNodes();
+			m_textureArrayNodes = new UsageListTextureArrayNodes();
+			m_propertyNodes = new UsageListPropertyNodes();
+			m_screenColorNodes = new UsageListScreenColorNodes();
+			m_localVarNodes = new UsageListRegisterLocalVarNodes();
+			m_functionInputNodes = new UsageListFunctionInputNodes();
+			m_functionNodes = new UsageListFunctionNodes();
+			m_functionOutputNodes = new UsageListFunctionOutputNodes();
 
 			m_selectedNodes = new List<ParentNode>();
 			m_markedForDeletion = new List<ParentNode>();
@@ -2171,15 +2170,11 @@ namespace AmplifyShaderEditor
 		{
 			if( CurrentOutputNode != null )
 				CurrentOutputNode.GenerateSignalPropagation();
-			List<ParentNode> localVarNodes = m_localVarNodes.NodesList;
+			List<RegisterLocalVarNode> localVarNodes = m_localVarNodes.NodesList;
 			int count = localVarNodes.Count;
 			for( int i = 0; i < count; i++ )
 			{
-				SignalGeneratorNode node = localVarNodes[ i ] as SignalGeneratorNode;
-				if( node != null )
-				{
-					node.GenerateSignalPropagation();
-				}
+				localVarNodes[ i ].GenerateSignalPropagation();
 			}
 		}
 
@@ -2395,6 +2390,9 @@ namespace AmplifyShaderEditor
 		{
 			m_afterDeserializeFlag = true;
 		}
+
+		[SerializeField]
+		private List<ParentNode> m_serializedProp;
 
 		public void CleanCorruptedNodes()
 		{
@@ -2735,15 +2733,15 @@ namespace AmplifyShaderEditor
 		}
 
 		public bool HasUnConnectedNodes { get { return m_hasUnConnectedNodes; } }
-		public NodeUsageRegister SamplerNodes { get { return m_samplerNodes; } }
-		public NodeUsageRegister TexturePropertyNodes { get { return m_texturePropertyNodes; } }
-		public NodeUsageRegister TextureArrayNodes { get { return m_textureArrayNodes; } }
-		public NodeUsageRegister PropertyNodes { get { return m_propertyNodes; } }
-		public NodeUsageRegister FunctionInputNodes { get { return m_functionInputNodes; } }
-		public NodeUsageRegister FunctionNodes { get { return m_functionNodes; } }
-		public NodeUsageRegister FunctionOutputNodes { get { return m_functionOutputNodes; } }
-		public NodeUsageRegister ScreenColorNodes { get { return m_screenColorNodes; } }
-		public NodeUsageRegister LocalVarNodes { get { return m_localVarNodes; } }
+		public UsageListSamplerNodes SamplerNodes { get { return m_samplerNodes; } }
+		public UsageListTexturePropertyNodes TexturePropertyNodes { get { return m_texturePropertyNodes; } }
+		public UsageListTextureArrayNodes TextureArrayNodes { get { return m_textureArrayNodes; } }
+		public UsageListPropertyNodes PropertyNodes { get { return m_propertyNodes; } }
+		public UsageListScreenColorNodes ScreenColorNodes { get { return m_screenColorNodes; } }
+		public UsageListRegisterLocalVarNodes LocalVarNodes { get { return m_localVarNodes; } }
+		public UsageListFunctionInputNodes FunctionInputNodes { get { return m_functionInputNodes; } }
+		public UsageListFunctionNodes FunctionNodes { get { return m_functionNodes; } }
+		public UsageListFunctionOutputNodes FunctionOutputNodes { get { return m_functionOutputNodes; } }
 		public PrecisionType CurrentPrecision
 		{
 			get { return m_currentPrecision; }

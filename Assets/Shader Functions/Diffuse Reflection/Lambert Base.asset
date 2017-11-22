@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Lambert Base
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=13707\n1953;34;1796;1125;1243;575.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;8;-470,-142.5;Float;False;451;156;N
+    dot L;3;7;4;3;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.SaturateNode;7;-181,-92.5;Float;False;1;0;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.DotProductOpNode;3;-451,-92.5;Float;False;2;0;FLOAT3;0.0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT\nNode;AmplifyShaderEditor.SimpleMaxOpNode;4;-316,-92.5;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;1;-682,-124.5;Float;False;World
+    Normal;3;1;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionInput;2;-733,-53.5;Float;False;World
+    Space Light Dir;3;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.FunctionOutput;0;48,-98;Float;False;True;Lambert;0;True;1;0;FLOAT;0.0;False;1;FLOAT\nWireConnection;7;0;4;0\nWireConnection;3;0;1;0\nWireConnection;3;1;2;0\nWireConnection;4;0;3;0\nWireConnection;0;0;7;0\nASEEND*/\n//CHKSM=C3EB3AF21DF36B55B42D599C1CBA775887F2EB73"
+  m_functionName: 
+  m_description: Calculates Lambert shading given the world normal N and the world
+    space light direction L.
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_nodeCategory: 3
+  m_customNodeCategory: 

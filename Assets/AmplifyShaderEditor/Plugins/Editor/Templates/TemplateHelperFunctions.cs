@@ -61,20 +61,20 @@ namespace AmplifyShaderEditor
 	}
 
 	[Serializable]
-	public class BlendData
+	public class TemplateBlendData
 	{
 		public bool ValidBlendMode = false;
 		public bool SeparateBlendFactors = false;
-		public AvailableBlendFactor SourceFactorRGB;
-		public AvailableBlendFactor DestFactorRGB;
+		public AvailableBlendFactor SourceFactorRGB = AvailableBlendFactor.SrcAlpha;
+		public AvailableBlendFactor DestFactorRGB = AvailableBlendFactor.OneMinusSrcAlpha;
 
-		public AvailableBlendFactor SourceFactorA;
-		public AvailableBlendFactor DestFactorA;
+		public AvailableBlendFactor SourceFactorAlpha = AvailableBlendFactor.SrcAlpha;
+		public AvailableBlendFactor DestFactorAlpha = AvailableBlendFactor.OneMinusSrcAlpha;
 
 		public bool ValidBlendOp = false;
 		public bool SeparateBlendOps = false;
-		public AvailableBlendOps BlendOpRGB;
-		public AvailableBlendOps BlendOpA;
+		public AvailableBlendOps BlendOpRGB = AvailableBlendOps.OFF;
+		public AvailableBlendOps BlendOpAlpha = AvailableBlendOps.OFF;
 	}
 
 	public class TemplateHelperFunctions
@@ -231,10 +231,10 @@ namespace AmplifyShaderEditor
 		//public static readonly string PropertiesPattern = @"(\w*)\s*\(\s*\""([\w ] *)\""\s*\,\s*(\w*)\s*.*\)";
 		public static readonly string PropertiesPatternB = "(\\w*)\\s*\\(\\s*\"([\\w ]*)\"\\s*\\,\\s*(\\w*)\\s*.*\\)";
 
-		public static readonly string CullModePattern = "^\\s*(?:Cull\\s*)*(\\w+)";
-		public static readonly string ColorMaskPattern = "^\\s*(?:ColorMask\\s*)*(\\w+)";
-		public static readonly string BlendModePattern = "\\s*Blend\\s+(\\w+)\\s+(\\w+)(?:[\\s,]+(\\w+)\\s+(\\w+)|)";
-		public static readonly string BlendOpPattern = "\\s*BlendOp\\s+(\\w+)[\\s,]*(\\w+)";
+		public static readonly string CullModePattern = @"^\s*(?:Cull\s*)*(\w+)";
+		public static readonly string ColorMaskPattern = @"^\s*(?:ColorMask\s*)*(\w+)";
+		public static readonly string BlendModePattern = @"\s*Blend\s+(\w+)\s+(\w+)(?:[\s,]+(\w+)\s+(\w+)|)";
+		public static readonly string BlendOpPattern = @"\s*BlendOp\s+(\w+)[\s,]*(?:(\w+)|)";
 
 
 		public static readonly string ShaderGlobalsOverallPattern = @"[\}\#][\w\s\;\/\*]*\/\*ase_globals\*\/";
@@ -310,10 +310,10 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-		
-		public static BlendData CreateBlendMode( string blendModeData )
+
+		public static void CreateBlendMode( string blendModeData, ref TemplateBlendData blendData )
 		{
-			BlendData blendData = new BlendData();
+			// TODO: OPTIMIZE REGEX EXPRESSIONS TO NOT CATCH EMPTY GROUPS 
 			foreach( Match match in Regex.Matches( blendModeData, BlendModePattern ) )
 			{
 				if( match.Groups.Count == 3 )
@@ -335,18 +335,26 @@ namespace AmplifyShaderEditor
 					break;
 				}
 				else if( match.Groups.Count == 5 )
-				{	
+				{
 					try
 					{
 						AvailableBlendFactor sourceRGB = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 1 ].Value );
-						AvailableBlendFactor destRGB = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 2 ].Value );
-						AvailableBlendFactor sourceA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 3 ].Value );
-						AvailableBlendFactor destA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 4 ].Value );
-						blendData.SeparateBlendFactors = true;
 						blendData.SourceFactorRGB = sourceRGB;
+						AvailableBlendFactor destRGB = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 2 ].Value );
 						blendData.DestFactorRGB = destRGB;
-						blendData.SourceFactorA = sourceA;
-						blendData.DestFactorA = destA;
+
+						if( match.Groups[ 3 ].Success && match.Groups[ 4 ].Success )
+						{
+							AvailableBlendFactor sourceA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 3 ].Value );
+							blendData.SourceFactorAlpha = sourceA;
+							AvailableBlendFactor destA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 4 ].Value );
+							blendData.DestFactorAlpha = destA;
+							blendData.SeparateBlendFactors = true;
+						}
+						else
+						{
+							blendData.SeparateBlendFactors = false;
+						}
 						blendData.ValidBlendMode = true;
 					}
 					catch( Exception e )
@@ -357,7 +365,56 @@ namespace AmplifyShaderEditor
 					break;
 				}
 			}
-			return blendData;
+		}
+
+		public static void CreateBlendOp( string blendOpData, ref TemplateBlendData blendData )
+		{
+			// TODO: OPTIMIZE REGEX EXPRESSIONS TO NOT CATCH EMPTY GROUPS 
+			foreach( Match match in Regex.Matches( blendOpData, BlendOpPattern,RegexOptions.None) )
+			{
+				if( match.Groups.Count == 2 )
+				{
+					try
+					{
+						AvailableBlendOps blendOpsAll = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 1 ].Value );
+						blendData.SeparateBlendOps = false;
+						blendData.ValidBlendOp = true;
+						blendData.BlendOpRGB = blendOpsAll;
+					}
+					catch( Exception e )
+					{
+						Debug.LogException( e );
+						blendData.ValidBlendOp = false;
+					}
+					break;
+				}
+				else if( match.Groups.Count == 3 )
+				{
+					try
+					{
+						AvailableBlendOps blendOpsRGB = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 1 ].Value );
+						blendData.BlendOpRGB = blendOpsRGB;
+						if( match.Groups[ 2 ].Success )
+						{
+							AvailableBlendOps blendOpsA = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 2 ].Value );
+							blendData.BlendOpAlpha = blendOpsA;
+							blendData.SeparateBlendOps = true;
+						}
+						else
+						{
+							blendData.SeparateBlendOps = false;
+						}
+						
+						blendData.ValidBlendOp = true;
+					}
+					catch( Exception e )
+					{
+						Debug.LogException( e );
+						blendData.ValidBlendOp = false;
+					}
+					break;
+				}
+			}
 		}
 
 		public static List<TemplateVertexData> CreateVertexDataList( string vertexData, string parametersBody )

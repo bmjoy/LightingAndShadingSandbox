@@ -2158,7 +2158,7 @@ namespace AmplifyShaderEditor
 		public static void RegisterSamplerNode( SamplerNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.SamplerNodes.AddNode( node ); } }
 		public static void UnregisterSamplerNode( SamplerNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.SamplerNodes.RemoveNode( node ); } }
 		public static string[] SamplerNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.SamplerNodes.NodesArr; } return null; }
-		public static SamplerNode GetSamplerNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.SamplerNodes.GetNode( idx ) as SamplerNode; } return null; }
+		public static SamplerNode GetSamplerNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.SamplerNodes.GetNode( idx ); } return null; }
 		public static void UpdateSamplerDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.SamplerNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static int GetSamplerNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.SamplerNodes.GetNodeRegisterId( uniqueId ); } return -1; }
 		public static int GetSamplerNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.SamplerNodes.NodesList.Count; } return -1; }
@@ -2167,7 +2167,7 @@ namespace AmplifyShaderEditor
 		public static void RegisterTexturePropertyNode( TexturePropertyNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TexturePropertyNodes.AddNode( node ); } }
 		public static void UnregisterTexturePropertyNode( TexturePropertyNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TexturePropertyNodes.RemoveNode( node ); } }
 		public static string[] TexturePropertyNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TexturePropertyNodes.NodesArr; } return null; }
-		public static TexturePropertyNode GetTexturePropertyNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TexturePropertyNodes.GetNode( idx ) as TexturePropertyNode; } return null; }
+		public static TexturePropertyNode GetTexturePropertyNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TexturePropertyNodes.GetNode( idx ); } return null; }
 		public static void UpdateTexturePropertyDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TexturePropertyNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static int GetTexturePropertyNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TexturePropertyNodes.GetNodeRegisterId( uniqueId ); } return -1; }
 		public static int GetTexturePropertyNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TexturePropertyNodes.NodesList.Count; } return -1; }
@@ -2176,7 +2176,7 @@ namespace AmplifyShaderEditor
 		public static void RegisterTextureArrayNode( TextureArrayNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TextureArrayNodes.AddNode( node ); } }
 		public static void UnregisterTextureArrayNode( TextureArrayNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TextureArrayNodes.RemoveNode( node ); } }
 		public static string[] TextureArrayNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TextureArrayNodes.NodesArr; } return null; }
-		public static TextureArrayNode GetTextureArrayNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TextureArrayNodes.GetNode( idx ) as TextureArrayNode; } return null; }
+		public static TextureArrayNode GetTextureArrayNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TextureArrayNodes.GetNode( idx ); } return null; }
 		public static void UpdateTextureArrayDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.TextureArrayNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static int GetTextureArrayNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TextureArrayNodes.GetNodeRegisterId( uniqueId ); } return -1; }
 		public static int GetTextureArrayNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.TextureArrayNodes.NodesList.Count; } return -1; }
@@ -2185,35 +2185,35 @@ namespace AmplifyShaderEditor
 		public static void RegisterPropertyNode( PropertyNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.PropertyNodes.AddNode( node ); } }
 		public static void UnregisterPropertyNode( PropertyNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.PropertyNodes.RemoveNode( node ); } }
 		public static string[] PropertyNodeNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.NodesArr; } return null; }
-		public static PropertyNode GetPropertyNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.GetNode( idx ) as PropertyNode; } return null; }
+		public static PropertyNode GetPropertyNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.GetNode( idx ); } return null; }
 		public static void UpdatePropertyDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.PropertyNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static int GetPropertyNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.GetNodeRegisterId( uniqueId ); } return -1; }
-		public static List<ParentNode> PropertyNodesList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.NodesList; } return null; }
+		public static List<PropertyNode> PropertyNodesList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.NodesList; } return null; }
 		public static int GetPropertyNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.PropertyNodes.NodesList.Count; } return -1; }
 
 		// Function Inputs
 		public static void RegisterFunctionInputNode( FunctionInput node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionInputNodes.AddNode( node ); } }
 		public static void UnregisterFunctionInputNode( FunctionInput node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionInputNodes.RemoveNode( node ); } }
 		public static void UpdateFunctionInputData( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionInputNodes.UpdateDataOnNode( nodeIdx, data ); } }
-		public static List<ParentNode> FunctionInputList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionInputNodes.NodesList; } return null; }
+		public static List<FunctionInput> FunctionInputList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionInputNodes.NodesList; } return null; }
 
 		// Function Nodes
 		public static void RegisterFunctionNode( FunctionNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionNodes.AddNode( node ); } }
 		public static void UnregisterFunctionNode( FunctionNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionNodes.RemoveNode( node ); } }
 		public static void UpdateFunctionData( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionNodes.UpdateDataOnNode( nodeIdx, data ); } }
-		public static List<ParentNode> FunctionList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionNodes.NodesList; } return null; }
+		public static List<FunctionNode> FunctionList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionNodes.NodesList; } return null; }
 
 		// Function Outputs
 		public static void RegisterFunctionOutputNode( FunctionOutput node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionOutputNodes.AddNode( node ); } }
 		public static void UnregisterFunctionOutputNode( FunctionOutput node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionOutputNodes.RemoveNode( node ); } }
 		public static void UpdateFunctionOutputData( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionOutputNodes.UpdateDataOnNode( nodeIdx, data ); } }
-		public static List<ParentNode> FunctionOutputList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionOutputNodes.NodesList; } return null; }
+		public static List<FunctionOutput> FunctionOutputList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionOutputNodes.NodesList; } return null; }
 
 		// Screen Color Node
 		public static void RegisterScreenColorNode( ScreenColorNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.ScreenColorNodes.AddNode( node ); } }
 		public static void UnregisterScreenColorNode( ScreenColorNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.ScreenColorNodes.RemoveNode( node ); } }
 		public static string[] ScreenColorNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.ScreenColorNodes.NodesArr; } return null; }
-		public static ScreenColorNode GetScreenColorNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.ScreenColorNodes.GetNode( idx ) as ScreenColorNode; } return null; }
+		public static ScreenColorNode GetScreenColorNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.ScreenColorNodes.GetNode( idx ); } return null; }
 		public static int GetScreenColorNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.ScreenColorNodes.GetNodeRegisterId( uniqueId ); } return -1; }
 		public static void UpdateScreenColorDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.ScreenColorNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static int GetScreenColorNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.ScreenColorNodes.NodesList.Count; } return -1; }
@@ -2224,7 +2224,7 @@ namespace AmplifyShaderEditor
 		public static string[] LocalVarNodeArr() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.LocalVarNodes.NodesArr; } return null; }
 		public static int LocalVarNodeAmount() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.LocalVarNodes.NodesList.Count; } return 0; }
 		public static int GetLocalVarNodeRegisterId( int uniqueId ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.LocalVarNodes.GetNodeRegisterId( uniqueId ); } return -1; }
-		public static RegisterLocalVarNode GetLocalVarNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.LocalVarNodes.GetNode( idx ) as RegisterLocalVarNode; } return null; }
+		public static RegisterLocalVarNode GetLocalVarNode( int idx ) { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.LocalVarNodes.GetNode( idx ); } return null; }
 		public static void UpdateLocalVarDataNode( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.LocalVarNodes.UpdateDataOnNode( nodeIdx, data ); } }
 
 		public static void FocusOnNode( ParentNode node, float zoom, bool selectNode ) { if( CurrentWindow != null ) { CurrentWindow.FocusOnNode( node, zoom, selectNode ); } }
