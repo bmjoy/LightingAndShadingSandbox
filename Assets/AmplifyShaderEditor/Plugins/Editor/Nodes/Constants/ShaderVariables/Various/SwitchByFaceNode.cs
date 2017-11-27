@@ -66,7 +66,7 @@ namespace AmplifyShaderEditor
 			string front = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
 			string back = m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector );
 
-			dataCollector.AddToInput( UniqueId, Constants.VFaceInput, true );
+			dataCollector.AddToInput( UniqueId, SurfaceInputs.VFACE );
 			string variable = string.Empty;
 			if ( dataCollector.IsTemplate )
 			{

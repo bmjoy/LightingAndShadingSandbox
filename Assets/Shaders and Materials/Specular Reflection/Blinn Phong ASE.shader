@@ -15,7 +15,7 @@ Shader "Pipeworks_Custom/Blinn Phong ASE"
 
 	SubShader
 	{
-		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
+		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" }
 		Cull Back
 		ColorMask RGB
 		CGINCLUDE
@@ -123,7 +123,7 @@ Shader "Pipeworks_Custom/Blinn Phong ASE"
 			#pragma multi_compile_shadowcaster
 			#pragma multi_compile UNITY_PASS_SHADOWCASTER
 			#pragma skip_variants FOG_LINEAR FOG_EXP FOG_EXP2
-			# include "HLSLSupport.cginc"
+			#include "HLSLSupport.cginc"
 			#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )
 				#define CAN_SKIP_VPOS
 			#endif
@@ -189,43 +189,43 @@ Shader "Pipeworks_Custom/Blinn Phong ASE"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=13706
-1953;34;1796;1125;1559.89;-65.15027;1;True;False
+Version=13803
+1953;34;1796;1125;1491.89;449.8497;1;True;False
 Node;AmplifyShaderEditor.CommentaryNode;17;-1148.012,1011.719;Float;False;1140.715;497;Blinn Phong;9;15;13;12;8;10;35;29;3;4;Specular;0,1,0,0.5882353;0;0
-Node;AmplifyShaderEditor.CommentaryNode;18;-1148.125,462.0261;Float;False;1152.973;445;Half Lambert;4;16;31;7;6;Diffuse;0.9191176,0,0,0.5882353;0;0
-Node;AmplifyShaderEditor.RangedFloatNode;3;-1072.731,1078.724;Half;False;Property;_SpecularPower;Specular Power;4;0;0.2;0;2;0;1;FLOAT
 Node;AmplifyShaderEditor.ColorNode;4;-964.0628,1216.483;Fixed;False;Property;_SpecularColor;Specular Color;2;0;1,1,1,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;8;-774.5146,1148.76;Half;False;Property;_SpecularIntensity;Specular Intensity;3;0;1;0;10;0;1;FLOAT
-Node;AmplifyShaderEditor.LightColorNode;12;-670.5145,1295.76;Float;False;0;3;COLOR;FLOAT3;FLOAT
-Node;AmplifyShaderEditor.LightAttenuation;29;-675.4459,1405.523;Float;False;0;1;FLOAT
-Node;AmplifyShaderEditor.ColorNode;7;-987.1801,713.2632;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.RangedFloatNode;3;-1072.731,1078.724;Half;False;Property;_SpecularPower;Specular Power;4;0;0.2;0;2;0;1;FLOAT
+Node;AmplifyShaderEditor.CommentaryNode;18;-1148.125,462.0261;Float;False;1152.973;445;Half Lambert;4;16;31;7;6;Diffuse;0.9191176,0,0,0.5882353;0;0
 Node;AmplifyShaderEditor.ComponentMaskNode;10;-709.029,1216.379;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.FunctionNode;35;-791.1728,1083.26;Float;False;Blinn Phong;-1;;58;1d2fe4dd949cc274fada205553d043f9;1;0;FLOAT;0.0;False;1;FLOAT
 Node;AmplifyShaderEditor.SamplerNode;6;-1036.269,528.9293;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;31;-731.188,614.4565;Float;False;Lambert Wrap;-1;;59;31f8f5f80290a284a82e58e8d6bb3fef;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
-Node;AmplifyShaderEditor.CommentaryNode;22;-1154.146,-134.8238;Float;False;1154.035;519.9;;5;0;33;21;19;20;Master;0,0,1,0.5882353;0;0
+Node;AmplifyShaderEditor.ColorNode;7;-987.1801,713.2632;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.RangedFloatNode;8;-774.5146,1148.76;Half;False;Property;_SpecularIntensity;Specular Intensity;3;0;1;0;10;0;1;FLOAT
+Node;AmplifyShaderEditor.LightColorNode;12;-670.5145,1295.76;Float;False;0;3;COLOR;FLOAT3;FLOAT
+Node;AmplifyShaderEditor.LightAttenuation;29;-675.4459,1405.523;Float;False;0;1;FLOAT
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;13;-436.5155,1175.76;Float;False;5;5;0;FLOAT;0.0;False;1;FLOAT;0.0;False;2;FLOAT3;0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.CommentaryNode;22;-1154.146,-134.8238;Float;False;1154.035;519.9;;5;0;33;21;19;20;Master;0,0,1,0.5882353;0;0
+Node;AmplifyShaderEditor.FunctionNode;31;-731.188,614.4565;Float;False;Lambert Wrap;-1;;59;31f8f5f80290a284a82e58e8d6bb3fef;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
+Node;AmplifyShaderEditor.RegisterLocalVarNode;16;-277.1844,609.3972;Fixed;False;DIFFUSE;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.GetLocalVarNode;20;-916.9771,-20.5293;Float;False;16;0;1;FLOAT3
 Node;AmplifyShaderEditor.RegisterLocalVarNode;15;-262.0289,1170.379;Fixed;False;SPECULAR;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.GetLocalVarNode;19;-922.8524,49.36546;Float;False;15;0;1;FLOAT3
-Node;AmplifyShaderEditor.GetLocalVarNode;20;-914.9771,-18.5293;Float;False;16;0;1;FLOAT3
-Node;AmplifyShaderEditor.RegisterLocalVarNode;16;-277.1844,609.3972;Fixed;False;DIFFUSE;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.SimpleAddOpNode;21;-733.9771,9.470651;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.SaturateNode;33;-597.4882,10.15652;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;-431.8044,-35.44049;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Blinn Phong ASE;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;14;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;-431.8044,-35.44049;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Blinn Phong ASE;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;10;0;4;0
 WireConnection;35;0;3;0
-WireConnection;31;0;6;0
-WireConnection;31;1;7;0
 WireConnection;13;0;35;0
 WireConnection;13;1;8;0
 WireConnection;13;2;10;0
 WireConnection;13;3;12;1
 WireConnection;13;4;29;0
-WireConnection;15;0;13;0
+WireConnection;31;0;6;0
+WireConnection;31;1;7;0
 WireConnection;16;0;31;0
+WireConnection;15;0;13;0
 WireConnection;21;0;20;0
 WireConnection;21;1;19;0
 WireConnection;33;0;21;0
-WireConnection;0;2;33;0
+WireConnection;0;13;33;0
 ASEEND*/
-//CHKSM=228F54D17EF8328423F92E3D143F6FABF842CC01
+//CHKSM=5E9D15771C8CA820D129B94DE60AAE8E7847A50B

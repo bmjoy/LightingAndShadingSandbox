@@ -1,6 +1,6 @@
 // Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
-
+//#define TEMPLATE_MODULES
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -8,6 +8,13 @@ using System.Collections.Generic;
 
 namespace AmplifyShaderEditor
 {
+	[Serializable]
+	public class TemplateDataContainer
+	{
+		public int UNITY_VERSION = -1;
+		public TemplateData TemplateDataRef;
+	}
+
 	[Serializable]
 	public class TemplateData
 	{
@@ -55,9 +62,19 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private TemplateFunctionData m_fragmentFunctionData;
-
+#if TEMPLATE_MODULES
 		[SerializeField]
 		private TemplateBlendData m_blendData = new TemplateBlendData();
+
+		[SerializeField]
+		private TemplateCullModeData m_cullModeData = new TemplateCullModeData();
+
+		[SerializeField]
+		private TemplateColorMaskData m_colorMaskData = new TemplateColorMaskData();
+
+		[SerializeField]
+		private TemplateStencilData m_stencilData = new TemplateStencilData();
+#endif
 
 		[SerializeField]
 		private string m_interpDataId = string.Empty;
@@ -293,6 +310,8 @@ namespace AmplifyShaderEditor
 					int idx = m_templateBody.IndexOf( TemplatesManager.CommonTags[ i ].Id );
 					if( idx > -1 )
 					{
+						string currentId = TemplatesManager.CommonTags[ i ].Id;
+
 						TemplateCommonTagId commonTagId = (TemplateCommonTagId)i;
 						switch( commonTagId )
 						{
@@ -310,37 +329,75 @@ namespace AmplifyShaderEditor
 							break;
 
 							//Tags
-							case TemplateCommonTagId.Tag:
-							{
-								m_propertyList[ m_propertyList.Count - 1 ].Indentation = " ";
-							}
-							break;
+							//case TemplateCommonTagId.Tag:
+							//{
+							//	m_propertyList[ m_propertyList.Count - 1 ].Indentation = " ";
+							//}
+							//break;
+#if TEMPLATE_MODULES
 							case TemplateCommonTagId.CullMode:
+							{
+								int newId = idx + TemplatesManager.CommonTags[ i ].Id.Length;
+								int end = m_templateBody.IndexOf( TemplatesManager.TemplateNewLine, newId );
+								string cullParams = m_templateBody.Substring( newId, end - newId );
+								currentId = m_templateBody.Substring( idx, end - idx );
+								m_cullModeData.CullModeId = currentId;
+								TemplateHelperFunctions.CreateCullMode( cullParams, ref m_cullModeData );
+							}
 							break;
 							//Blend Mode
 							case TemplateCommonTagId.BlendMode:
 							{
 								int newId = idx + TemplatesManager.CommonTags[ i ].Id.Length;
 								int end = m_templateBody.IndexOf( TemplatesManager.TemplateNewLine, newId );
-								TemplateHelperFunctions.CreateBlendMode( m_templateBody.Substring( newId, end - newId ), ref m_blendData );
+								string blendParams = m_templateBody.Substring( newId, end - newId );
+								currentId = m_templateBody.Substring( idx, end - idx );
+								m_blendData.BlendModeId = currentId;
+								TemplateHelperFunctions.CreateBlendMode( blendParams, ref m_blendData );
 							}
 							break;
 							case TemplateCommonTagId.BlendOp:
 							{
 								int newId = idx + TemplatesManager.CommonTags[ i ].Id.Length;
 								int end = m_templateBody.IndexOf( TemplatesManager.TemplateNewLine, newId );
+								currentId = m_templateBody.Substring( idx, end - idx );
+								BlendData.BlendOpId = currentId;
 								TemplateHelperFunctions.CreateBlendOp( m_templateBody.Substring( newId, end - newId ), ref m_blendData );
 							}
 							break;
 							case TemplateCommonTagId.ColorMask:
+							{
+								int newId = idx + TemplatesManager.CommonTags[ i ].Id.Length;
+								int end = m_templateBody.IndexOf( TemplatesManager.TemplateNewLine, newId );
+								string colorMaskParams = m_templateBody.Substring( newId, end - newId );
+								currentId = m_templateBody.Substring( idx, end - idx );
+								m_colorMaskData.ColorMaskId = currentId;
+								TemplateHelperFunctions.CreateColorMask( colorMaskParams, ref m_colorMaskData );
+							}
 							break;
+							case TemplateCommonTagId.StencilOp:
+							{
+								int id = m_templateBody.LastIndexOf( "Stencil" );
+								if( id > -1 )
+								{
+									string stencilParams = m_templateBody.Substring( id, idx - id );
+									currentId = stencilParams;
+									TemplateHelperFunctions.CreateStencilOps( stencilParams, ref m_stencilData );
+								}
+								
+							} break;
+#endif
 							default:
 							break;
 						}
 
-						AddId( TemplatesManager.CommonTags[ i ] );
+						//AddId( TemplatesManager.CommonTags[ i ] );
+						AddId( currentId, TemplatesManager.CommonTags[ i ].SearchIndentation , TemplatesManager.CommonTags[ i ].CustomIndentation );
 					}
 				}
+#if TEMPLATE_MODULES
+				m_blendData.ValidBlendData = m_blendData.ValidBlendMode || m_blendData.ValidBlendOp;
+#endif
 				duplicatesHelper.Clear();
 				duplicatesHelper = null;
 			}
@@ -548,12 +605,12 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public void AddId( TemplateTagData data )
+		public void AddId( string ID, bool searchIndentation = true )
 		{
-			AddId( data.Id, data.SearchIndentation );
+			AddId( ID, searchIndentation, string.Empty );
 		}
 
-		public void AddId( string ID, bool searchIndentation = true )
+		public void AddId( string ID, bool searchIndentation , string customIndentation )
 		{
 			int propertyIndex = m_templateBody.IndexOf( ID );
 			if( propertyIndex > -1 )
@@ -573,12 +630,12 @@ namespace AmplifyShaderEditor
 					{
 						int length = propertyIndex - indentationIndex;
 						string indentation = ( length > 0 ) ? m_templateBody.Substring( indentationIndex, length ) : string.Empty;
-						m_propertyList.Add( new TemplateProperty( ID, indentation ) );
+						m_propertyList.Add( new TemplateProperty( ID, indentation ,false ) );
 					}
 				}
 				else
 				{
-					m_propertyList.Add( new TemplateProperty( ID, string.Empty ) );
+					m_propertyList.Add( new TemplateProperty( ID, customIndentation ,true) );
 				}
 			}
 		}
@@ -675,6 +732,11 @@ namespace AmplifyShaderEditor
 				m_snippetElementsList.Clear();
 				m_snippetElementsList = null;
 			}
+#if TEMPLATE_MODULES
+			m_cullModeData = null;
+			m_blendData = null;
+			m_colorMaskData = null;
+#endif
 		}
 
 		public void FillEmptyTags( ref string body )
@@ -683,7 +745,14 @@ namespace AmplifyShaderEditor
 			{
 				if( !m_propertyList[ i ].Used )
 				{
-					body = body.Replace( m_propertyList[ i ].Indentation + m_propertyList[ i ].Id, string.Empty );
+					if( m_propertyList[ i ].UseCustomIndentation )
+					{
+						body = body.Replace( m_propertyList[ i ].Id, string.Empty );
+					}
+					else
+					{
+						body = body.Replace( m_propertyList[ i ].Indentation + m_propertyList[ i ].Id, string.Empty );
+					}
 				}
 			}
 		}
@@ -722,7 +791,9 @@ namespace AmplifyShaderEditor
 		public bool FillTemplateBody( string id, ref string body, params string[] values )
 		{
 			if( values.Length == 0 )
+			{
 				return true;
+			}
 
 			BuildInfo();
 
@@ -751,6 +822,7 @@ namespace AmplifyShaderEditor
 				}
 
 				body = body.Replace( id, finalValue );
+				m_propertyDict[ id ].Used = true;
 				return true;
 			}
 
@@ -768,7 +840,7 @@ namespace AmplifyShaderEditor
 		{
 			if( values.Count == 0 )
 			{
-				return FillTemplateBody( id, ref body, string.Empty );
+				return true;
 			}
 
 			string[] array = new string[ values.Count ];
@@ -840,6 +912,10 @@ namespace AmplifyShaderEditor
 		public bool IsValid { get { return m_isValid; } }
 		public string GUID { get { return m_guid; } }
 		public List<TemplateShaderPropertyData> AvailableShaderProperties { get { return m_availableShaderProperties; } }
+#if TEMPLATE_MODULES
 		public TemplateBlendData BlendData { get { return m_blendData; } }
+		public TemplateCullModeData CullModeData { get { return m_cullModeData; } }
+		public TemplateColorMaskData ColorMaskData { get { return m_colorMaskData; } }
+#endif
 	}
 }

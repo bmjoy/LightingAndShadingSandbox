@@ -23,14 +23,24 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private int m_orderIndex = -1;
-
+		
 		[SerializeField]
 		private AmplifyShaderFunction m_function;
-		public AmplifyShaderFunction Function
-		{
-			get { return m_function; }
-			set { m_function = value; }
-		}
+
+		//Title editing 
+		[SerializeField]
+		private string m_uniqueName;
+
+		private bool m_isEditing;
+		private bool m_stopEditing;
+		private bool m_startEditing;
+		private double m_clickTime;
+		private double m_doubleClickTime = 0.3;
+		private Rect m_titleClickArea;
+		private bool m_showTitleWhenNotEditing = true;
+
+
+		
 
 		void CommonInit()
 		{
@@ -73,6 +83,8 @@ namespace AmplifyShaderEditor
 		{
 			base.OnUniqueIDAssigned();
 			UIUtils.RegisterFunctionOutputNode( this );
+			if( m_nodeAttribs != null )
+				m_uniqueName = m_nodeAttribs.Name + UniqueId;
 		}
 
 
@@ -134,8 +146,86 @@ namespace AmplifyShaderEditor
 				m_additionalContent.text = "Preview";
 			else
 				m_additionalContent.text = "";
+
+			if( ContainerGraph.LodLevel <= ParentGraph.NodeLOD.LOD3 )
+			{
+				if( !m_isEditing && ( ( !ContainerGraph.ParentWindow.MouseInteracted && drawInfo.CurrentEventType == EventType.MouseDown && m_titleClickArea.Contains( drawInfo.MousePosition ) ) ) )
+				{
+					if( ( EditorApplication.timeSinceStartup - m_clickTime ) < m_doubleClickTime )
+						m_startEditing = true;
+					else
+						GUI.FocusControl( null );
+					m_clickTime = EditorApplication.timeSinceStartup;
+				}
+				else if( m_isEditing && ( ( drawInfo.CurrentEventType == EventType.MouseDown && !m_titleClickArea.Contains( drawInfo.MousePosition ) ) || !EditorGUIUtility.editingTextField ) )
+				{
+					m_stopEditing = true;
+				}
+
+				if( m_isEditing || m_startEditing )
+				{
+					EditorGUI.BeginChangeCheck();
+					GUI.SetNextControlName( m_uniqueName );
+					m_outputName = EditorGUITextField( m_titleClickArea, string.Empty, m_outputName, UIUtils.GetCustomStyle( CustomStyle.NodeTitle ) );
+					if( EditorGUI.EndChangeCheck() )
+					{
+						SetTitleText( m_outputName );
+						UIUtils.UpdateFunctionInputData( UniqueId, m_outputName );
+					}
+
+					if( m_startEditing )
+						EditorGUI.FocusTextInControl( m_uniqueName );
+
+				}
+
+				if( drawInfo.CurrentEventType == EventType.Repaint )
+				{
+					if( m_startEditing )
+					{
+						m_startEditing = false;
+						m_isEditing = true;
+					}
+
+					if( m_stopEditing )
+					{
+						m_stopEditing = false;
+						m_isEditing = false;
+						GUI.FocusControl( null );
+					}
+				}
+			}
+		}
+		
+		public override void OnNodeLayout( DrawInfo drawInfo )
+		{
+			// RUN LAYOUT CHANGES AFTER TITLES CHANGE
+			base.OnNodeLayout( drawInfo );
+			m_titleClickArea = m_titlePos;
+			m_titleClickArea.height = Constants.NODE_HEADER_HEIGHT;
 		}
 
+		public override void OnNodeRepaint( DrawInfo drawInfo )
+		{
+			base.OnNodeRepaint( drawInfo );
+
+			if( !m_isVisible )
+				return;
+
+			// Fixed Title ( only renders when not editing )
+			if( m_showTitleWhenNotEditing && !m_isEditing && !m_startEditing && ContainerGraph.LodLevel <= ParentGraph.NodeLOD.LOD3 )
+			{
+				GUI.Label( m_titleClickArea, m_content, UIUtils.GetCustomStyle( CustomStyle.NodeTitle ) );
+			}
+		}
+
+		public override void OnNodeDoubleClicked( Vector2 currentMousePos2D )
+		{
+			if( currentMousePos2D.y - m_globalPosition.y > ( Constants.NODE_HEADER_HEIGHT + Constants.NODE_HEADER_EXTRA_HEIGHT ) * ContainerGraph.ParentWindow.CameraDrawInfo.InvertedZoom )
+			{
+				ContainerGraph.ParentWindow.ParametersWindow.IsMaximized = !ContainerGraph.ParentWindow.ParametersWindow.IsMaximized;
+			}
+		}
+		
 		public WirePortDataType AutoOutputType
 		{
 			get { return m_inputPorts[ 0 ].DataType; }
@@ -165,6 +255,12 @@ namespace AmplifyShaderEditor
 				m_function = UIUtils.CurrentWindow.OpenedShaderFunction;
 			SetTitleText( m_outputName );
 			UIUtils.UpdateFunctionOutputData( UniqueId, m_outputName );
+		}
+
+		public AmplifyShaderFunction Function
+		{
+			get { return m_function; }
+			set { m_function = value; }
 		}
 
 		public string OutputName

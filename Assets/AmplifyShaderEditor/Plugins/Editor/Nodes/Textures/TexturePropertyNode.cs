@@ -712,6 +712,8 @@ namespace AmplifyShaderEditor
 			m_defaultTextureValue = ( TexturePropertyValues ) Enum.Parse( typeof( TexturePropertyValues ), GetCurrentParam( ref nodeParams ) );
 			m_autocastMode = ( AutoCastType ) Enum.Parse( typeof( AutoCastType ), GetCurrentParam( ref nodeParams ) );
 
+			ConfigTextureData(TextureType.Texture2D);
+
 			ConfigFromObject( m_defaultValue );
 			ConfigureInputPorts();
 			ConfigureOutputPorts();

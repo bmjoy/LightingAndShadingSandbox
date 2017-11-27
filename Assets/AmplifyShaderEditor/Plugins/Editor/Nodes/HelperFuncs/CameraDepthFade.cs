@@ -48,7 +48,7 @@ namespace AmplifyShaderEditor
 			}
 
 			dataCollector.AddToIncludes( UniqueId, Constants.UnityShaderVariables );
-			dataCollector.AddToInput( UniqueId, "float eyeDepth", true );
+			dataCollector.AddToInput( UniqueId, "eyeDepth", WirePortDataType.FLOAT );
 
 			string instruction = "-UnityObjectToViewPos( " + Constants.VertexShaderInputStr + ".vertex.xyz ).z";
 			dataCollector.AddVertexInstruction( Constants.VertexShaderOutputStr + ".eyeDepth = " + instruction, UniqueId );

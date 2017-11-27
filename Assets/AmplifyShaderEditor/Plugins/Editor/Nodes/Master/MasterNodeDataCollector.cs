@@ -138,6 +138,7 @@ namespace AmplifyShaderEditor
 		private bool m_usingArrayDerivatives;
 
 		private bool m_usingHigherSizeTexcoords;
+		private bool m_usingCustomScreenPos;
 
 		private bool m_usingCustomOutput;
 
@@ -152,6 +153,7 @@ namespace AmplifyShaderEditor
 		private int m_availableFragTempId = 0;
 
 		private MasterNodePortCategory m_portCategory;
+		private PortGenType m_genType;
 		private RenderPath m_renderPath = RenderPath.All;
 		private NodeAvailability m_currentCanvasMode = NodeAvailability.SurfaceShader;
 
@@ -352,6 +354,45 @@ namespace AmplifyShaderEditor
 			return m_inputDict.ContainsKey( value );
 		}
 
+		public void AddToInput( int nodeId, string interpName, WirePortDataType dataType, PrecisionType precision = PrecisionType.Float, bool addSemiColon = true )
+		{
+			string value = UIUtils.FinalPrecisionWirePortToCgType( precision, dataType ) + " " + interpName;
+			AddToInput( nodeId, value, addSemiColon );
+		}
+
+		public void AddToInput( int nodeId, SurfaceInputs surfaceInput, PrecisionType precision = PrecisionType.Float, bool addSemiColon = true )
+		{
+			switch( surfaceInput )
+			{
+				case SurfaceInputs.VIEW_DIR:
+				UsingViewDirection = true;
+				break;
+				case SurfaceInputs.SCREEN_POS:
+				UsingScreenPos = true;
+				break;
+				case SurfaceInputs.WORLD_POS:
+				UsingWorldPosition = true;
+				break;
+				case SurfaceInputs.WORLD_REFL:
+				UsingWorldReflection = true;
+				break;
+				case SurfaceInputs.WORLD_NORMAL:
+				UsingWorldNormal = true;
+				break;
+				case SurfaceInputs.INTERNALDATA:
+				UsingInternalData = true;
+				break;
+			}
+
+			AddToInput( nodeId, UIUtils.GetInputDeclarationFromType( precision, surfaceInput ), addSemiColon );
+		}
+
+		/// <summary>
+		/// Direct access to inputs, plese use another overload
+		/// </summary>
+		/// <param name="nodeId"></param>
+		/// <param name="value"></param>
+		/// <param name="addSemiColon"></param>
 		public void AddToInput( int nodeId, string value, bool addSemiColon )
 		{
 			if ( string.IsNullOrEmpty( value ) )
@@ -365,35 +406,17 @@ namespace AmplifyShaderEditor
 				m_input += "\t\t\t" + value + ( ( addSemiColon ) ? ( ";\n" ) : "\n" );
 				m_dirtyInputs = true;
 
-				// TODO: move this elsewhere (waste of string calculations)
-				if( m_input.Contains( " screenPos;" ) )
-					UsingScreenPos = true;
-
-				if ( m_input.Contains( " worldNormal;" ) )
-					UsingWorldNormal = true;
-
-				if ( m_input.Contains( " worldRefl;" ) )
-					UsingWorldReflection = true;
-
-				if ( m_input.Contains( " worldPos;" ) )
-					UsingWorldPosition = true;
-
-				if ( m_input.Contains( " viewDir;" ) )
-					UsingViewDirection = true;
-
-				if ( m_input.Contains( "INTERNAL_DATA" ) )
-					UsingInternalData = true;
-
-				if ( m_input.Contains( "uv_texcoord;" ) )
+				// TODO: remove this after proper shadow caster packing
+				if( m_input.Contains( "uv_texcoord;" ) )
 					UsingTexcoord0 = true;
 
-				if ( m_input.Contains( "uv2_texcoord2;" ) )
+				if( m_input.Contains( "uv2_texcoord2;" ) )
 					UsingTexcoord1 = true;
 
-				if ( m_input.Contains( "uv3_texcoord3;" ) )
+				if( m_input.Contains( "uv3_texcoord3;" ) )
 					UsingTexcoord2 = true;
 
-				if ( m_input.Contains( "uv4_texcoord4;" ) )
+				if( m_input.Contains( "uv4_texcoord4;" ) )
 					UsingTexcoord3 = true;
 			}
 		}
@@ -1310,6 +1333,12 @@ namespace AmplifyShaderEditor
 			set { m_portCategory = value; }
 		}
 
+		public PortGenType GenType
+		{
+			get { return m_genType; }
+			set { m_genType = value; }
+		}
+
 		public bool IsTemplate { get { return m_masterNodeCategory == AvailableShaderTypes.Template; } }
 		public AvailableShaderTypes MasterNodeCategory
 		{
@@ -1350,6 +1379,12 @@ namespace AmplifyShaderEditor
 		{
 			get { return m_usingScreenPos; }
 			set { m_usingScreenPos = value; }
+		}
+
+		public bool UsingCustomScreenPos
+		{
+			get { return m_usingCustomScreenPos; }
+			set { m_usingCustomScreenPos = value; }
 		}
 
 		public bool UsingWorldNormal

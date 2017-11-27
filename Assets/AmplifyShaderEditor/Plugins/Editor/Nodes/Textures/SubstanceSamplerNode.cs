@@ -558,7 +558,7 @@ namespace AmplifyShaderEditor
 
 					dataCollector.AddToUniforms( UniqueId, "uniform float4 " + propertyName + "_ST;" );
 					dataCollector.AddToProperties( UniqueId, "[HideInInspector] " + dummyPropUV + "( \"\", 2D ) = \"white\" {}", 100 );
-					dataCollector.AddToInput( UniqueId, "float2 " + dummyUV, true );
+					dataCollector.AddToInput( UniqueId, dummyUV, WirePortDataType.FLOAT2 );
 
 					if ( isVertex )
 					{

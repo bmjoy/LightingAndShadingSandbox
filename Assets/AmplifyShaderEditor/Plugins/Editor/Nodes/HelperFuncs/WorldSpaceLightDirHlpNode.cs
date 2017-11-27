@@ -35,7 +35,7 @@ namespace AmplifyShaderEditor
 			//	return m_outputPorts[ 0 ].LocalValue;
 
 			dataCollector.AddToIncludes( UniqueId, Constants.UnityCgLibFuncs );
-			dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
+			dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_POS );
 
 			string worldPos = GeneratorUtils.GenerateWorldPosition( ref dataCollector, UniqueId );
 			return GetOutputVectorItem( 0, outputId, GeneratorUtils.GenerateWorldLightDirection( ref dataCollector, UniqueId, m_currentPrecisionType, worldPos ));

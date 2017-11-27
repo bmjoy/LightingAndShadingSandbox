@@ -61,12 +61,12 @@ namespace AmplifyShaderEditor
 
 			if( dataCollector.PortCategory == MasterNodePortCategory.Fragment || dataCollector.PortCategory == MasterNodePortCategory.Debug )
 			{
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
-				//dataCollector.AddToInput( m_uniqueId, Constants.InternalData, false );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
+				
 				string result = string.Empty;
 				if( m_inputPorts[ 0 ].IsConnected )
 				{
-					dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+					dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 					dataCollector.ForceNormal = true;
 
 					result = "WorldNormalVector( " + Constants.InputVarStr + " , " + m_inputPorts[ 0 ].GenerateShaderForOutput( ref dataCollector, WirePortDataType.FLOAT3, ignoreLocalvar ) + " )";
@@ -91,7 +91,7 @@ namespace AmplifyShaderEditor
 					}
 					else
 					{
-						dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+						dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 						result = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId );
 					}
 				}

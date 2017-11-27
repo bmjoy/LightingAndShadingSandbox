@@ -147,6 +147,12 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		public override void PropagateNodeData( NodeData nodeData, ref MasterNodeDataCollector dataCollector )
+		{
+			base.PropagateNodeData( nodeData, ref dataCollector );
+			dataCollector.UsingCustomScreenPos = true;
+		}
+
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalVar )
 		{
 			if ( m_outputPorts[ 0 ].IsLocalValue )
@@ -169,7 +175,7 @@ namespace AmplifyShaderEditor
 				}
 				else
 				{
-					varName = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, true );
+					varName = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
 				}
 			}
 

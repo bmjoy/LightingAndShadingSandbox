@@ -20,7 +20,7 @@ namespace AmplifyShaderEditor
 
 		private const string ScreenPosStr = "screenPos";
 		private const string ScreenColorStr = "screenColor";
-		private readonly string ScreenPosOnFragStr = Constants.InputVarStr + "." + ScreenPosStr;
+		//private readonly string ScreenPosOnFragStr = Constants.InputVarStr + "." + ScreenPosStr;
 
 		private readonly string[] HackInstruction = {   "#if UNITY_UV_STARTS_AT_TOP",
 														"float scale{0} = -1.0;",
@@ -358,10 +358,12 @@ namespace AmplifyShaderEditor
 				}
 				else
 				{
-					dataCollector.AddToInput( UniqueId, "float4 " + ScreenPosStr, true );
+					//dataCollector.AddToInput( UniqueId, "float4 " + ScreenPosStr, true );
 
-					localVarName = ScreenPosStr + OutputId;
-					string value = UIUtils.PrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType ) + " " + localVarName + " = " + ScreenPosOnFragStr + ";";
+					string screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+
+					localVarName = screenPos + OutputId;
+					string value = UIUtils.PrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType ) + " " + localVarName + " = " + screenPos + ";";
 					dataCollector.AddLocalVariable( UniqueId, value, true );
 				}
 

@@ -36,8 +36,8 @@ namespace AmplifyShaderEditor
 			{
 				dataCollector.ForceNormal = true;
 
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
-				dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 			}
 
 			string worldBitangent = GeneratorUtils.GenerateWorldBitangent( ref dataCollector, UniqueId );

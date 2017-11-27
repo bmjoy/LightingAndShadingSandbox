@@ -72,6 +72,14 @@ namespace AmplifyShaderEditor
 		public Color m_frameColor = Color.white;
 
 		private List<int> m_nodesIds = new List<int>();
+
+		private bool m_isEditing;
+		private bool m_stopEditing;
+		private bool m_startEditing;
+		private double m_clickTime;
+		private double m_doubleClickTime = 0.3;
+
+
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -238,8 +246,7 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-
-
+		
 		public override void DrawProperties()
 		{
 			base.DrawProperties();
@@ -324,9 +331,7 @@ namespace AmplifyShaderEditor
 			m_resizeRightIconCoords.x = m_globalPosition.x + m_globalPosition.width - 1 - ( m_resizeIconTex.width + ResizeButtonPos.x ) * drawInfo.InvertedZoom;
 			m_resizeRightIconCoords.y = m_globalPosition.y + m_globalPosition.height - 2 - ( m_resizeIconTex.height + ResizeButtonPos.y ) * drawInfo.InvertedZoom;
 			m_resizeRightIconCoords.width = m_resizeIconTex.width * drawInfo.InvertedZoom;
-			m_resizeRightIconCoords.height = m_resizeIconTex.height * drawInfo.InvertedZoom;
-
-			
+			m_resizeRightIconCoords.height = m_resizeIconTex.height * drawInfo.InvertedZoom;			
 		}
 
 		public override void OnNodeRepaint( DrawInfo drawInfo )
@@ -370,13 +375,7 @@ namespace AmplifyShaderEditor
 				GUI.Label( titleRect, m_titleText, UIUtils.GetCustomStyle( CustomStyle.CommentarySuperTitle ) );
 			}
 		}
-
-		private bool m_isEditing;
-		private bool m_stopEditing;
-		private bool m_startEditing;
-		private double m_clickTime;
-		private double m_doubleClickTime = 0.3;
-
+		
 		public override void Draw( DrawInfo drawInfo )
 		{
 			base.Draw( drawInfo );

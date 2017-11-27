@@ -1,5 +1,18 @@
 Release Notes:
-v1.3.7 dev 07:
+v1.3.8 dev 02/03:
+* Improvements:
+    * Added new custom lighting port and migrated the emission connection to this port
+        * Now custom lighting display both albedo and emission to be used in baking
+    * 'Function Input' and 'Function Output' names can be edited through node body
+
+* Fixes:
+    * Fixed indentation issue on some templates generated code
+    * Fixed issue in texture property that would forget it's auto cast type on load
+    * Fixed issue on 'Triplanar Sample' node being initialized with incorrect internal tiling value
+    * Fixed issue on screen position for 'Dither' node
+        * Now it changes the screen position interpolator globally to make it work on the shadow caster
+
+ v1.3.8 dev 01 ( the same as v1.3.7 dev 07 but bumped version for Asset Store release ):
 * Improvements:
     * Added Shader Function previews
     * Improved node list update on current focused window when renaming a shader function

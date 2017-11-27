@@ -84,7 +84,7 @@ namespace AmplifyShaderEditor
 			if ( m_inputPorts[ 0 ].IsConnected )
 				screenPos = m_inputPorts[ 0 ].GenerateShaderForOutput( ref dataCollector, WirePortDataType.FLOAT4, false );
 			else
-				screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, true );
+				screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
 
 			string viewSpace = m_viewSpaceInt == 0 ? "Eye" : "01";
 			string screenDepthInstruction = "Linear" + viewSpace + "Depth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture,UNITY_PROJ_COORD(" + screenPos + "))))";

@@ -6,18 +6,17 @@ Shader "ASESampleShaders/SubstanceExample"
 {
 	Properties
 	{
-		_TessPhongStrength( "Phong Strength", Range( 0, 1 ) ) = 0.5
-		_TessValue( "Tessellation", Range( 1, 32 ) ) = 30
-		Snow_Bricks_height("Snow_Bricks_height", 2D) = "white"{}
-		[HideInInspector] __dirty( "", Int ) = 1
-		_MaskClipValue( "Mask Clip Value", Float ) = 0.5
-		Snow_Bricks_ambientOcclusion("Snow_Bricks_ambientOcclusion", 2D) = "white"{}
-		Snow_Bricks_basecolor("Snow_Bricks_basecolor", 2D) = "white"{}
-		Snow_Bricks_normal("Snow_Bricks_normal", 2D) = "white"{}
-		Snow_Bricks_metallic("Snow_Bricks_metallic", 2D) = "white"{}
 		Snow_Bricks_roughness("Snow_Bricks_roughness", 2D) = "white"{}
+		Snow_Bricks_ambientOcclusion("Snow_Bricks_ambientOcclusion", 2D) = "white"{}
+		Snow_Bricks_height("Snow_Bricks_height", 2D) = "white"{}
+		Snow_Bricks_metallic("Snow_Bricks_metallic", 2D) = "white"{}
+		Snow_Bricks_normal("Snow_Bricks_normal", 2D) = "white"{}
+		Snow_Bricks_basecolor("Snow_Bricks_basecolor", 2D) = "white"{}
+		_TessValue( "Max Tessellation", Range( 1, 32 ) ) = 30
+		_TessPhongStrength( "Phong Tess Strength", Range( 0, 1 ) ) = 0.5
 		_HeightStrength("Height Strength", Range( 0 , 1)) = 0
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
+		[HideInInspector] __dirty( "", Int ) = 1
 	}
 
 	SubShader
@@ -26,7 +25,7 @@ Shader "ASESampleShaders/SubstanceExample"
 		Cull Back
 		CGPROGRAM
 		#pragma target 4.6
-		#pragma surface surf Standard keepalpha addshadow fullforwardshadows vertex:vertexDataFunc tessellate:tessFunction nolightmap tessphong:_TessPhongStrength 
+		#pragma surface surf Standard keepalpha addshadow fullforwardshadows vertex:vertexDataFunc tessellate:tessFunction tessphong:_TessPhongStrength 
 		struct Input
 		{
 			float2 uv_texcoord;
@@ -53,9 +52,8 @@ Shader "ASESampleShaders/SubstanceExample"
 		uniform sampler2D Snow_Bricks_ambientOcclusion;
 		uniform sampler2D Snow_Bricks_height;
 		uniform float _HeightStrength;
-		uniform float _MaskClipValue = 0.5;
-		uniform float _TessPhongStrength;
 		uniform float _TessValue;
+		uniform float _TessPhongStrength;
 
 		float4 tessFunction( )
 		{
@@ -66,7 +64,8 @@ Shader "ASESampleShaders/SubstanceExample"
 		{
 			float4 uvSnow_Bricks_basecolor = float4(v.texcoord * Snow_Bricks_basecolor_ST.xy + Snow_Bricks_basecolor_ST.zw, 0 ,0);
 			float4 Snow_Bricks_height56 = tex2Dlod( Snow_Bricks_height, uvSnow_Bricks_basecolor);
-			v.vertex.xyz += ( ( Snow_Bricks_height56 * _HeightStrength ) * float4( v.normal , 0.0 ) ).rgb;
+			float3 ase_vertexNormal = v.normal.xyz;
+			v.vertex.xyz += ( ( Snow_Bricks_height56 * _HeightStrength ) * float4( ase_vertexNormal , 0.0 ) ).rgb;
 		}
 
 		void surf( Input i , inout SurfaceOutputStandard o )
@@ -91,25 +90,25 @@ Shader "ASESampleShaders/SubstanceExample"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=5001
-283;92;1007;650;517.222;47.25665;1;False;False
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;328.5,60.69992;Float;True;6;Float;ASEMaterialInspector;Standard;ASESampleShaders/SubstanceExample;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Custom;0.5;True;True;0;True;TransparentCutout;Transparent;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;0;255;255;0;0;0;0;True;1;30;0;10;True;0.5;True;0;Zero;Zero;0;Zero;Zero;Add;Add;0;FLOAT3;0,0,0;FLOAT3;0,0,0;FLOAT3;0,0,0;FLOAT;0.0;FLOAT;0.0;FLOAT;0.0;FLOAT3;0,0,0;FLOAT3;0,0,0;FLOAT;0.0;FLOAT;0.0;OBJECT;0.0;FLOAT3;0.0;FLOAT3;0.0,0,0;OBJECT;0;FLOAT4;0,0,0,0;FLOAT3;0,0,0
-Node;AmplifyShaderEditor.OneMinusNode;50;100.78,171.6431;Float;COLOR;0.0
-Node;AmplifyShaderEditor.RangedFloatNode;51;-355.22,353.6431;Float;Property;_HeightStrength;Height Strength;2;0;0;0;1
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;54;149.78,378.6431;Float;COLOR;0,0,0;FLOAT3;0.0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;52;-15.22,276.6431;Float;COLOR;0.0;FLOAT;0.0,0,0,0
-Node;AmplifyShaderEditor.NormalVertexDataNode;53;-39.21997,423.6431;Float
-Node;AmplifyShaderEditor.SubstanceSamplerNode;56;-409.222,42.74335;Float;Property;_SnowBricksSubstance;Snow Bricks Substance;1;0;7af3ece29374c234f9406a3bb35df76c;0;True;FLOAT2;0,0
+Version=13803
+566;511;900;507;824.7965;124.1966;1.543807;True;False
+Node;AmplifyShaderEditor.RangedFloatNode;51;-355.22,353.6431;Float;False;Property;_HeightStrength;Height Strength;7;0;0;0;1;0;1;FLOAT
+Node;AmplifyShaderEditor.SubstanceSamplerNode;56;-409.222,42.74335;Float;True;Property;_SnowBricksSubstance;Snow Bricks Substance;6;0;7af3ece29374c234f9406a3bb35df76c;0;True;1;0;FLOAT2;0,0;False;6;COLOR;FLOAT3;COLOR;COLOR;COLOR;COLOR
+Node;AmplifyShaderEditor.NormalVertexDataNode;53;-39.21997,423.6431;Float;False;0;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;52;-15.22,276.6431;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0.0,0,0,0;False;1;COLOR
+Node;AmplifyShaderEditor.OneMinusNode;50;81.48209,196.3014;Float;False;1;0;COLOR;0,0,0,0;False;1;COLOR
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;54;149.78,378.6431;Float;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT3;0;False;1;COLOR
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;328.5,60.69992;Float;False;True;6;Float;ASEMaterialInspector;0;0;Standard;ASESampleShaders/SubstanceExample;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Custom;0.5;True;True;0;True;TransparentCutout;Transparent;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;0;255;255;0;0;0;0;0;0;0;0;True;1;30;0;10;True;0.5;True;0;Zero;Zero;0;Zero;Zero;Add;Add;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;5;-1;-1;0;0;0;0;False;16;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;5;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+WireConnection;52;0;56;5
+WireConnection;52;1;51;0
+WireConnection;50;0;56;2
+WireConnection;54;0;52;0
+WireConnection;54;1;53;0
 WireConnection;0;0;56;0
 WireConnection;0;1;56;1
 WireConnection;0;3;56;3
 WireConnection;0;4;50;0
 WireConnection;0;5;56;4
 WireConnection;0;11;54;0
-WireConnection;50;0;56;2
-WireConnection;54;0;52;0
-WireConnection;54;1;53;0
-WireConnection;52;0;56;5
-WireConnection;52;1;51;0
 ASEEND*/
-//CHKSM=4818B0AFC9B5275D8ECE1395E3BCC25FC3EEFDDE
+//CHKSM=F5C480EF8A8D3388F588BDD53579F353062EB819

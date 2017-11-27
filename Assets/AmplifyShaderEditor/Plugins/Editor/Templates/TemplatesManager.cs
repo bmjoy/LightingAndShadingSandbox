@@ -35,13 +35,16 @@ namespace AmplifyShaderEditor
 	public class TemplateProperty
 	{
 		public string Indentation;
+		public bool UseCustomIndentation;
 		public string Id;
 		public bool AutoLineFeed;
 		public bool Used;
-		public TemplateProperty( string id, string indentation )
+		
+		public TemplateProperty( string id, string indentation , bool useCustomIndentation )
 		{
 			Id = id;
 			Indentation = indentation;
+			UseCustomIndentation = useCustomIndentation;
 			AutoLineFeed = !string.IsNullOrEmpty( indentation );
 			Used = false;
 		}
@@ -86,10 +89,21 @@ namespace AmplifyShaderEditor
 	{
 		public string Id;
 		public bool SearchIndentation;
-		public TemplateTagData( string id, bool searchIndentation )
+		public string CustomIndentation;
+
+
+		public TemplateTagData( string id, bool searchIndentation)
 		{
 			Id = id;
 			SearchIndentation = searchIndentation;
+			CustomIndentation = string.Empty;
+		}
+
+		public TemplateTagData( string id, bool searchIndentation, string customIndentation )
+		{
+			Id = id;
+			SearchIndentation = searchIndentation;
+			CustomIndentation = customIndentation;
 		}
 	}
 
@@ -113,8 +127,9 @@ namespace AmplifyShaderEditor
 		Params_Frag = 7,
 		CullMode	= 8,
 		BlendMode   = 9,
-		BlendOp    = 10,
-		ColorMask	= 11
+		BlendOp		= 10,
+		ColorMask	= 11,
+		StencilOp	= 12
 	}
 
 	public class TemplatesManager
@@ -136,7 +151,8 @@ namespace AmplifyShaderEditor
 		public static readonly string TemplateBlendModeTag = "/*ase_blend_mode*/";
 		public static readonly string TemplateBlendOpTag = "/*ase_blend_op*/";
 		public static readonly string TemplateColorMaskTag = "/*ase_color_mask*/";
-		
+		public static readonly string TemplateStencilOpTag = "/*ase_stencil*/";
+
 		public static readonly string TemplateCodeSnippetAttribBegin = "#CODE_SNIPPET_ATTRIBS_BEGIN#";
 		public static readonly string TemplateCodeSnippetAttribEnd = "#CODE_SNIPPET_ATTRIBS_END#\n";
 		public static readonly string TemplateCodeSnippetEnd = "#CODE_SNIPPET_END#\n";
@@ -164,7 +180,7 @@ namespace AmplifyShaderEditor
 		public static readonly TemplateTagData[] CommonTags = { new TemplateTagData( TemplatePropertyTag,true),
 																new TemplateTagData( TemplateGlobalsTag,true),
 																new TemplateTagData( TemplateFunctionsTag,true),
-																new TemplateTagData( TemplateTagsTag,false),
+																new TemplateTagData( TemplateTagsTag,false," "),
 																new TemplateTagData( TemplatePragmaTag,true),
 																new TemplateTagData( TemplatePassTag,true),
 																new TemplateTagData( TemplateInputsVertParamsTag,false),
@@ -173,6 +189,7 @@ namespace AmplifyShaderEditor
 																new TemplateTagData( TemplateBlendModeTag,false),
 																new TemplateTagData( TemplateBlendOpTag,false),
 																new TemplateTagData( TemplateColorMaskTag,false),
+																new TemplateTagData( TemplateStencilOpTag,false),
 																};
 
 		

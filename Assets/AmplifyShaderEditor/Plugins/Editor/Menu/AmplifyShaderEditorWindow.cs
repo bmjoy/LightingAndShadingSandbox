@@ -2893,6 +2893,7 @@ namespace AmplifyShaderEditor
 
 		void OnLostFocus()
 		{
+			EditorGUI.FocusTextInControl( null );
 			m_lostFocus = true;
 			m_multipleSelectionActive = false;
 			m_wireReferenceUtils.InvalidateReferences();
@@ -3257,7 +3258,6 @@ namespace AmplifyShaderEditor
 										Debug.LogException( e );
 									}
 
-
 									ParentNode inNode = graph.GetNode( InNodeId );
 									ParentNode outNode = graph.GetNode( OutNodeId );
 
@@ -3337,7 +3337,7 @@ namespace AmplifyShaderEditor
 
 						graph.ForceSignalPropagationOnMasterNode();
 						graph.RefreshExternalReferences();
-
+						graph.LoadedShaderVersion = versionInfo.FullNumber;
 						//if ( shaderFunction != null )
 						//{
 						//	UIUtils.CurrentWindow.CurrentGraph.CurrentShaderFunction = shaderFunction;

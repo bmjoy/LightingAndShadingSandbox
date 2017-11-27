@@ -102,7 +102,7 @@ namespace AmplifyShaderEditor
 				if( m_viewSpaceInt == 1 )
 					space = " * _ProjectionParams.w";
 
-				dataCollector.AddToInput( UniqueId, "float " + m_vertexNameStr[ m_viewSpaceInt ], true );
+				dataCollector.AddToInput( UniqueId, m_vertexNameStr[ m_viewSpaceInt ], WirePortDataType.FLOAT );
 				string instruction = "-UnityObjectToViewPos( " + Constants.VertexShaderInputStr + ".vertex.xyz ).z" + space;
 				dataCollector.AddVertexInstruction( Constants.VertexShaderOutputStr + "." + m_vertexNameStr[ m_viewSpaceInt ] + " = " + instruction, UniqueId );
 

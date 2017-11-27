@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace AmplifyShaderEditor
 {
-	public enum AvailableSurfaceInputs
+	public enum SurfaceInputs
 	{
 		DEPTH = 0,
 		UV_COORDS,
@@ -20,7 +20,9 @@ namespace AmplifyShaderEditor
 		SCREEN_POS,
 		WORLD_POS,
 		WORLD_REFL,
-		WORLD_NORMAL
+		WORLD_NORMAL,
+		VFACE,
+		INTERNALDATA
 	}
 
 	public enum CustomStyle
@@ -86,6 +88,16 @@ namespace AmplifyShaderEditor
 		Fragment = 1 << 1,
 		Tessellation = 1 << 2,
 		Debug = 1 << 3
+	}
+
+	public enum PortGenType
+	{
+		NonCustomLighting,
+		//Normal = 1 << 1,
+		//Emission = 1 << 2,
+		//Metallic = 1 << 3,
+		//Specular = 1 << 4,
+		CustomLighting
 	}
 
 	public struct NodeData
@@ -489,30 +501,33 @@ namespace AmplifyShaderEditor
 			{ WirePortDataType.SAMPLERCUBE,	"SamplerCUBE"}
 		};
 
-		private static Dictionary<AvailableSurfaceInputs, string> m_inputTypeDeclaration = new Dictionary<AvailableSurfaceInputs, string>()
+		private static Dictionary<SurfaceInputs, string> m_inputTypeDeclaration = new Dictionary<SurfaceInputs, string>()
 		{
-			{ AvailableSurfaceInputs.DEPTH, "{0} Depth : SV_Depth"},
-			{ AvailableSurfaceInputs.UV_COORDS, "{0}2 uv"},// texture uv must have uv or uv2 followed by the texture name
-			{ AvailableSurfaceInputs.UV2_COORDS, "{0}2 uv2"},
-			{ AvailableSurfaceInputs.VIEW_DIR, "{0}3 viewDir"},
-			{ AvailableSurfaceInputs.COLOR, "{0}4 color : COLOR"},
-			{ AvailableSurfaceInputs.SCREEN_POS, "{0}4 screenPos"},
-			{ AvailableSurfaceInputs.WORLD_POS, "{0}3 worldPos"},
-			{ AvailableSurfaceInputs.WORLD_REFL, "{0}3 worldRefl"},
-			{ AvailableSurfaceInputs.WORLD_NORMAL,"{0}3 worldNormal"}
+			{ SurfaceInputs.DEPTH, "{0} Depth : SV_Depth"},
+			{ SurfaceInputs.UV_COORDS, "{0}2 uv"},// texture uv must have uv or uv2 followed by the texture name
+			{ SurfaceInputs.UV2_COORDS, "{0}2 uv2"},
+			{ SurfaceInputs.VIEW_DIR, "{0}3 viewDir"},
+			{ SurfaceInputs.COLOR, Constants.ColorInput},
+			{ SurfaceInputs.SCREEN_POS, "{0}4 screenPos"},
+			{ SurfaceInputs.WORLD_POS, "{0}3 worldPos"},
+			{ SurfaceInputs.WORLD_REFL, "{0}3 worldRefl"},
+			{ SurfaceInputs.WORLD_NORMAL,"{0}3 worldNormal"},
+			{ SurfaceInputs.VFACE, Constants.VFaceInput},
+			{ SurfaceInputs.INTERNALDATA, Constants.InternalData}
 		};
 
-		private static Dictionary<AvailableSurfaceInputs, string> m_inputTypeName = new Dictionary<AvailableSurfaceInputs, string>()
+		private static Dictionary<SurfaceInputs, string> m_inputTypeName = new Dictionary<SurfaceInputs, string>()
 		{
-			{ AvailableSurfaceInputs.DEPTH,			"Depth"},
-			{ AvailableSurfaceInputs.UV_COORDS,		"uv"},// texture uv must have uv or uv2 followed by the texture name
-			{ AvailableSurfaceInputs.UV2_COORDS,	"uv2"},
-			{ AvailableSurfaceInputs.VIEW_DIR,		"viewDir"},
-			{ AvailableSurfaceInputs.COLOR,			"color"},
-			{ AvailableSurfaceInputs.SCREEN_POS,	"screenPos"},
-			{ AvailableSurfaceInputs.WORLD_POS,		"worldPos"},
-			{ AvailableSurfaceInputs.WORLD_REFL,	"worldRefl"},
-			{ AvailableSurfaceInputs.WORLD_NORMAL,	"worldNormal"}
+			{ SurfaceInputs.DEPTH, "Depth"},
+			{ SurfaceInputs.UV_COORDS, "uv"},// texture uv must have uv or uv2 followed by the texture name
+			{ SurfaceInputs.UV2_COORDS, "uv2"},
+			{ SurfaceInputs.VIEW_DIR, "viewDir"},
+			{ SurfaceInputs.COLOR, Constants.ColorVariable},
+			{ SurfaceInputs.SCREEN_POS, "screenPos"},
+			{ SurfaceInputs.WORLD_POS, "worldPos"},
+			{ SurfaceInputs.WORLD_REFL, "worldRefl"},
+			{ SurfaceInputs.WORLD_NORMAL, "worldNormal"},
+			{ SurfaceInputs.VFACE, Constants.VFaceVariable},
 		};
 
 		private static Dictionary<PrecisionType, string> m_precisionTypeToCg = new Dictionary<PrecisionType, string>()
@@ -1056,13 +1071,13 @@ namespace AmplifyShaderEditor
 
 		public static string GetNameForDataType( WirePortDataType dataType ) { return m_dataTypeToName[ dataType ]; }
 
-		public static string GetInputDeclarationFromType( PrecisionType precision, AvailableSurfaceInputs inputType )
+		public static string GetInputDeclarationFromType( PrecisionType precision, SurfaceInputs inputType )
 		{
 			string precisionStr = m_precisionTypeToCg[ precision ];
 			return string.Format( m_inputTypeDeclaration[ inputType ], precisionStr );
 		}
 
-		public static string GetInputValueFromType( AvailableSurfaceInputs inputType ) { return m_inputTypeName[ inputType ]; }
+		public static string GetInputValueFromType( SurfaceInputs inputType ) { return m_inputTypeName[ inputType ]; }
 		private static string CreateLocalValueName( PrecisionType precision, WirePortDataType dataType, string localOutputValue, string value ) { return string.Format( Constants.LocalValueDecWithoutIdent, PrecisionWirePortToCgType( precision, dataType ), localOutputValue, value ); }
 
 		public static string CastPortType( ref MasterNodeDataCollector dataCollector, PrecisionType nodePrecision, NodeCastInfo castInfo, object value, WirePortDataType oldType, WirePortDataType newType, string parameterName = null )

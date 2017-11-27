@@ -1,6 +1,7 @@
 // Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 #define SHOW_TEMPLATE_HELP_BOX
+//#define TEMPLATE_MODULES
 
 using System;
 using System.Collections.Generic;
@@ -35,10 +36,16 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private string m_templateName = string.Empty;
+#if TEMPLATE_MODULES
+		[SerializeField]
+		private TemplatesBlendModule m_blendOpHelper = new TemplatesBlendModule();
 
-		//[SerializeField]
-		//private TemplatesBlendModule m_blendOpHelper = new TemplatesBlendModule();
+		[SerializeField]
+		private TemplateCullModeModule m_cullModeHelper = new TemplateCullModeModule();
 
+		[SerializeField]
+		private TemplateColorMaskModule m_colorMaskHelper = new TemplateColorMaskModule();
+#endif
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -68,7 +75,16 @@ namespace AmplifyShaderEditor
 
 		void FetchInfoFromTemplate()
 		{
-			//m_blendOpHelper.ConfigureFromTemplateData( m_currentTemplate.BlendData );
+#if TEMPLATE_MODULES
+			if( m_currentTemplate.BlendData.ValidBlendData )
+				m_blendOpHelper.ConfigureFromTemplateData( m_currentTemplate.BlendData );
+
+			if( m_currentTemplate.CullModeData.ValidCullData )
+				m_cullModeHelper.ConfigureFromTemplateData( m_currentTemplate.CullModeData );
+
+			if( m_currentTemplate.ColorMaskData.ValidColorMaskData )
+				m_colorMaskHelper.ConfigureFromTemplateData( m_currentTemplate.ColorMaskData );
+#endif
 		}
 
 		void FetchCurrentTemplate()
@@ -102,7 +118,6 @@ namespace AmplifyShaderEditor
 						m_inputPorts[ i ].ChangeProperties( inputDataList[ i ].PortName, inputDataList[ i ].DataType, false );
 					}
 				}
-				
 			}
 		}
 
@@ -210,22 +225,21 @@ namespace AmplifyShaderEditor
 
 		public override void DrawProperties()
 		{
+			if( m_currentTemplate == null )
+				return;
+
 			base.DrawProperties();
 			bool generalIsVisible = EditorVariablesManager.ExpandedGeneralShaderOptions.Value;
 			NodeUtils.DrawPropertyGroup( ref generalIsVisible, GeneralFoldoutStr, DrawGeneralOptions );
 			EditorVariablesManager.ExpandedGeneralShaderOptions.Value = generalIsVisible;
-
-			//if( m_currentTemplate != null && m_currentTemplate.BlendData.ValidBlendMode )
-			//{
-			//	bool blendModeIsVisible = EditorVariablesManager.ExpandedBlendModeModule.Value;
-			//	NodeUtils.DrawPropertyGroup( ref blendModeIsVisible, BlendModeStr,
-			//	() =>
-			//	{
-			//		m_blendOpHelper.Draw( this );
-			//	} );
-			//	EditorVariablesManager.ExpandedBlendModeModule.Value = blendModeIsVisible;
-			//}
-
+#if TEMPLATE_MODULES
+			if( m_currentTemplate.BlendData.ValidBlendData )
+			{
+				bool blendModeIsVisible = EditorVariablesManager.ExpandedBlendModeModule.Value;
+				NodeUtils.DrawPropertyGroup( ref blendModeIsVisible, BlendModeStr, DrawBlendOptions );
+				EditorVariablesManager.ExpandedBlendModeModule.Value = blendModeIsVisible;
+			}
+#endif
 			//	NodeUtils.DrawPropertyGroup( ref m_snippetsFoldout, SnippetsFoldoutStr, DrawSnippetOptions );
 			if( GUILayout.Button( OpenTemplateStr ) && m_currentTemplate != null )
 			{
@@ -236,11 +250,27 @@ namespace AmplifyShaderEditor
 #endif
 
 		}
-
+#if TEMPLATE_MODULES
+		public void DrawBlendOptions()
+		{
+			m_blendOpHelper.Draw( this );
+		}
+#endif
 		public void DrawGeneralOptions()
 		{
 			DrawShaderName();
 			DrawCurrentShaderType();
+#if TEMPLATE_MODULES
+			if( m_currentTemplate.CullModeData.ValidCullData )
+			{
+				m_cullModeHelper.Draw( this );
+			}
+
+			if( m_currentTemplate.ColorMaskData.ValidColorMaskData )
+			{
+				m_colorMaskHelper.Draw( this );
+			}
+#endif
 		}
 
 		public void DrawSnippetOptions()
@@ -301,25 +331,20 @@ namespace AmplifyShaderEditor
 			}
 			return isValid;
 		}
-		
-		public override void OnNodeLayout( DrawInfo drawInfo )
+
+		public override void Draw( DrawInfo drawInfo )
 		{
+			base.Draw( drawInfo );
+
 			if( m_currentTemplate == null )
 			{
 				FetchCurrentTemplate();
 			}
 
-			base.OnNodeLayout( drawInfo );
-
 			if( m_reRegisterTemplateData )
 			{
 				RegisterProperties();
 			}
-		}
-
-		public override void Draw( DrawInfo drawInfo )
-		{
-			base.Draw( drawInfo );
 
 			if( m_containerGraph.IsInstancedShader )
 			{
@@ -341,7 +366,7 @@ namespace AmplifyShaderEditor
 				m_containerGraph.FireMasterNodeReplacedEvent();
 			}
 		}
-		
+
 		public override void UpdateFromShader( Shader newShader )
 		{
 			if( m_currentMaterial != null )
@@ -410,7 +435,6 @@ namespace AmplifyShaderEditor
 				m_currentDataCollector.UniformsList.AddRange( m_currentDataCollector.InstancedPropertiesList );
 			}
 
-
 			//Add Functions
 			m_currentDataCollector.UniformsList.AddRange( m_currentDataCollector.FunctionsList );
 
@@ -425,19 +449,27 @@ namespace AmplifyShaderEditor
 			validBody = m_currentTemplate.FillTemplateBody( TemplatesManager.TemplateGlobalsTag, ref shaderBody, m_currentDataCollector.UniformsList ) && validBody;
 			validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.VertexDataId, ref shaderBody, m_currentDataCollector.VertexInputList.ToArray() ) && validBody;
 			validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.InterpDataId, ref shaderBody, m_currentDataCollector.InterpolatorList.ToArray() ) && validBody;
+#if TEMPLATE_MODULES
+			if( m_currentTemplate.BlendData.ValidBlendMode )
+			{
+				validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.BlendData.BlendModeId, ref shaderBody, m_blendOpHelper.CurrentBlendFactor ) && validBody;
+			}
 
-			//if( m_currentTemplate.BlendData.ValidBlendMode )
-			//{
-			//	string blendMode = m_blendOpHelper.CurrentBlendFactor;
-			//	Debug.Log("Blend Mode: "+ blendMode );
-			//}
-			//
-			//if( m_currentTemplate.BlendData.ValidBlendOp )
-			//{
-			//	string blendOp = m_blendOpHelper.CurrentBlendOp;
-			//	Debug.Log( "Blend Op: " + blendOp );
-			//}
+			if( m_currentTemplate.BlendData.ValidBlendOp )
+			{
+				validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.BlendData.BlendOpId, ref shaderBody, m_blendOpHelper.CurrentBlendOp ) && validBody;
+			}
 
+			if( m_currentTemplate.CullModeData.ValidCullData )
+			{
+				validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.CullModeData.CullModeId, ref shaderBody, m_cullModeHelper.GenerateShaderData() ) && validBody;
+			}
+
+			if( m_currentTemplate.ColorMaskData.ValidColorMaskData )
+			{
+				validBody = m_currentTemplate.FillTemplateBody( m_currentTemplate.ColorMaskData.ColorMaskId, ref shaderBody, m_colorMaskHelper.GenerateShaderData() ) && validBody;
+			}
+#endif
 			if( m_currentDataCollector.TemplateDataCollectorInstance.HasVertexInputParams )
 			{
 				validBody = m_currentTemplate.FillTemplateBody( TemplatesManager.TemplateInputsVertParamsTag, ref shaderBody, m_currentDataCollector.TemplateDataCollectorInstance.VertexInputParamsStr ) && validBody;
@@ -498,17 +530,33 @@ namespace AmplifyShaderEditor
 						m_masterNodeCategory = -1;
 					}
 				}
-				
-				////BLEND MODULE
-				//if( m_currentTemplate.BlendData.ValidBlendMode )
-				//{
-				//	m_blendOpHelper.ReadBlendModeFromString( ref m_currentReadParamIdx, ref nodeParams );
-				//}
-				//
-				//if( m_currentTemplate.BlendData.ValidBlendOp )
-				//{
-				//	m_blendOpHelper.ReadBlendOpFromString( ref m_currentReadParamIdx, ref nodeParams );
-				//}
+#if TEMPLATE_MODULES
+				if( UIUtils.CurrentShaderVersion() > 13802 )
+				{
+					//BLEND MODULE
+					if( m_currentTemplate.BlendData.ValidBlendMode )
+					{
+						m_blendOpHelper.ReadBlendModeFromString( ref m_currentReadParamIdx, ref nodeParams );
+					}
+
+					if( m_currentTemplate.BlendData.ValidBlendOp )
+					{
+						m_blendOpHelper.ReadBlendOpFromString( ref m_currentReadParamIdx, ref nodeParams );
+					}
+
+					//CULL MODE
+					if( m_currentTemplate.CullModeData.ValidCullData )
+					{
+						m_cullModeHelper.ReadFromString( ref m_currentReadParamIdx, ref nodeParams );
+					}
+
+					//COLOR MASK
+					if( m_currentTemplate.ColorMaskData.ValidColorMaskData )
+					{
+						m_colorMaskHelper.ReadFromString( ref m_currentReadParamIdx, ref nodeParams );
+					}
+				}
+#endif
 			}
 			catch( Exception e )
 			{
@@ -517,31 +565,51 @@ namespace AmplifyShaderEditor
 			m_containerGraph.CurrentCanvasMode = NodeAvailability.TemplateShader;
 		}
 
-		public override void Destroy()
-		{
-			base.Destroy();
-			m_currentTemplate = null;
-			//m_blendOpHelper = null;
-		}
-
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
 		{
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_shaderName );
 			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_currentTemplate != null ) ? m_currentTemplate.GUID : string.Empty );
 			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_currentTemplate != null ) ? m_currentTemplate.DefaultShaderName : string.Empty );
-			
-			////BLEND MODULE
-			//if( m_currentTemplate.BlendData.ValidBlendMode )
-			//{
-			//	m_blendOpHelper.WriteBlendModeToString( ref nodeInfo );
-			//}
-			//
-			//if( m_currentTemplate.BlendData.ValidBlendOp )
-			//{
-			//	m_blendOpHelper.WriteBlendOpToString( ref nodeInfo );
-			//}
+#if TEMPLATE_MODULES
+			BLEND MODULE
+			if( m_currentTemplate.BlendData.ValidBlendMode )
+			{
+				m_blendOpHelper.WriteBlendModeToString( ref nodeInfo );
+			}
+
+			if( m_currentTemplate.BlendData.ValidBlendOp )
+			{
+				m_blendOpHelper.WriteBlendOpToString( ref nodeInfo );
+			}
+
+			//CULL MODULE
+			if( m_currentTemplate.CullModeData.ValidCullData )
+			{
+				m_cullModeHelper.WriteToString( ref nodeInfo );
+			}
+
+			//COLOR MASK MODULE
+			if( m_currentTemplate.ColorMaskData.ValidColorMaskData )
+			{
+				m_colorMaskHelper.WriteToString( ref nodeInfo );
+			}
+#endif
 		}
+
+
+		public override void Destroy()
+		{
+			base.Destroy();
+			m_currentTemplate = null;
+#if TEMPLATE_MODULES
+			m_blendOpHelper = null;
+			m_cullModeHelper = null;
+			m_colorMaskHelper.Destroy();
+			m_colorMaskHelper = null;
+#endif
+		}
+
 
 		public TemplateData CurrentTemplate { get { return m_currentTemplate; } }
 	}

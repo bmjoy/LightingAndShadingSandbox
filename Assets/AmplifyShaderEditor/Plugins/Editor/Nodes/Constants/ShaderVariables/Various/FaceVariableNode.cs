@@ -41,7 +41,7 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				dataCollector.AddToInput( UniqueId, Constants.VFaceInput, true );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.VFACE );
 				string variable = ( dataCollector.PortCategory == MasterNodePortCategory.Vertex ) ? Constants.VertexShaderOutputStr : Constants.InputVarStr;
 				return variable + "." + Constants.VFaceVariable;
 			}

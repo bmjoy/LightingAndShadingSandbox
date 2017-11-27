@@ -1364,7 +1364,7 @@ namespace AmplifyShaderEditor
 					string dummyUV = "uv" + ( m_textureCoordSet > 0 ? ( m_textureCoordSet + 1 ).ToString() : "" ) + dummyPropUV;
 						
 					dataCollector.AddToProperties( UniqueId, "[HideInInspector] " + dummyPropUV + "( \"\", 2D ) = \"white\" {}", 100 );
-					dataCollector.AddToInput( UniqueId, "float2 " + dummyUV, true );
+					dataCollector.AddToInput( UniqueId, dummyUV, WirePortDataType.FLOAT2 );
 
 					string attr = GetPropertyValue();
 
@@ -1438,7 +1438,7 @@ namespace AmplifyShaderEditor
 				else
 				{
 					coordInput = Constants.InputVarStr + "." + dummyUV;
-					dataCollector.AddToInput( UniqueId, "float" + ( coordSize > 1 ? coordSize.ToString() : "" ) + " " + dummyUV, true );
+					dataCollector.AddToInput( UniqueId, dummyUV, m_uvPort.DataType );
 				}
 
 				if( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )

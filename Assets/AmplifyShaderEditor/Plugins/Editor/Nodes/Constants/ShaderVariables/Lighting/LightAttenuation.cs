@@ -20,7 +20,7 @@ namespace AmplifyShaderEditor
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
 			//Debug.Log( dataCollector.CurrentCanvasMode );
-			if ( dataCollector.CurrentCanvasMode != NodeAvailability.CustomLighting )
+			if ( dataCollector.GenType == PortGenType.NonCustomLighting || dataCollector.CurrentCanvasMode != NodeAvailability.CustomLighting )
                 return "1";
 
 			dataCollector.UsingLightAttenuation = true;

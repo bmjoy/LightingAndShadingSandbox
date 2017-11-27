@@ -32,8 +32,8 @@ namespace AmplifyShaderEditor
 			dataCollector.AddToIncludes( UniqueId, Constants.UnityCgLibFuncs );
 			dataCollector.AddToUniforms( UniqueId, "uniform sampler2D _CameraDepthTexture;" );
 
-			string screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, true );
-			string screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, true );
+			string screenPos = GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
+			string screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalized( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
 
 			string screenDepth = "LinearEyeDepth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture,UNITY_PROJ_COORD(" + screenPos + "))))";
 			string distance = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );

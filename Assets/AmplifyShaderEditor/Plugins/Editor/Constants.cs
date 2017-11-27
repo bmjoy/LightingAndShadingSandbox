@@ -206,7 +206,8 @@ namespace AmplifyShaderEditor
 		public readonly static string VFaceVariable = "ASEVFace";
 		public readonly static string VFaceInput = "fixed ASEVFace : VFACE";
 
-
+		public readonly static string ColorVariable = "vertexColor";
+		public readonly static string ColorInput = "float4 vertexColor : COLOR";
 
 		public readonly static string NoStringValue = "None";
 		public readonly static string EmptyPortValue = "  ";

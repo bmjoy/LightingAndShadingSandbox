@@ -107,6 +107,14 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		protected List<int> m_selectedAttribs = new List<int>();
 
+		//Title editing 
+		protected bool m_isEditing;
+		protected bool m_stopEditing;
+		protected bool m_startEditing;
+		protected double m_clickTime;
+		protected double m_doubleClickTime = 0.3;
+		private Rect m_titleClickArea;
+		
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -535,14 +543,7 @@ namespace AmplifyShaderEditor
 		{
 			//base.DrawTitle( titlePos );
 		}
-
-		protected bool m_isEditing;
-		protected bool m_stopEditing;
-		protected bool m_startEditing;
-		protected double m_clickTime;
-		protected double m_doubleClickTime = 0.3;
-		private Rect m_titleClickArea;
-
+		
 		public override void Draw( DrawInfo drawInfo )
 		{
 			base.Draw( drawInfo );

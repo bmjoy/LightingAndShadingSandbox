@@ -80,7 +80,7 @@ namespace AmplifyShaderEditor
 				return m_outputPorts[ 0 ].LocalValue;
 
 			if( dataCollector.IsFragmentCategory )
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_POS );
 
 			string viewdir = GeneratorUtils.GenerateViewDirection( ref dataCollector, UniqueId, ViewSpace.World );
 
@@ -91,11 +91,11 @@ namespace AmplifyShaderEditor
 
 				if( dataCollector.IsFragmentCategory )
 				{
-					dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+					dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 
 					if( m_normalSpace == ViewSpace.Tangent )
 					{
-						dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
+						dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
 						dataCollector.ForceNormal = true;
 						normal = "WorldNormalVector( " + Constants.InputVarStr + " , " + normal + " )";
 					}
@@ -113,9 +113,9 @@ namespace AmplifyShaderEditor
 			{
 				if( dataCollector.IsFragmentCategory )
 				{
-					dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
+					dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
 					if( dataCollector.DirtyNormal )
-						dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+						dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 				}
 
 				normal = dataCollector.IsTemplate ? dataCollector.TemplateDataCollectorInstance.GetWorldNormal() : GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId );

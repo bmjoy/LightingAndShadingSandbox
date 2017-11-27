@@ -63,6 +63,15 @@ namespace AmplifyShaderEditor
 		private bool m_midTextureFoldout = true;
 		private bool m_botTextureFoldout = true;
 
+		private InputPort m_topTexPort;
+		private InputPort m_midTexPort;
+		private InputPort m_botTexPort;
+		private InputPort m_tilingPort;
+		private InputPort m_falloffPort;
+		private InputPort m_topIndexPort;
+		private InputPort m_midIndexPort;
+		private InputPort m_botIndexPort;
+		
 		private readonly string m_functionCall = "TriplanarSampling{0}( {1} )";
 		private readonly string m_functionHeader = "inline {0} TriplanarSampling{1}( {2}float3 worldPos, float3 worldNormal, float falloff, float tilling, float3 index )";
 
@@ -125,16 +134,7 @@ namespace AmplifyShaderEditor
 		private readonly List<string> m_functionSamplingBodyReturnCylinder = new List<string>() {
 			"return xNorm * projNormal.x + yNorm * projNormal.y + yNormN * negProjNormalY + zNorm * projNormal.z;"
 		};
-
-		InputPort m_topTexPort;
-		InputPort m_midTexPort;
-		InputPort m_botTexPort;
-		InputPort m_tilingPort;
-		InputPort m_falloffPort;
-		InputPort m_topIndexPort;
-		InputPort m_midIndexPort;
-		InputPort m_botIndexPort;
-
+		
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -157,6 +157,7 @@ namespace AmplifyShaderEditor
 			m_tilingPort = InputPorts[ 6 ];
 			m_falloffPort = InputPorts[ 7 ];
 
+			m_tilingPort.FloatInternalData = 1;
 			m_topIndexPort.FloatInternalData = 1;
 			m_falloffPort.FloatInternalData = 1;
 			m_topIndexPort.Visible = false;
@@ -961,9 +962,9 @@ namespace AmplifyShaderEditor
 
 			if( !isVertex )
 			{
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
-				dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_POS );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 				dataCollector.ForceNormal = true;
 			}
 

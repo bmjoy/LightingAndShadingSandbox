@@ -155,7 +155,7 @@ namespace AmplifyShaderEditor
 				string dummyUV = "uv" + ( index > 0 ? ( index + 1 ).ToString() : "" ) + dummyPropUV;
 
 				dataCollector.AddToProperties( uniqueId, "[HideInInspector] " + dummyPropUV + "( \"\", 2D ) = \"white\" {}", 100 );
-				dataCollector.AddToInput( uniqueId, UIUtils.WirePortToCgType( size ) + " " + dummyUV, true );
+				dataCollector.AddToInput( uniqueId, dummyUV, size );
 
 				result = Constants.InputVarStr + "." + dummyUV;
 			}
@@ -189,13 +189,31 @@ namespace AmplifyShaderEditor
 			if( !string.IsNullOrEmpty( propertyName ) )
 			{
 				dataCollector.AddToUniforms( uniqueId, "uniform float4 " + propertyName + "_ST;" );
-				dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, "uv" + propertyName, result + " * " + propertyName + "_ST.xy + " + propertyName + "_ST.zw" );
+				if( size > WirePortDataType.FLOAT2 )
+				{
+					dataCollector.UsingHigherSizeTexcoords = true;
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, "uv" + propertyName, result );
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, "uv" + propertyName + ".xy = " + result + ".xy * " + propertyName + "_ST.xy + " + propertyName + "_ST.zw;" );
+				}
+				else
+				{
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, "uv" + propertyName, result + " * " + propertyName + "_ST.xy + " + propertyName + "_ST.zw" );
+				}
 
 				result = "uv" + propertyName;
 			}
 			else if( !string.IsNullOrEmpty( scale ) && !string.IsNullOrEmpty( offset ) )
 			{
-				dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, varName, result + " * " + scale + " + " + offset );
+				if( size > WirePortDataType.FLOAT2 )
+				{
+					dataCollector.UsingHigherSizeTexcoords = true;
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, varName, result );
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, varName + ".xy = " + result + ".xy * " + scale + " + " + offset + ";" );
+				}
+				else
+				{
+					dataCollector.AddToLocalVariables( dataCollector.PortCategory, uniqueId, PrecisionType.Float, size, varName, result + " * " + scale + " + " + offset );
+				}
 
 				result = varName;
 			}
@@ -217,14 +235,27 @@ namespace AmplifyShaderEditor
 		// SCREEN POSITION
 		static public string GenerateScreenPosition( ref MasterNodeDataCollector dataCollector, int uniqueId, PrecisionType precision, bool addInput = true )
 		{
-			if( !dataCollector.IsFragmentCategory )
-				return GenerateVertexScreenPosition( ref dataCollector, uniqueId, precision );
+			if( dataCollector.UsingCustomScreenPos && dataCollector.IsFragmentCategory )
+			{
+				string value = GenerateVertexScreenPosition( ref dataCollector, uniqueId, precision );
+				dataCollector.AddToInput( uniqueId, "screenPosition", WirePortDataType.FLOAT4, precision );
+				dataCollector.AddToVertexLocalVariables( uniqueId, Constants.VertexShaderOutputStr + ".screenPosition = " + value+";" );
 
-			if( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetScreenPos();
+				string globalResult = Constants.InputVarStr + ".screenPosition";
+				dataCollector.AddLocalVariable( uniqueId, string.Format( "float4 {0} = {1};", ScreenPositionStr, globalResult ) );
+				return ScreenPositionStr;
+			} else
+			{
+				if( !dataCollector.IsFragmentCategory )
+					return GenerateVertexScreenPosition( ref dataCollector, uniqueId, precision );
+
+				if( dataCollector.IsTemplate )
+					return dataCollector.TemplateDataCollectorInstance.GetScreenPos();
+			}
+
 
 			if( addInput )
-				dataCollector.AddToInput( uniqueId, UIUtils.GetInputDeclarationFromType( precision, AvailableSurfaceInputs.SCREEN_POS ), true );
+				dataCollector.AddToInput( uniqueId, SurfaceInputs.SCREEN_POS, precision );
 
 			string result = Constants.InputVarStr + ".screenPos";
 			dataCollector.AddLocalVariable( uniqueId, string.Format( "float4 {0} = float4( {1}.xyz , {1}.w + 0.00000000001 );", ScreenPositionStr, result ) );
@@ -252,7 +283,7 @@ namespace AmplifyShaderEditor
 
 			if( dataCollector.PortCategory == MasterNodePortCategory.Fragment || dataCollector.PortCategory == MasterNodePortCategory.Debug )
 			{
-				dataCollector.AddToInput( uniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
+				dataCollector.AddToInput( uniqueId, SurfaceInputs.WORLD_POS );
 				dataCollector.AddToIncludes( uniqueId, Constants.UnityShaderVariables );
 
 				value = "mul( unity_WorldToObject, float4( " + Constants.InputVarStr + ".worldPos , 1 ) )";
@@ -303,11 +334,9 @@ namespace AmplifyShaderEditor
 			string value = Constants.VertexShaderInputStr + ".tangent.w";
 			if( dataCollector.IsFragmentCategory )
 			{
-				//GenerateWorldTangent( ref dataCollector, uniqueId );
-				dataCollector.AddToInput( uniqueId, "fixed " + VertexTangentSignStr, true );
+				dataCollector.AddToInput( uniqueId, VertexTangentSignStr, WirePortDataType.FLOAT, PrecisionType.Fixed );
 				dataCollector.AddToVertexLocalVariables( uniqueId, Constants.VertexShaderOutputStr + "." + VertexTangentSignStr + " = " + Constants.VertexShaderInputStr + ".tangent.w;" );
 				return Constants.InputVarStr + "." + VertexTangentSignStr;
-				//dataCollector.AddToLocalVariables( uniqueId, precision, WirePortDataType.FLOAT, VertexTangentSignStr, "mul( unity_WorldToObject, float4( " + WorldTangentStr + ", 0 ) )" );
 			}
 			else
 			{
@@ -336,7 +365,7 @@ namespace AmplifyShaderEditor
 		// VERTEX POSITION ON FRAG
 		static public string GenerateVertexPositionOnFrag( ref MasterNodeDataCollector dataCollector, int uniqueId, PrecisionType precision )
 		{
-			dataCollector.AddToInput( uniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
+			dataCollector.AddToInput( uniqueId, SurfaceInputs.WORLD_POS );
 			dataCollector.AddToIncludes( uniqueId, Constants.UnityShaderVariables );
 
 			string value = "mul( unity_WorldToObject, float4( " + Constants.InputVarStr + ".worldPos , 1 ) )";

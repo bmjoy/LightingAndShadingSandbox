@@ -26,7 +26,7 @@ namespace AmplifyShaderEditor
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
-			m_currentInput = AvailableSurfaceInputs.SCREEN_POS;
+			m_currentInput = SurfaceInputs.SCREEN_POS;
 			InitialSetup();
 			m_textLabelWidth = 65;
 			m_autoWrapProperties = true;
@@ -86,7 +86,7 @@ namespace AmplifyShaderEditor
 				return GetOutputVectorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue );
 			}
 
-			if( dataCollector.IsFragmentCategory )
+			if( dataCollector.IsFragmentCategory && !dataCollector.UsingCustomScreenPos )
 				base.GenerateShaderForOutput( outputId, ref dataCollector, ignoreLocalVar );
 
 			string screenPos = string.Empty;

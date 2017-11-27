@@ -142,7 +142,7 @@ namespace AmplifyShaderEditor
 			string dummyUV = "uv" + ( index > 0 ? ( index + 1 ).ToString() : "" ) + dummyPropUV;
 
 			dataCollector.AddToProperties( uniqueId, "[HideInInspector] " + dummyPropUV + "( \"\", 2D ) = \"white\" {}", 100 );
-			dataCollector.AddToInput( uniqueId, UIUtils.WirePortToCgType( size ) + " " + dummyUV, true );
+			dataCollector.AddToInput( uniqueId, dummyUV, size );
 
 			string result = Constants.InputVarStr + "." + dummyUV;
 			if ( !string.IsNullOrEmpty( propertyName ) )

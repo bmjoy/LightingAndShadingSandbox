@@ -61,20 +61,60 @@ namespace AmplifyShaderEditor
 	}
 
 	[Serializable]
+	public class TemplateStencilData
+	{
+		public bool ValidStencilData = false;
+
+		public int Reference;
+		public int ReadMask;
+		public int WriteMask;
+
+		public string ComparisonFront;
+		public string PassFront;
+		public string FailFront;
+		public string ZFailFront;
+
+		public string ComparisonBack;
+		public string PassBack;
+		public string FailBack;
+		public string ZFailBack;
+	}
+	
+	[Serializable]
 	public class TemplateBlendData
 	{
-		public bool ValidBlendMode = false;
-		public bool SeparateBlendFactors = false;
-		public AvailableBlendFactor SourceFactorRGB = AvailableBlendFactor.SrcAlpha;
-		public AvailableBlendFactor DestFactorRGB = AvailableBlendFactor.OneMinusSrcAlpha;
+		public bool ValidBlendData = false;
 
-		public AvailableBlendFactor SourceFactorAlpha = AvailableBlendFactor.SrcAlpha;
-		public AvailableBlendFactor DestFactorAlpha = AvailableBlendFactor.OneMinusSrcAlpha;
+		public bool ValidBlendMode = false;
+		public string BlendModeId;
+		public bool SeparateBlendFactors = false;
+		public AvailableBlendFactor SourceFactorRGB = AvailableBlendFactor.One;
+		public AvailableBlendFactor DestFactorRGB = AvailableBlendFactor.Zero;
+
+		public AvailableBlendFactor SourceFactorAlpha = AvailableBlendFactor.One;
+		public AvailableBlendFactor DestFactorAlpha = AvailableBlendFactor.Zero;
 
 		public bool ValidBlendOp = false;
+		public string BlendOpId;
 		public bool SeparateBlendOps = false;
 		public AvailableBlendOps BlendOpRGB = AvailableBlendOps.OFF;
 		public AvailableBlendOps BlendOpAlpha = AvailableBlendOps.OFF;
+	}
+
+	[Serializable]
+	public class TemplateCullModeData
+	{
+		public bool ValidCullData = false;
+		public string CullModeId;
+		public CullMode CullModeData = CullMode.Front;
+	}
+
+	[Serializable]
+	public class TemplateColorMaskData
+	{
+		public bool ValidColorMaskData = false;
+		public string ColorMaskId;
+		public bool[] ColorMaskData = { true, true, true, true };
 	}
 
 	public class TemplateHelperFunctions
@@ -231,11 +271,14 @@ namespace AmplifyShaderEditor
 		//public static readonly string PropertiesPattern = @"(\w*)\s*\(\s*\""([\w ] *)\""\s*\,\s*(\w*)\s*.*\)";
 		public static readonly string PropertiesPatternB = "(\\w*)\\s*\\(\\s*\"([\\w ]*)\"\\s*\\,\\s*(\\w*)\\s*.*\\)";
 
-		public static readonly string CullModePattern = @"^\s*(?:Cull\s*)*(\w+)";
-		public static readonly string ColorMaskPattern = @"^\s*(?:ColorMask\s*)*(\w+)";
+		public static readonly string CullModePattern = @"\s*Cull\s+(\w+)";
+		public static readonly string ColorMaskPattern = @"\s*ColorMask\s+(\w+)";
 		public static readonly string BlendModePattern = @"\s*Blend\s+(\w+)\s+(\w+)(?:[\s,]+(\w+)\s+(\w+)|)";
 		public static readonly string BlendOpPattern = @"\s*BlendOp\s+(\w+)[\s,]*(?:(\w+)|)";
 
+		//public static readonly string StencilOpGlobalPattern = @"Stencil\s{([\w\W\s]*)}\/\*ase_stencil\*\/";
+		public static readonly string StencilOpGlobalPattern = @"Stencil\s*{([\w\W\s]*)}";
+		public static readonly string StencilOpLinePattern = @"(\w+)\s*(\w+)";
 
 		public static readonly string ShaderGlobalsOverallPattern = @"[\}\#][\w\s\;\/\*]*\/\*ase_globals\*\/";
 		public static readonly string ShaderGlobalsMultilinePattern = @"^\s*(?:uniform\s*)*(\w*)\s*(\w*);$";
@@ -311,8 +354,171 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public static void CreateBlendMode( string blendModeData, ref TemplateBlendData blendData )
+		public static void CreateStencilOps( string stencilData, ref TemplateStencilData stencilDataObj )
 		{
+			MatchCollection overallGlobalMatch = Regex.Matches( stencilData, StencilOpGlobalPattern );
+			if( overallGlobalMatch.Count == 1 && overallGlobalMatch[ 0 ].Groups.Count == 2 )
+			{
+				string value = overallGlobalMatch[ 0 ].Groups[ 1 ].Value;
+				foreach( Match match in Regex.Matches( value, StencilOpLinePattern ) )
+				{
+					if( match.Groups.Count == 3 )
+					{
+						switch( match.Groups[ 1 ].Value )
+						{
+							case "Ref":
+							{
+								try
+								{
+									stencilDataObj.Reference = Convert.ToInt32( match.Groups[ 2 ].Value );
+								}
+								catch( Exception e )
+								{
+									Debug.LogException( e );
+								}
+							}
+							break;
+							case "ReadMask":
+							{
+								try
+								{
+								stencilDataObj.ReadMask =  Convert.ToInt32( match.Groups[ 2 ].Value );
+								}
+								catch( Exception e )
+								{
+									Debug.LogException( e );
+								}
+							}
+							break;
+							case "WriteMask":
+							{
+								try
+								{
+								stencilDataObj.WriteMask = Convert.ToInt32( match.Groups[ 2 ].Value );
+								}
+								catch( Exception e )
+								{
+									Debug.LogException( e );
+								}
+							}
+							break;
+							case "CompFront":
+							case "Comp":
+							{
+								stencilDataObj.ComparisonFront = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "PassFront":
+							case "Pass":
+							{
+								stencilDataObj.PassFront = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "FailFront":
+							case "Fail":
+							{
+								stencilDataObj.FailFront = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "ZFail":
+							case "ZFailFront":
+							{
+								stencilDataObj.ZFailFront = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "CompBack":
+							{
+								stencilDataObj.ComparisonBack = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "PassBack":
+							{
+								stencilDataObj.PassBack = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "FailBack":
+							{
+								stencilDataObj.ZFailBack = match.Groups[ 2 ].Value;
+							}
+							break;
+							case "ZFailBack":
+							{
+								stencilDataObj.ZFailBack = match.Groups[ 2 ].Value;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		public static void CreateColorMask( string colorMaskData, ref TemplateColorMaskData colorMaskObj )
+		{
+			colorMaskObj.ValidColorMaskData = true;
+			foreach( Match match in Regex.Matches( colorMaskData, ColorMaskPattern ) )
+			{
+				if( match.Groups.Count == 2 )
+				{
+					for( int i = 0; i < 4; i++ )
+					{
+						colorMaskObj.ColorMaskData[ i ] = false;
+					}
+
+					try
+					{
+						bool breakCycle = false;
+						for( int i = 0; i < match.Groups[ 1 ].Value.Length; i++ )
+						{
+							if( breakCycle )
+								break;
+							
+							switch( Char.ToLower( match.Groups[ 1 ].Value[ i ] ) )
+							{
+								case'0':
+								{
+									breakCycle = true;
+									for( int j = 0; j < 4; j++ )
+									{
+										colorMaskObj.ColorMaskData[ j ] = false;
+									}
+								}break;
+								case 'r': colorMaskObj.ColorMaskData[ 0 ] = true;break;
+								case 'g': colorMaskObj.ColorMaskData[ 1 ] = true;break;
+								case 'b': colorMaskObj.ColorMaskData[ 2 ] = true;break;
+								case 'a': colorMaskObj.ColorMaskData[ 3 ] = true;break;
+							}
+						}
+					}
+					catch( Exception e )
+					{
+						Debug.LogException( e );
+					}
+				}
+			}
+		}
+
+		public static void CreateCullMode( string cullModeData, ref TemplateCullModeData cullDataObj )
+		{
+			cullDataObj.ValidCullData = true;
+			foreach( Match match in Regex.Matches( cullModeData, CullModePattern ) )
+			{
+				if( match.Groups.Count == 2 )
+				{
+					try
+					{
+						cullDataObj.CullModeData = (CullMode)Enum.Parse( typeof( CullMode ), match.Groups[1].Value );
+					}
+					catch( Exception e )
+					{
+						Debug.LogException( e );
+					}
+				}
+			}
+		}
+
+		public static void CreateBlendMode( string blendModeData, ref TemplateBlendData blendDataObj )
+		{
+			blendDataObj.ValidBlendMode = true;
 			// TODO: OPTIMIZE REGEX EXPRESSIONS TO NOT CATCH EMPTY GROUPS 
 			foreach( Match match in Regex.Matches( blendModeData, BlendModePattern ) )
 			{
@@ -322,15 +528,13 @@ namespace AmplifyShaderEditor
 					{
 						AvailableBlendFactor sourceAll = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 1 ].Value );
 						AvailableBlendFactor destAll = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 2 ].Value );
-						blendData.SeparateBlendFactors = false;
-						blendData.SourceFactorRGB = sourceAll;
-						blendData.DestFactorRGB = destAll;
-						blendData.ValidBlendMode = true;
+						blendDataObj.SeparateBlendFactors = false;
+						blendDataObj.SourceFactorRGB = sourceAll;
+						blendDataObj.DestFactorRGB = destAll;
 					}
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-						blendData.ValidBlendMode = false;
 					}
 					break;
 				}
@@ -339,36 +543,35 @@ namespace AmplifyShaderEditor
 					try
 					{
 						AvailableBlendFactor sourceRGB = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 1 ].Value );
-						blendData.SourceFactorRGB = sourceRGB;
+						blendDataObj.SourceFactorRGB = sourceRGB;
 						AvailableBlendFactor destRGB = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 2 ].Value );
-						blendData.DestFactorRGB = destRGB;
+						blendDataObj.DestFactorRGB = destRGB;
 
 						if( match.Groups[ 3 ].Success && match.Groups[ 4 ].Success )
 						{
 							AvailableBlendFactor sourceA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 3 ].Value );
-							blendData.SourceFactorAlpha = sourceA;
+							blendDataObj.SourceFactorAlpha = sourceA;
 							AvailableBlendFactor destA = (AvailableBlendFactor)Enum.Parse( typeof( AvailableBlendFactor ), match.Groups[ 4 ].Value );
-							blendData.DestFactorAlpha = destA;
-							blendData.SeparateBlendFactors = true;
+							blendDataObj.DestFactorAlpha = destA;
+							blendDataObj.SeparateBlendFactors = true;
 						}
 						else
 						{
-							blendData.SeparateBlendFactors = false;
+							blendDataObj.SeparateBlendFactors = false;
 						}
-						blendData.ValidBlendMode = true;
 					}
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-						blendData.ValidBlendMode = false;
 					}
 					break;
 				}
 			}
 		}
 
-		public static void CreateBlendOp( string blendOpData, ref TemplateBlendData blendData )
+		public static void CreateBlendOp( string blendOpData, ref TemplateBlendData blendDataObj )
 		{
+			blendDataObj.ValidBlendOp = true;
 			// TODO: OPTIMIZE REGEX EXPRESSIONS TO NOT CATCH EMPTY GROUPS 
 			foreach( Match match in Regex.Matches( blendOpData, BlendOpPattern,RegexOptions.None) )
 			{
@@ -377,14 +580,12 @@ namespace AmplifyShaderEditor
 					try
 					{
 						AvailableBlendOps blendOpsAll = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 1 ].Value );
-						blendData.SeparateBlendOps = false;
-						blendData.ValidBlendOp = true;
-						blendData.BlendOpRGB = blendOpsAll;
+						blendDataObj.SeparateBlendOps = false;
+						blendDataObj.BlendOpRGB = blendOpsAll;
 					}
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-						blendData.ValidBlendOp = false;
 					}
 					break;
 				}
@@ -393,24 +594,22 @@ namespace AmplifyShaderEditor
 					try
 					{
 						AvailableBlendOps blendOpsRGB = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 1 ].Value );
-						blendData.BlendOpRGB = blendOpsRGB;
+						blendDataObj.BlendOpRGB = blendOpsRGB;
 						if( match.Groups[ 2 ].Success )
 						{
 							AvailableBlendOps blendOpsA = (AvailableBlendOps)Enum.Parse( typeof( AvailableBlendOps ), match.Groups[ 2 ].Value );
-							blendData.BlendOpAlpha = blendOpsA;
-							blendData.SeparateBlendOps = true;
+							blendDataObj.BlendOpAlpha = blendOpsA;
+							blendDataObj.SeparateBlendOps = true;
 						}
 						else
 						{
-							blendData.SeparateBlendOps = false;
+							blendDataObj.SeparateBlendOps = false;
 						}
 						
-						blendData.ValidBlendOp = true;
 					}
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-						blendData.ValidBlendOp = false;
 					}
 					break;
 				}

@@ -2391,9 +2391,6 @@ namespace AmplifyShaderEditor
 			m_afterDeserializeFlag = true;
 		}
 
-		[SerializeField]
-		private List<ParentNode> m_serializedProp;
-
 		public void CleanCorruptedNodes()
 		{
 			for( int i = 0; i < m_nodes.Count; i++ )

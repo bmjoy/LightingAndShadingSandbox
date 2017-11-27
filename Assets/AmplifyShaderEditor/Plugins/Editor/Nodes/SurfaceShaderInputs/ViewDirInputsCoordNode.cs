@@ -27,7 +27,7 @@ namespace AmplifyShaderEditor
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
-			m_currentInput = AvailableSurfaceInputs.VIEW_DIR;
+			m_currentInput = SurfaceInputs.VIEW_DIR;
 			InitialSetup();
 			m_textLabelWidth = 75;
 			m_autoWrapProperties = true;
@@ -103,13 +103,15 @@ namespace AmplifyShaderEditor
 				{
 					if ( dataCollector.DirtyNormal )
 					{
-						dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( PrecisionType.Float, AvailableSurfaceInputs.WORLD_POS ), true );
+						dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_POS );
 						string result = GeneratorUtils.GenerateViewDirection( ref dataCollector, UniqueId );
 						return GetOutputVectorItem( 0, outputId, result );
 					}
 					else
 					{
-						return base.GenerateShaderForOutput( outputId, ref dataCollector, ignoreLocalVar );
+						dataCollector.AddToInput( UniqueId, SurfaceInputs.VIEW_DIR, PrecisionType.Float );
+						return GetOutputVectorItem( 0, outputId, m_currentInputValueStr );
+						//return base.GenerateShaderForOutput( outputId, ref dataCollector, ignoreLocalVar );
 					}
 				}
 				else

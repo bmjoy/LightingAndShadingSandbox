@@ -69,7 +69,7 @@ namespace AmplifyShaderEditor
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
-			if( dataCollector.CurrentCanvasMode != NodeAvailability.CustomLighting )
+			if( dataCollector.GenType == PortGenType.NonCustomLighting || dataCollector.CurrentCanvasMode != NodeAvailability.CustomLighting )
 				return "float3(0,0,0)";
 
 			if( m_outputPorts[ 0 ].IsLocalValue )
@@ -79,11 +79,11 @@ namespace AmplifyShaderEditor
 			if( m_workflow == ASEStandardSurfaceWorkflow.Specular )
 				specularMode = "Specular";
 
-			dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_NORMAL ), true );
+			dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_NORMAL, m_currentPrecisionType );
 
 			if( dataCollector.DirtyNormal )
 			{
-				dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 				dataCollector.ForceNormal = true;
 			}
 

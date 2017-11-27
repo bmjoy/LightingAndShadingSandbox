@@ -100,7 +100,7 @@ namespace AmplifyShaderEditor
 
 			if ( isFragment )
 			{
-				string screenPos = dataCollector.IsTemplate? dataCollector.TemplateDataCollectorInstance.GetScreenPos():GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, true );
+				string screenPos = dataCollector.IsTemplate? dataCollector.TemplateDataCollectorInstance.GetScreenPos():GeneratorUtils.GenerateScreenPosition( ref dataCollector, UniqueId, m_currentPrecisionType, !dataCollector.UsingCustomScreenPos );
 				localVarName = screenPos + OutputId;
 				//dataCollector.AddToInput( m_uniqueId, "float4 " + ScreenPosStr, true );
 				string value = UIUtils.PrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType ) + " " + localVarName + " = " + screenPos + ";";

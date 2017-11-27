@@ -102,12 +102,12 @@ namespace AmplifyShaderEditor
 				if( m_outputPorts[ 0 ].IsLocalValue )
 					return GetOutputVectorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue );
 				
-				dataCollector.AddToInput( UniqueId, UIUtils.GetInputDeclarationFromType( m_currentPrecisionType, AvailableSurfaceInputs.WORLD_REFL ), true );
-				
+				dataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_REFL, m_currentPrecisionType );
+
 				string result = string.Empty;
 				if( m_inputPorts[ 0 ].IsConnected )
 				{
-					dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+					dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 					dataCollector.ForceNormal = true;
 
 					result = "WorldReflectionVector( " + Constants.InputVarStr + " , " + m_inputPorts[ 0 ].GenerateShaderForOutput( ref dataCollector, WirePortDataType.FLOAT3, ignoreLocalVar ) + " )";
@@ -128,7 +128,7 @@ namespace AmplifyShaderEditor
 				}
 				else
 				{
-					dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
+					dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 					result = GeneratorUtils.GenerateWorldReflection( ref dataCollector, UniqueId );
 				}
 

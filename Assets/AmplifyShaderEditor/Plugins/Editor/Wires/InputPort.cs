@@ -31,6 +31,9 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private MasterNodePortCategory m_category = MasterNodePortCategory.Fragment;
 
+		[SerializeField]
+		private PortGenType m_genType;
+
 		private string m_propertyName = string.Empty;
 		private int m_cachedPropertyId = -1;
 
@@ -54,21 +57,23 @@ namespace AmplifyShaderEditor
 		private Color m_previewInternalColor = Color.clear;
 
 		public InputPort() : base( -1, -1, WirePortDataType.FLOAT, string.Empty ) { m_typeLocked = true; UpdateInternalData(); }
-		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment ) : base( nodeId, portId, dataType, name, orderId )
+		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment, PortGenType genType = PortGenType.NonCustomLighting ) : base( nodeId, portId, dataType, name, orderId )
 		{
 			m_dataName = name;
 			m_internalDataPropertyLabel = ( string.IsNullOrEmpty( name ) || name.Equals( Constants.EmptyPortValue ) ) ? InputDefaultNameStr : name;
 			m_typeLocked = typeLocked;
 			m_category = category;
+			m_genType = genType;
 			UpdateInternalData();
 		}
 
-		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, string dataName, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment ) : base( nodeId, portId, dataType, name, orderId )
+		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, string dataName, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment, PortGenType genType = PortGenType.NonCustomLighting ) : base( nodeId, portId, dataType, name, orderId )
 		{
 			m_dataName = dataName;
 			m_internalDataPropertyLabel = ( string.IsNullOrEmpty( name ) || name.Equals( Constants.EmptyPortValue ) ) ? InputDefaultNameStr : name;
 			m_typeLocked = typeLocked;
 			m_category = category;
+			m_genType = genType;
 			UpdateInternalData();
 		}
 
@@ -1049,6 +1054,12 @@ namespace AmplifyShaderEditor
 		{
 			get { return m_internalDataPropertyLabel; }
 			set { m_internalDataPropertyLabel = value; }
+		}
+
+		public PortGenType GenType
+		{
+			get { return m_genType; }
+			set { m_genType = value; }
 		}
 
 		public bool ValidInternalData

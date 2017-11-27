@@ -554,7 +554,7 @@ namespace AmplifyShaderEditor
 
 		public string GetWorldReflection( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment )
 		{
-			string varName = UIUtils.GetInputValueFromType( AvailableSurfaceInputs.WORLD_REFL );
+			string varName = UIUtils.GetInputValueFromType( SurfaceInputs.WORLD_REFL );
 			if ( HasCustomInterpolatedData( varName, useMasterNodeCategory, customCategory ) )
 				return varName;
 
@@ -579,7 +579,7 @@ namespace AmplifyShaderEditor
 
 		public string GetWorldPos( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment )
 		{
-			string varName = UIUtils.GetInputValueFromType( AvailableSurfaceInputs.WORLD_POS );
+			string varName = UIUtils.GetInputValueFromType( SurfaceInputs.WORLD_POS );
 			if ( HasCustomInterpolatedData( varName, useMasterNodeCategory, customCategory ) )
 				return varName;
 
@@ -618,7 +618,7 @@ namespace AmplifyShaderEditor
 
 		public string GetScreenPos( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment )
 		{
-			string varName = UIUtils.GetInputValueFromType( AvailableSurfaceInputs.SCREEN_POS );
+			string varName = UIUtils.GetInputValueFromType( SurfaceInputs.SCREEN_POS );
 			if ( HasCustomInterpolatedData( varName, useMasterNodeCategory, customCategory ) )
 				return varName;
 
@@ -630,7 +630,7 @@ namespace AmplifyShaderEditor
 
 		public string GetViewDir( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment )
 		{
-			string varName = UIUtils.GetInputValueFromType( AvailableSurfaceInputs.VIEW_DIR );
+			string varName = UIUtils.GetInputValueFromType( SurfaceInputs.VIEW_DIR );
 			if ( HasCustomInterpolatedData( varName, useMasterNodeCategory, customCategory ) )
 				return varName;
 

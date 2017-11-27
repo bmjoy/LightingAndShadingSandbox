@@ -68,10 +68,9 @@ namespace AmplifyShaderEditor
 				return m_outputPorts[ 0 ].ErrorValue;
 			}
 
-			string tpName = UIUtils.FinalPrecisionWirePortToCgType( m_currentPrecisionType, m_inputPorts[ 0 ].DataType );
 
 			string interpName = "data" + OutputId;
-			dataCollector.AddToInput( UniqueId, tpName + " " + interpName, true );
+			dataCollector.AddToInput( UniqueId, interpName, m_inputPorts[ 0 ].DataType, m_currentPrecisionType );
 
 			MasterNodePortCategory portCategory = dataCollector.PortCategory;
 			dataCollector.PortCategory = MasterNodePortCategory.Vertex;

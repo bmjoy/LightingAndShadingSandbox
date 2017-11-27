@@ -200,7 +200,7 @@ namespace AmplifyShaderEditor
 		private const string VertexPositionStr = "Local Vertex Position";
 		private const string VertexDataStr = "VertexData";
 		private const string VertexNormalStr = "Local Vertex Normal";
-		//private const string CustomLightModelStr = "C. Light Model";
+		private const string CustomLightingStr = "Custom Lighting";
 		private const string AlbedoStr = "Albedo";
 		private const string NormalStr = "Normal";
 		private const string EmissionStr = "Emission";
@@ -301,6 +301,12 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private float m_opacityMaskClipValue = 0.5f;
+
+		[SerializeField]
+		private int m_customLightingPortId = -1;
+
+		[SerializeField]
+		private int m_emissionPortId = -1;
 
 		[SerializeField]
 		private int m_discardPortId = -1;
@@ -436,20 +442,18 @@ namespace AmplifyShaderEditor
 					AddInputPort( WirePortDataType.FLOAT, false, OcclusionLabelStr, OcclusionDataStr, index++, MasterNodePortCategory.Fragment, 5 );
 				}
 				break;
-				//case StandardShaderLightModel.CustomLighting:
-				//{
-				//	AddInputPort( WirePortDataType.FLOAT3, false, AlbedoStr, 1, MasterNodePortCategory.Fragment, 0 );
-				//	m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
-				//	AddInputPort( WirePortDataType.FLOAT3, false, NormalStr, 0, MasterNodePortCategory.Fragment, 1 );
-				//	m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
-				//	AddInputPort( WirePortDataType.FLOAT3, false, EmissionStr, index++, MasterNodePortCategory.Fragment, 2 );
-				//	AddInputPort( WirePortDataType.FLOAT, false, SpecularStr, index++, MasterNodePortCategory.Fragment, 3 );
-				//	m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
-				//	AddInputPort( WirePortDataType.FLOAT, false, GlossStr, index++, MasterNodePortCategory.Fragment, 4 );
-				//	m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
-				//}
-				//break;
 				case StandardShaderLightModel.CustomLighting:
+				{
+					AddInputPort( WirePortDataType.FLOAT3, false, AlbedoStr, 1, MasterNodePortCategory.Fragment, 0 );
+					AddInputPort( WirePortDataType.FLOAT3, false, NormalStr, 0, MasterNodePortCategory.Fragment, 1 );
+					m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
+					AddInputPort( WirePortDataType.FLOAT3, false, EmissionStr, index++, MasterNodePortCategory.Fragment, 2 );
+					AddInputPort( WirePortDataType.FLOAT, false, SpecularStr, index++, MasterNodePortCategory.Fragment, 3 );
+					m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
+					AddInputPort( WirePortDataType.FLOAT, false, GlossStr, index++, MasterNodePortCategory.Fragment, 4 );
+					m_inputPorts[ m_inputPorts.Count - 1 ].Locked = true;
+				}
+				break;
 				case StandardShaderLightModel.Unlit:
 				{
 					AddInputPort( WirePortDataType.FLOAT3, false, AlbedoStr, 1, MasterNodePortCategory.Fragment, 0 );
@@ -483,6 +487,9 @@ namespace AmplifyShaderEditor
 				break;
 			}
 
+			// instead of setting in the switch emission port is always at position 2;
+			m_emissionPortId = 2;
+
 			AddInputPort( WirePortDataType.FLOAT3, false, TransmissionStr, index++, MasterNodePortCategory.Fragment, 6 );
 			m_transmissionPort = m_inputPorts[ m_inputPorts.Count - 1 ];
 			m_inputPorts[ m_inputPorts.Count - 1 ].Locked = ( m_currentLightModel == StandardShaderLightModel.Standard ) || ( m_currentLightModel == StandardShaderLightModel.StandardSpecular ) ? false : true;
@@ -506,6 +513,11 @@ namespace AmplifyShaderEditor
 
 			// This is done to take the index + 2 from refraction port into account and not overlap indexes 
 			index++;
+
+			AddInputPort( WirePortDataType.FLOAT3, false, CustomLightingStr, index++, MasterNodePortCategory.Fragment, 13 );
+			m_inputPorts[ m_inputPorts.Count - 1 ].Locked = ( m_currentLightModel != StandardShaderLightModel.CustomLighting );
+			m_inputPorts[ m_inputPorts.Count - 1 ].GenType = PortGenType.CustomLighting;
+			m_customLightingPortId = m_inputPorts.Count - 1;
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 			// Vertex functions - Adding ordex index in order to force these to be the last ones 
@@ -558,6 +570,14 @@ namespace AmplifyShaderEditor
 				}
 				break;
 				case StandardShaderLightModel.CustomLighting:
+				{
+					m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
+					m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
+					m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
+					m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
+					m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT, false );
+				}
+				break;
 				case StandardShaderLightModel.Unlit:
 				case StandardShaderLightModel.Lambert:
 				{
@@ -589,12 +609,12 @@ namespace AmplifyShaderEditor
 			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT, false );
 			//Discard
 			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT, false );
+			//Custom Lighting
+			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
 			//Vertex Offset
 			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
 			//Vertex Normal
 			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
-			//Custom Light
-			//m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT3, false );
 			//Tessellation
 			m_inputPorts[ portId++ ].ChangeType( WirePortDataType.FLOAT4, false );
 			//Debug
@@ -1443,11 +1463,14 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				// Custom Light Model
-				//TODO: Create Custom Light behaviour
 				//Collect data from standard nodes
 				for ( int i = 0; i < sortedPorts.Count; i++ )
 				{
+					// prepare ports for custom lighting
+					m_currentDataCollector.GenType = sortedPorts[ i ].GenType;
+					if( m_currentLightModel == StandardShaderLightModel.CustomLighting && sortedPorts[ i ].Name.Equals( AlphaStr ) )
+						ContainerGraph.ResetNodesLocalVariables();
+
 					if ( sortedPorts[ i ].IsConnected )
 					{
 						if ( i == 0 )// Normal Map is Connected
@@ -1479,8 +1502,8 @@ namespace AmplifyShaderEditor
 
 						if ( hasRefraction )
 						{
-							m_currentDataCollector.AddToInput( UniqueId, "float4 screenPos", true );
-							m_currentDataCollector.AddToInput( UniqueId, "float3 worldPos", true );
+							m_currentDataCollector.AddToInput( UniqueId, SurfaceInputs.SCREEN_POS );
+							m_currentDataCollector.AddToInput( UniqueId, SurfaceInputs.WORLD_POS );
 
 							//not necessary, just being safe
 							m_currentDataCollector.DirtyNormal = true;
@@ -1565,39 +1588,12 @@ namespace AmplifyShaderEditor
 						{
 							//Discard Op Node
 							m_currentDataCollector.PortCategory = MasterNodePortCategory.Fragment;
-							//string opacityValue = "0.0";
-							//switch ( sortedPorts[ i ].ConnectionType() )
-							//{
-							//	case WirePortDataType.INT:
-							//	case WirePortDataType.FLOAT:
-							//	{
-							//		opacityValue = IOUtils.MaskClipValueName;//UIUtils.FloatToString( m_opacityMaskClipValue );
-							//	}
-							//	break;
-
-							//	case WirePortDataType.FLOAT2:
-							//	{
-							//		opacityValue = string.Format( "( {0} ).xx", IOUtils.MaskClipValueName );
-							//	}
-							//	break;
-
-							//	case WirePortDataType.FLOAT3:
-							//	{
-							//		opacityValue = string.Format( "( {0} ).xxx", IOUtils.MaskClipValueName );
-							//	}
-							//	break;
-							//	case WirePortDataType.COLOR:
-							//	case WirePortDataType.FLOAT4:
-							//	{
-							//		opacityValue = string.Format( "( {0} ).xxxx", IOUtils.MaskClipValueName );
-							//	}
-							//	break;
-							//}
 
 							if ( m_currentLightModel == StandardShaderLightModel.CustomLighting )
 							{
 								hasCustomLightingMask = true;
 								m_currentDataCollector.UsingCustomOutput = true;
+								m_currentDataCollector.GenType = PortGenType.CustomLighting;
 								WireReference connection = sortedPorts[ i ].GetConnection();
 								ParentNode node = UIUtils.GetNode( connection.NodeId );
 
@@ -1605,6 +1601,7 @@ namespace AmplifyShaderEditor
 								customLightingMaskCode = "clip( " + customLightingMaskCode + " - " + IOUtils.MaskClipValueName + " )";
 								customLightingInstructions = m_currentDataCollector.CustomOutput;
 
+								m_currentDataCollector.GenType = PortGenType.NonCustomLighting;
 								m_currentDataCollector.UsingCustomOutput = false;
 								continue;
 							} else
@@ -1671,7 +1668,7 @@ namespace AmplifyShaderEditor
 
 							m_currentDataCollector.UsingCustomOutput = false;
 						}
-						else if ( sortedPorts[ i ].Name.Equals( EmissionStr ) && m_currentLightModel == StandardShaderLightModel.CustomLighting )
+						else if ( sortedPorts[ i ].Name.Equals( CustomLightingStr ) )
 						{
 							//if ( !hasCustomLightingAlpha )
 							//	ContainerGraph.ResetNodesLocalVariables();
@@ -1697,12 +1694,15 @@ namespace AmplifyShaderEditor
 							}
 
 							m_currentDataCollector.UsingCustomOutput = false;
+
+							//ContainerGraph.ResetNodesLocalVariables();
 						}
 						else if ( sortedPorts[ i ].Name.Equals( AlphaStr ) && m_currentLightModel == StandardShaderLightModel.CustomLighting )
 						{
 							//hasCustomLightingAlpha = true;
 							//ContainerGraph.ResetNodesLocalVariables();
 							m_currentDataCollector.UsingCustomOutput = true;
+							m_currentDataCollector.GenType = PortGenType.CustomLighting;
 
 							WireReference connection = sortedPorts[ i ].GetConnection();
 							ParentNode node = UIUtils.GetNode( connection.NodeId );
@@ -1723,6 +1723,7 @@ namespace AmplifyShaderEditor
 								m_currentDataCollector.ClearVertexLocalVariables();
 							}
 
+							m_currentDataCollector.GenType = PortGenType.NonCustomLighting;
 							m_currentDataCollector.UsingCustomOutput = false;
 						}
 						else
@@ -1756,7 +1757,7 @@ namespace AmplifyShaderEditor
 			else
 				m_customShadowCaster = false;
 
-			//m_customShadowCaster = false;
+			//m_customShadowCaster = true;
 
 			for ( int i = 0; i < 4; i++ )
 			{
@@ -2271,7 +2272,7 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t#pragma multi_compile_shadowcaster\n";
 						ShaderBody += "\t\t\t#pragma multi_compile UNITY_PASS_SHADOWCASTER\n";
 						ShaderBody += "\t\t\t#pragma skip_variants FOG_LINEAR FOG_EXP FOG_EXP2\n";
-						ShaderBody += "\t\t\t# include \"HLSLSupport.cginc\"\n";
+						ShaderBody += "\t\t\t#include \"HLSLSupport.cginc\"\n";
 						ShaderBody += "\t\t\t#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )\n";
 						ShaderBody += "\t\t\t\t#define CAN_SKIP_VPOS\n";
 						ShaderBody += "\t\t\t#endif\n";
@@ -2590,8 +2591,10 @@ namespace AmplifyShaderEditor
 				}
 			}
 
-			//added transmission input after translucency
-			if ( UIUtils.CurrentShaderVersion() < 2407 )
+			portId = newPort;
+
+			//added transmission input after occlusion
+			if( UIUtils.CurrentShaderVersion() < 2407 )
 			{
 				switch ( m_currentLightModel )
 				{
@@ -2609,6 +2612,8 @@ namespace AmplifyShaderEditor
 					break;
 				}
 			}
+
+			portId = newPort;
 
 			//added tessellation ports
 			if ( UIUtils.CurrentShaderVersion() < 3002 )
@@ -2630,6 +2635,8 @@ namespace AmplifyShaderEditor
 				}
 			}
 
+			portId = newPort;
+
 			//added refraction after translucency
 			if ( UIUtils.CurrentShaderVersion() < 3204 )
 			{
@@ -2650,8 +2657,10 @@ namespace AmplifyShaderEditor
 				}
 			}
 
-			//removed custom lighting port
-			if ( UIUtils.CurrentShaderVersion() < 10003 )
+			portId = newPort;
+
+			//removed custom lighting port 
+			//if ( UIUtils.CurrentShaderVersion() < 10003 ) //runs everytime because this system is only used after 5000 version
 			{
 				switch ( m_currentLightModel )
 				{
@@ -2670,6 +2679,28 @@ namespace AmplifyShaderEditor
 				}
 			}
 
+			portId = newPort;
+
+			//if( UIUtils.CurrentShaderVersion() < 13802 ) //runs everytime because this system is only used after 5000 version
+			{
+				switch( m_currentLightModel )
+				{
+					case StandardShaderLightModel.Standard:
+					case StandardShaderLightModel.StandardSpecular:
+					if( portId >= 11 )
+						newPort += 1;
+					break;
+					case StandardShaderLightModel.CustomLighting:
+					case StandardShaderLightModel.Unlit:
+					case StandardShaderLightModel.Lambert:
+					case StandardShaderLightModel.BlinnPhong:
+					if( portId >= 10 )
+						newPort += 1;
+					break;
+				}
+			}
+
+			portId = newPort;
 			return newPort;
 		}
 
@@ -2826,6 +2857,19 @@ namespace AmplifyShaderEditor
 			catch ( Exception e )
 			{
 				Debug.Log( e );
+			}
+		}
+
+		public override void RefreshExternalReferences()
+		{
+			base.RefreshExternalReferences();
+
+			// change port connection from emission to the new custom lighting port
+			if( m_currentLightModel == StandardShaderLightModel.CustomLighting && m_inputPorts[ m_emissionPortId ].IsConnected && UIUtils.CurrentShaderVersion() < 13802 )
+			{
+				OutputPort port = m_inputPorts[ m_emissionPortId ].GetOutputConnection( 0 );
+				m_inputPorts[ m_emissionPortId ].FullDeleteConnections();
+				UIUtils.SetConnection( m_inputPorts[ m_customLightingPortId ].NodeId, m_inputPorts[ m_customLightingPortId ].PortId, port.NodeId, port.PortId );
 			}
 		}
 
