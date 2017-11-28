@@ -6,17 +6,20 @@ Shader "Pipeworks_Custom/Lambert"
 	{
 		_BaseTint("Base Tint", Color) = (0.9191176,0.5205312,0.2840074,1)
 		_BaseRGB("Base (RGB)", 2D) = "white" {}
+		_NormalMap("Normal Map", 2D) = "bump" {}
+		_NormalScale("Normal Scale", Range( 0 , 4)) = 1
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
 
 	SubShader
 	{
-		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" "IsEmissive" = "true"  }
+		Tags{ "RenderType" = "Opaque"  "Queue" = "Geometry+0" }
 		Cull Back
 		ColorMask RGB
 		CGINCLUDE
 		#include "UnityPBSLighting.cginc"
+		#include "UnityStandardUtils.cginc"
 		#include "UnityCG.cginc"
 		#include "UnityShaderVariables.cginc"
 		#include "Lighting.cginc"
@@ -33,8 +36,8 @@ Shader "Pipeworks_Custom/Lambert"
 		{
 			float3 worldNormal;
 			INTERNAL_DATA
-			float3 worldPos;
 			float2 uv_texcoord;
+			float3 worldPos;
 		};
 
 		struct SurfaceOutputCustomLightingCustom
@@ -50,6 +53,9 @@ Shader "Pipeworks_Custom/Lambert"
 			UnityGIInput GIData;
 		};
 
+		uniform half _NormalScale;
+		uniform sampler2D _NormalMap;
+		uniform float4 _NormalMap_ST;
 		uniform half4 _BaseTint;
 		uniform sampler2D _BaseRGB;
 		uniform float4 _BaseRGB_ST;
@@ -67,17 +73,18 @@ Shader "Pipeworks_Custom/Lambert"
 			float3 ase_lightAttenRGB = gi.light.color / ( ( _LightColor0.rgb ) + 0.000001 );
 			float ase_lightAtten = max( max( ase_lightAttenRGB.r, ase_lightAttenRGB.g ), ase_lightAttenRGB.b );
 			#endif
-			float3 newWorldNormal2_g46 = WorldNormalVector( i , float3(0,0,1) );
+			float2 uv_NormalMap = i.uv_texcoord * _NormalMap_ST.xy + _NormalMap_ST.zw;
+			float3 newWorldNormal2_g114 = WorldNormalVector( i , (UnpackScaleNormal( tex2D( _NormalMap, uv_NormalMap ) ,_NormalScale )).xyz );
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
-			float dotResult3_g47 = dot( newWorldNormal2_g46 , ase_worldlightDir );
-			float3 normalizeResult31_g46 = normalize( newWorldNormal2_g46 );
-			UnityGI gi28_g46 = gi;
-			gi28_g46 = UnityGI_Base( data, 1, normalizeResult31_g46 );
-			float3 indirectDiffuse28_g46 = gi28_g46.indirect.diffuse;
+			float dotResult3_g115 = dot( newWorldNormal2_g114 , ase_worldlightDir );
+			float3 normalizeResult50_g114 = normalize( newWorldNormal2_g114 );
+			UnityGI gi28_g114 = gi;
+			gi28_g114 = UnityGI_Base( data, 1, normalizeResult50_g114 );
+			float3 indirectDiffuse28_g114 = gi28_g114.indirect.diffuse;
 			float2 uv_BaseRGB = i.uv_texcoord * _BaseRGB_ST.xy + _BaseRGB_ST.zw;
-			float4 temp_output_14_0_g46 = tex2D( _BaseRGB, uv_BaseRGB );
-			c.rgb = saturate( ( ( ( saturate( max( dotResult3_g47 , 0.0 ) ) * ( _LightColor0.rgb * ase_lightAtten ) ) + indirectDiffuse28_g46 ) * (_BaseTint).rgb * (temp_output_14_0_g46).rgb ) );
+			float4 temp_output_14_0_g114 = tex2D( _BaseRGB, uv_BaseRGB );
+			c.rgb = saturate( ( ( ( saturate( max( dotResult3_g115 , 0.0 ) ) * ( _LightColor0.rgb * ase_lightAtten ) ) + indirectDiffuse28_g114 ) * (_BaseTint).rgb * (temp_output_14_0_g114).rgb ) );
 			c.a = 1;
 			return c;
 		}
@@ -110,7 +117,7 @@ Shader "Pipeworks_Custom/Lambert"
 			#pragma multi_compile_shadowcaster
 			#pragma multi_compile UNITY_PASS_SHADOWCASTER
 			#pragma skip_variants FOG_LINEAR FOG_EXP FOG_EXP2
-			# include "HLSLSupport.cginc"
+			#include "HLSLSupport.cginc"
 			#if ( SHADER_API_D3D11 || SHADER_API_GLCORE || SHADER_API_GLES3 || SHADER_API_METAL || SHADER_API_VULKAN )
 				#define CAN_SKIP_VPOS
 			#endif
@@ -176,16 +183,22 @@ Shader "Pipeworks_Custom/Lambert"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=13706
-1953;34;1796;1125;1315.486;240.9391;1;True;False
-Node;AmplifyShaderEditor.ColorNode;6;-700.365,252.601;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.SamplerNode;5;-751.454,69.267;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;51;-441.486,154.0609;Float;False;Lambert;-1;;46;219de6595bdc9994abce6a464acc9397;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
-Node;AmplifyShaderEditor.SaturateNode;50;-115.486,154.0609;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;16;56.1386,107.3465;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;14;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
-WireConnection;51;0;5;0
-WireConnection;51;1;6;0
-WireConnection;50;0;51;0
-WireConnection;16;2;50;0
+Version=13803
+1953;34;1796;1125;1914.483;255.9377;1;True;False
+Node;AmplifyShaderEditor.RangedFloatNode;81;-1439.483,398.0623;Half;False;Property;_NormalScale;Normal Scale;3;0;1;0;4;0;1;FLOAT
+Node;AmplifyShaderEditor.SamplerNode;78;-1141.483,352.0623;Float;True;Property;_NormalMap;Normal Map;2;0;None;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.SamplerNode;5;-888.454,-3.733002;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.ComponentMaskNode;79;-821.483,352.0623;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.ColorNode;6;-837.365,179.601;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.FunctionNode;89;-525.486,162.0609;Float;False;Lambert;-1;;114;219de6595bdc9994abce6a464acc9397;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
+Node;AmplifyShaderEditor.SaturateNode;50;-146.486,163.0609;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;16;56.1386,107.3465;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+WireConnection;78;5;81;0
+WireConnection;79;0;78;0
+WireConnection;89;0;5;0
+WireConnection;89;1;6;0
+WireConnection;89;2;79;0
+WireConnection;50;0;89;0
+WireConnection;16;13;50;0
 ASEEND*/
-//CHKSM=24F878183033E97A91C482B3A46B61E26DA8F36A
+//CHKSM=576DA37024C8A186F260CC15479D801180E300FD
