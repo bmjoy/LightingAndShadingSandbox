@@ -157,7 +157,7 @@ Shader "Pipeworks_Custom/Minnaert"
 		float unityAtten = LIGHT_ATTENUATION(IN);
 
 		fixed rimLight = frensel(-IN.viewDir, lightDirection, _frenselPower);
-		rimLight *= saturate(dot(fixed3(0, 1, 0), worldNormal)* 0.5 + 0.5) * saturate(dot(fixed3(0, 1, 0), -IN.viewDir) + 1.75);
+		rimLight *= saturate(dot(fixed3(0, 1, 0), worldNormal) * 0.5 + 0.5) * saturate(dot(fixed3(0, 1, 0), -IN.viewDir) + 1.75);
 		fixed3 diffuse = _LightColor0.xyz * (diffuseL + (rimLight * diffuseL)) * unityAtten;
 		diffuse = saturate(UNITY_LIGHTMODEL_AMBIENT.xyz + diffuse);
 		rimLight *= (1 - diffuseL);

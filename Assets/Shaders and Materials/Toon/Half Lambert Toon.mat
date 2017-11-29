@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: Half Lambert Toon
   m_Shader: {fileID: 4800000, guid: 6cc258ca59310034892faa2239966c49, type: 3}
-  m_ShaderKeywords: _USERAMPTEX_ON
+  m_ShaderKeywords: _USEHALFLAMBERT_ON _USERAMPTEX_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -23,7 +23,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normals:
-        m_Texture: {fileID: 2800000, guid: b3d940e75e1f5d24684cd93a2758e1bf, type: 3}
+        m_Texture: {fileID: 2800000, guid: 302951faffe230848aa0d3df7bb70faa, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonRampRGB:
@@ -43,7 +43,7 @@ Material:
     - _NormalScale: 0.25
     - _Specular: 1
     - _SpecularIntensity: 0.8
-    - _UseHalfLambert: 0
+    - _UseHalfLambert: 1
     - _UseRampTex: 1
     - __dirty: 0
     m_Colors:

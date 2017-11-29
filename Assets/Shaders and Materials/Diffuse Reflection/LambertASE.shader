@@ -184,12 +184,12 @@ Shader "Pipeworks_Custom/Lambert"
 }
 /*ASEBEGIN
 Version=13803
-1953;34;1796;1125;1914.483;255.9377;1;True;False
+1953;34;1796;1125;1814.483;250.9377;1;True;False
 Node;AmplifyShaderEditor.RangedFloatNode;81;-1439.483,398.0623;Half;False;Property;_NormalScale;Normal Scale;3;0;1;0;4;0;1;FLOAT
 Node;AmplifyShaderEditor.SamplerNode;78;-1141.483,352.0623;Float;True;Property;_NormalMap;Normal Map;2;0;None;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.SamplerNode;5;-888.454,-3.733002;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.ComponentMaskNode;79;-821.483,352.0623;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.ColorNode;6;-837.365,179.601;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
+Node;AmplifyShaderEditor.ComponentMaskNode;79;-821.483,352.0623;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.SamplerNode;5;-888.454,-3.733002;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
 Node;AmplifyShaderEditor.FunctionNode;89;-525.486,162.0609;Float;False;Lambert;-1;;114;219de6595bdc9994abce6a464acc9397;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
 Node;AmplifyShaderEditor.SaturateNode;50;-146.486,163.0609;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;16;56.1386,107.3465;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
@@ -201,4 +201,4 @@ WireConnection;89;2;79;0
 WireConnection;50;0;89;0
 WireConnection;16;13;50;0
 ASEEND*/
-//CHKSM=576DA37024C8A186F260CC15479D801180E300FD
+//CHKSM=CFBC3BACF57D8E4A25B483299FE8FA7EA8D6289E
