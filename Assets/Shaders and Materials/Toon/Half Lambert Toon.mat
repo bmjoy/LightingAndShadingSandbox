@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Half Lambert Toon
-  m_Shader: {fileID: 4800000, guid: 6cc258ca59310034892faa2239966c49, type: 3}
+  m_Shader: {fileID: 4800000, guid: b5105a5b84b82054785506952e8d7935, type: 3}
   m_ShaderKeywords: _USEHALFLAMBERT_ON _USERAMPTEX_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0

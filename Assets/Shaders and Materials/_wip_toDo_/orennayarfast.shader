@@ -10,12 +10,10 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 	{
 		_diffuseColor("Diffuse Color", Color) = (1,1,1,1)
 		_diffuseMap("Diffuse", 2D) = "white" {}
-		_FrenselPower ("Rim Power", Range(1.0, 10.0)) = 2.5
-		_FrenselPower (" ", Float) = 2.5
+		_fresnelPower ("Rim Power", Range(1.0, 10.0)) = 2.5
 		_rimColor("Rim Color", Color) = (1,1,1,1)
 		_normalMap("Normal", 2D) = "bump" {}
-		_Roughness ("Roughness", Range(0.0, 1.0)) = 1
-		_Roughness (" ", Float) = 1
+		_roughness ("Roughness", Range(0.0, 1.0)) = 1
 	}
 	SubShader
 	{
@@ -34,11 +32,11 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 			uniform sampler2D _diffuseMap;
 			uniform half4 _diffuseMap_ST;
 			uniform fixed4 _LightColor0;
-			uniform half _FrenselPower;
+			uniform half _fresnelPower;
 			uniform fixed4 _rimColor;
 			uniform sampler2D _normalMap;
 			uniform half4 _normalMap_ST;
-			uniform half _Roughness;
+			uniform half _roughness;
 
 			struct app2vert
 			{
@@ -81,7 +79,7 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 				fixed fakeyNumber = .62;
 				fixed fakeyFix = 1-(saturate(dot(L,V)) * lambert);
 				fakey = fakeyNumber - fakey * (fakeyNumber*fakeyFix);
-				return lerp(lambert,fakey,_Roughness);
+				return lerp(lambert,fakey,_roughness);
 			}
 			vert2Pixel vShader(app2vert IN)
 			{
@@ -139,7 +137,7 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 				fixed diffuseL = orenNayar(normalDir, lightDirection, -IN.viewDir);
 
 				//rimLight calculation
-				fixed rimLight = frensel(normalDir, -IN.viewDir, _FrenselPower);
+				fixed rimLight = frensel(normalDir, -IN.viewDir, _fresnelPower);
 				rimLight *= saturate(dot(fixed3(0,1,0),normalDir)* 0.5 + 0.5)* saturate(dot(fixed3(0,1,0),-IN.viewDir)+ 1.75);
 				fixed3 diffuse = _LightColor0.xyz * (diffuseL+ (rimLight * diffuseL)) * attenuation;
 				rimLight *= (1-diffuseL);
@@ -174,7 +172,7 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 			uniform fixed4 _LightColor0;
 			uniform sampler2D _normalMap;
 			uniform half4 _normalMap_ST;
-			uniform half _Roughness;
+			uniform half _roughness;
 
 
 			struct app2vert {
@@ -212,7 +210,7 @@ Shader "CG Shaders/Alternative Lighting/OrenNayarFast"
 				fixed fakeyNumber = .62;
 				fixed fakeyFix = 1-(saturate(dot(L,V)) * lambert);
 				fakey = fakeyNumber - fakey * (fakeyNumber*fakeyFix);
-				return lerp(lambert,fakey,_Roughness);
+				return lerp(lambert,fakey,_roughness);
 			}
 			vert2Pixel vShader(app2vert IN)
 			{
