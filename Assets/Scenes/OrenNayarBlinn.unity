@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.450957, g: 0.5008293, b: 0.57442486, a: 1}
+  m_IndirectSpecularColor: {r: 0.4509564, g: 0.50082797, b: 0.5744253, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -338,14 +338,14 @@ Prefab:
         type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 936a322ddaf652040a463df31a415bde, type: 2}
+      objectReference: {fileID: 2100000, guid: d7010dfac8eb25e4bb6e1166a26fc05a, type: 2}
     - target: {fileID: 1000012017197192, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_Name
       value: ShaderBall
       objectReference: {fileID: 0}
     - target: {fileID: 1000012017197192, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4000010319129062, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_LocalScale.x
@@ -466,7 +466,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1224830793
 Transform:
   m_ObjectHideFlags: 0
@@ -562,7 +562,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: da2c233b59617744588b18235eda5f56, type: 2}
+  - {fileID: 2100000, guid: e747af35ad9980a4fb217465a6a8540f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -629,13 +629,13 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1403064609}
-  m_LocalRotation: {x: 0.6664642, y: -0.56372154, z: -0.07206202, w: 0.48254594}
+  m_LocalRotation: {x: 0.6694124, y: -0.63361996, z: 0.03542002, w: 0.3862102}
   m_LocalPosition: {x: 0, y: 11.01, z: 6.14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1565065022}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 34.191, y: -129.3, z: -82.968}
+  m_LocalEulerAnglesHint: {x: 34.191, y: -147.7, z: -82.968}
 --- !u!108 &1403064611
 Light:
   m_ObjectHideFlags: 0
@@ -647,7 +647,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 0.96732354, g: 1, b: 0.9191176, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.8
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -852,12 +852,12 @@ GameObject:
   - component: {fileID: 1845604334}
   - component: {fileID: 1845604333}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Moon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1845604333
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -872,7 +872,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: d7010dfac8eb25e4bb6e1166a26fc05a, type: 2}
+  - {fileID: 2100000, guid: 6523ae3e58fdf9443a1476b36c92ca70, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

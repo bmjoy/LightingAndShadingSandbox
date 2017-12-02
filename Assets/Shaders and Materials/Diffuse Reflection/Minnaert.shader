@@ -63,8 +63,14 @@ Shader "Pipeworks_Custom/Minnaert"
 		LIGHTING_COORDS(6, 7)
 	};
 
+	// Fresnel term at normal incidence.
+	float FZero()
+	{
+		return pow((1.0f - (1.0f / 1.31f)), 2) / pow((1.0f + (1.0f / 1.31f)), 2);
+	}
+
 	// Fresnel calculation.
-	fixed frensel(fixed3 V, fixed3 L, float P)
+	fixed frensel(fixed3 V, fixed3 L)
 	{
 		// Precalculate 1/2-vector
 		fixed3 halfV = normalize(L + V);
@@ -72,13 +78,10 @@ Shader "Pipeworks_Custom/Minnaert"
 		// Precalculate 1/2-vector falloff.
 		fixed hdotV = dot(halfV, V);
 
-		// Fresnel term at normal incidence
-		float F0 = pow((1.0f - (1.0f / 1.31f)), 2) / pow((1.0f + (1.0f / 1.31f)), 2);
-
 		// Calculate fresnel falloff using Schlick's approximation.
 		fixed base = 1.0 - hdotV;
-		float exponential = pow(base, P);
-		fixed fresnel = exponential + F0 * (1.0 - exponential);
+		float exponential = pow(base, _frenselPower);
+		fixed fresnel = exponential + FZero() * (1.0 - exponential);
 
 		return fresnel;
 	}
@@ -156,7 +159,7 @@ Shader "Pipeworks_Custom/Minnaert"
 		// and stored in the structure defined by LIGHTING_COORDS), and returns the value as a float.
 		float unityAtten = LIGHT_ATTENUATION(IN);
 
-		fixed rimLight = frensel(-IN.viewDir, lightDirection, _frenselPower);
+		fixed rimLight = frensel(-IN.viewDir, lightDirection);
 		rimLight *= saturate(dot(fixed3(0, 1, 0), worldNormal) * 0.5 + 0.5) * saturate(dot(fixed3(0, 1, 0), -IN.viewDir) + 1.75);
 		fixed3 diffuse = _LightColor0.xyz * (diffuseL + (rimLight * diffuseL)) * unityAtten;
 		diffuse = saturate(UNITY_LIGHTMODEL_AMBIENT.xyz + diffuse);
