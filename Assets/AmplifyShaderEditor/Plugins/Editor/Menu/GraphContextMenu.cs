@@ -110,10 +110,10 @@ namespace AmplifyShaderEditor
 										UIUtils.AddColorCategory( attribute.Category, Constants.DefaultCategoryColor );
 									}
 								}
-								else
-								{
-									UIUtils.AddColorCategory( attribute.Category, Constants.DefaultCategoryColor );
-								}
+								//else
+								//{
+								//	UIUtils.AddColorCategory( attribute.Category, Constants.DefaultCategoryColor );
+								//}
 							}
 
 							if ( attribute.CastType != null && attribute.CastType.Length > 0 && type != null )

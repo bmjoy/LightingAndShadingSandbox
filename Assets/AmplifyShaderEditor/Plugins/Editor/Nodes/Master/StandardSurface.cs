@@ -230,7 +230,7 @@ namespace AmplifyShaderEditor
 		private const string DefaultShaderName = "New AmplifyShader";
 
 		private const string ShaderInputOrderStr = "Shader Input Order";
-		private const string PropertyOderFoldoutStr = " Material Properties";
+		
 
 		[SerializeField]
 		private BlendOpsHelper m_blendOpsHelper = new BlendOpsHelper();
@@ -343,16 +343,11 @@ namespace AmplifyShaderEditor
 		private InputPort m_tessellationPort;
 		private bool m_previousTranslucencyOn = false;
 		private bool m_previousRefractionOn = false;
-		[SerializeField]
-		private List<PropertyNode> m_propertyNodes = new List<PropertyNode>();
-
+		
 		[SerializeField]
 		private CacheNodeConnections m_cacheNodeConnections = new CacheNodeConnections();
 
-		private ReorderableList m_propertyReordableList;
-		//private int m_availableCount = 0;
-		private int m_lastCount = 0;
-
+        
 		private bool m_usingProSkin = false;
 		private GUIStyle m_inspectorFoldoutStyle;
 		private GUIStyle m_inspectorToolbarStyle;
@@ -368,7 +363,7 @@ namespace AmplifyShaderEditor
 		private InputPort m_refractionPort;
 
 		private GUIStyle m_inspectorDefaultStyle;
-		private GUIStyle m_propertyAdjustment;
+		
 
 		[SerializeField]
 		private ReordenatorNode m_maskClipReorder = null;
@@ -642,94 +637,7 @@ namespace AmplifyShaderEditor
 			}
 			EditorGUILayout.EndHorizontal();
 		}
-
-
-
-		public void InvalidateMaterialPropertyCount()
-		{
-			m_lastCount = -1;
-		}
-
-		public void DrawMaterialInputs( GUIStyle toolbarstyle )
-		{
-			Color cachedColor = GUI.color;
-			GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, 0.5f );
-			EditorGUILayout.BeginHorizontal( toolbarstyle );
-			GUI.color = cachedColor;
-
-			EditorGUI.BeginChangeCheck();
-			ContainerGraph.ParentWindow.ExpandedProperties = GUILayoutToggle( ContainerGraph.ParentWindow.ExpandedProperties, PropertyOderFoldoutStr, m_inspectorFoldoutStyle );
-			if ( EditorGUI.EndChangeCheck() )
-			{
-				EditorPrefs.SetBool( "ExpandedProperties", ContainerGraph.ParentWindow.ExpandedProperties );
-			}
-
-			EditorGUILayout.EndHorizontal();
-			if ( !ContainerGraph.ParentWindow.ExpandedProperties )
-				return;
-
-			cachedColor = GUI.color;
-			GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, ( EditorGUIUtility.isProSkin ? 0.5f : 0.25f ) );
-			EditorGUILayout.BeginVertical( UIUtils.MenuItemBackgroundStyle );
-			GUI.color = cachedColor;
-			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
-			if ( m_propertyReordableList == null || nodes.Count != m_lastCount )
-			{
-				m_propertyNodes.Clear();
-
-				for ( int i = 0; i < nodes.Count; i++ )
-				{
-					ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
-					if ( ( rnode == null || !rnode.IsInside ) && ( !m_propertyNodes.Exists( x => x.PropertyName.Equals( nodes[ i ].PropertyName ) ) ) )
-						m_propertyNodes.Add( nodes[ i ] );
-				}
-
-				m_propertyNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
-
-				m_propertyReordableList = new ReorderableList( m_propertyNodes, typeof( PropertyNode ), true, false, false, false )
-				{
-					headerHeight = 0,
-					footerHeight = 0,
-					showDefaultBackground = false,
-
-					drawElementCallback = ( Rect rect, int index, bool isActive, bool isFocused ) =>
-					{
-						EditorGUI.LabelField( rect, m_propertyNodes[ index ].PropertyInspectorName );
-					},
-
-					onReorderCallback = ( list ) =>
-					{
-						ReorderList( ref nodes );
-
-						//RecursiveLog();
-					}
-				};
-				ReorderList( ref nodes );
-
-				m_lastCount = nodes.Count;
-			}
-
-			if ( m_propertyReordableList != null )
-			{
-				if ( m_propertyAdjustment == null )
-				{
-					m_propertyAdjustment = new GUIStyle();
-					m_propertyAdjustment.padding.left = 17;
-				}
-				EditorGUILayout.BeginVertical( m_propertyAdjustment );
-				m_propertyReordableList.DoLayoutList();
-				EditorGUILayout.EndVertical();
-			}
-			EditorGUILayout.EndVertical();
-		}
-
-		public void ForceReordering()
-		{
-			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
-			ReorderList( ref nodes );
-			//RecursiveLog();
-		}
-
+        
 		private void RecursiveLog()
 		{
 			List<PropertyNode> nodes = UIUtils.PropertyNodesList();
@@ -742,60 +650,7 @@ namespace AmplifyShaderEditor
 					Debug.Log( nodes[ i ].OrderIndex + " " + nodes[ i ].PropertyName );
 			}
 		}
-
-		private void ReorderList( ref List<PropertyNode> nodes )
-		{
-			// clear lock list before reordering because of multiple sf being used
-			for( int i = 0; i < nodes.Count; i++ )
-			{
-				ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
-				if( rnode != null )
-					rnode.RecursiveClear();
-			}
-
-			int propoffset = 0;
-			int count = 0;
-			for ( int i = 0; i < m_propertyNodes.Count; i++ )
-			{
-				ReordenatorNode renode = m_propertyNodes[ i ] as ReordenatorNode;
-				if ( renode != null )
-				{
-					if ( !renode.IsInside )
-					{
-						m_propertyNodes[ i ].OrderIndex = count + propoffset;
-
-						if ( renode.PropertyListCount > 0 )
-						{
-							propoffset += renode.RecursiveCount();
-							// the same reordenator can exist multiple times, apply ordering to all of them
-							for( int j = 0; j < nodes.Count; j++ )
-							{
-								ReordenatorNode pnode = ( nodes[ j ] as ReordenatorNode );
-								if( pnode != null && pnode.PropertyName.Equals( renode.PropertyName ) )
-								{
-									pnode.OrderIndex = renode.RawOrderIndex;
-									pnode.RecursiveSetOrderOffset( renode.RawOrderIndex, true );
-								}
-							}
-						}
-						else
-						{
-							count++;
-						}
-					}
-					else
-					{
-						m_propertyNodes[ i ].OrderIndex = 0;
-					}
-				}
-				else
-				{
-					m_propertyNodes[ i ].OrderIndex = count + propoffset;
-					count++;
-				}
-			}
-		}
-
+        
 		public void DrawGeneralOptions()
 		{
 			EditorGUI.BeginChangeCheck();
@@ -1015,7 +870,7 @@ namespace AmplifyShaderEditor
 					EditorGUILayout.EndVertical();
 				}
 
-				m_stencilBufferHelper.Draw( this, m_inspectorToolbarStyle );
+				m_stencilBufferHelper.Draw( this );
 				m_tessOpHelper.Draw( this, m_inspectorToolbarStyle, m_currentMaterial, m_tessellationPort.IsConnected );
 				m_outlineHelper.Draw( this, m_inspectorToolbarStyle, m_currentMaterial );
 				m_billboardOpHelper.Draw( this );
@@ -2173,7 +2028,15 @@ namespace AmplifyShaderEditor
 
 							//Add GI function
 							ShaderBody += "\t\tinline void Lighting" + m_currentLightModel.ToString() + Constants.CustomLightStructStr + "_GI(" + outputStruct + " " + Constants.CustomLightOutputVarStr + ", UnityGIInput data, inout UnityGI gi )\n\t\t{\n";
-							ShaderBody += "\t\t\tUNITY_GI(gi, " + Constants.CustomLightOutputVarStr + ", data);\n";
+
+							ShaderBody += "\t\t\t#if defined(UNITY_PASS_DEFERRED) && UNITY_ENABLE_REFLECTION_BUFFERS\n";
+							ShaderBody += "\t\t\t\tgi = UnityGlobalIllumination(data, " + Constants.CustomLightOutputVarStr + ".Occlusion, " + Constants.CustomLightOutputVarStr + ".Normal);\n";
+							ShaderBody += "\t\t\t#else\n";
+							ShaderBody += "\t\t\t\tUNITY_GLOSSY_ENV_FROM_SURFACE( g, " + Constants.CustomLightOutputVarStr + ", data );\n";
+							ShaderBody += "\t\t\t\tgi = UnityGlobalIllumination( data, " + Constants.CustomLightOutputVarStr + ".Occlusion, " + Constants.CustomLightOutputVarStr + ".Normal, g );\n";
+							ShaderBody += "\t\t\t#endif\n";
+
+							//ShaderBody += "\t\t\tUNITY_GI(gi, " + Constants.CustomLightOutputVarStr + ", data);\n";
 							ShaderBody += "\t\t}\n\n";
 						}
 
@@ -2289,28 +2152,31 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\tstruct v2f\n";
 						ShaderBody += "\t\t\t{\n";
 						ShaderBody += "\t\t\t\tV2F_SHADOW_CASTER;\n";
+						int texcoordIndex = 1;
+						for( int i = 0; i < m_currentDataCollector.PackSlotsList.Count; i++ )
+						{
+							int size = 4 - m_currentDataCollector.PackSlotsList[ i ];
+							if( size > 0 )
+							{
+								ShaderBody += "\t\t\t\tfloat"+ size + " customPack"+ ( i + 1 ) + " : TEXCOORD" + ( i + 1 ) + ";\n";
+							}
+							texcoordIndex++;
+						}
+
 						if( !m_currentDataCollector.UsingInternalData )
-							ShaderBody += "\t\t\t\tfloat3 worldPos : TEXCOORD6;\n";
+							ShaderBody += "\t\t\t\tfloat3 worldPos : TEXCOORD"+ (texcoordIndex++) + ";\n";
 						if( m_currentDataCollector.UsingScreenPos )
-							ShaderBody += "\t\t\t\tfloat4 screenPos : TEXCOORD7;\n";
+							ShaderBody += "\t\t\t\tfloat4 screenPos : TEXCOORD" + (texcoordIndex++) + ";\n";
 						if ( /*m_currentDataCollector.UsingWorldNormal || m_currentDataCollector.UsingWorldPosition ||*/ m_currentDataCollector.UsingInternalData || m_currentDataCollector.DirtyNormal )
 						{
-							ShaderBody += "\t\t\t\tfloat4 tSpace0 : TEXCOORD1;\n";
-							ShaderBody += "\t\t\t\tfloat4 tSpace1 : TEXCOORD2;\n";
-							ShaderBody += "\t\t\t\tfloat4 tSpace2 : TEXCOORD3;\n";
+							ShaderBody += "\t\t\t\tfloat4 tSpace0 : TEXCOORD" + ( texcoordIndex++ ) + ";\n";
+							ShaderBody += "\t\t\t\tfloat4 tSpace1 : TEXCOORD" + ( texcoordIndex++ ) + ";\n";
+							ShaderBody += "\t\t\t\tfloat4 tSpace2 : TEXCOORD" + ( texcoordIndex++ ) + ";\n";
 						} else if( !m_currentDataCollector.UsingInternalData && m_currentDataCollector.UsingWorldNormal )
 						{
-							ShaderBody += "\t\t\t\tfloat3 worldNormal : TEXCOORD1;\n";
+							ShaderBody += "\t\t\t\tfloat3 worldNormal : TEXCOORD" + ( texcoordIndex++ ) + ";\n";
 						}
-						if ( m_currentDataCollector.UsingTexcoord0 || m_currentDataCollector.UsingTexcoord1 )
-							ShaderBody += "\t\t\t\tfloat4 texcoords01 : TEXCOORD4;\n";
-						if ( m_currentDataCollector.UsingTexcoord2 || m_currentDataCollector.UsingTexcoord3 )
-							ShaderBody += "\t\t\t\tfloat4 texcoords23 : TEXCOORD5;\n";
-#if UNITY_5_5_OR_NEWER
 						ShaderBody += "\t\t\t\tUNITY_VERTEX_INPUT_INSTANCE_ID\n";
-#else
-						ShaderBody += "\t\t\t\tUNITY_INSTANCE_ID\n";
-#endif
 						ShaderBody += "\t\t\t};\n";
 
 						ShaderBody += "\t\t\tv2f vert( appdata_full v )\n";
@@ -2321,11 +2187,10 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t\tUNITY_INITIALIZE_OUTPUT( v2f, o );\n";
 						ShaderBody += "\t\t\t\tUNITY_TRANSFER_INSTANCE_ID( v, o );\n";
 
-
+						if( m_currentDataCollector.DirtyPerVertexData || m_currentDataCollector.CustomShadowCoordsList.Count > 0 )
+							ShaderBody += "\t\t\t\tInput customInputData;\n";
 						if ( m_currentDataCollector.DirtyPerVertexData )
 						{
-							ShaderBody += "\t\t\t\tInput customInputData;\n";
-
 							ShaderBody += "\t\t\t\tvertexDataFunc( v" + ( m_currentDataCollector.TesselationActive ? "" : ", customInputData" ) + " );\n";
 						}
 
@@ -2345,12 +2210,35 @@ namespace AmplifyShaderEditor
 							ShaderBody += "\t\t\t\to.worldNormal = worldNormal;\n";
 						}
 
-						if ( m_currentDataCollector.UsingTexcoord0 || m_currentDataCollector.UsingTexcoord1 )
-							ShaderBody += "\t\t\t\to.texcoords01 = float4( v.texcoord.xy, v.texcoord1.xy );\n";
-						if ( m_currentDataCollector.UsingTexcoord2 || m_currentDataCollector.UsingTexcoord3 )
-							ShaderBody += "\t\t\t\to.texcoords23 = float4( v.texcoord2.xy, v.texcoord3.xy );\n";
+						for( int i = 0; i < m_currentDataCollector.CustomShadowCoordsList.Count; i++ )
+						{
+							int size = UIUtils.GetChannelsAmount( m_currentDataCollector.CustomShadowCoordsList[ i ].DataType );
+							string channels = string.Empty;
+							for( int j = 0; j < size; j++ )
+							{
+								channels += Convert.ToChar( 120 + m_currentDataCollector.CustomShadowCoordsList[ i ].TextureIndex + j );
+							}
+							channels = channels.Replace( '{', 'w' );
+							ShaderBody += "\t\t\t\to.customPack" + ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "."+ channels + " = customInputData." + m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName + ";\n";
 
-						//if ( m_currentDataCollector.UsingWorldPosition && !m_currentDataCollector.UsingInternalData )
+							//TODO: TEMPORARY SOLUTION, this needs to go somewhere else, there's no need for these comparisons
+							if( m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName.StartsWith("uv_") )
+							{
+								ShaderBody += "\t\t\t\to.customPack" + ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "." + channels + " = v.texcoord;\n";
+							} else if( m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName.StartsWith( "uv2_" ) )
+							{
+								ShaderBody += "\t\t\t\to.customPack" + ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "." + channels + " = v.texcoord1;\n";
+							}
+							else if( m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName.StartsWith( "uv3_" ) )
+							{
+								ShaderBody += "\t\t\t\to.customPack" + ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "." + channels + " = v.texcoord2;\n";
+							}
+							else if( m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName.StartsWith( "uv4_" ) )
+							{
+								ShaderBody += "\t\t\t\to.customPack" + ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "." + channels + " = v.texcoord3;\n";
+							}
+						}
+
 						if( !m_currentDataCollector.UsingInternalData )
 							ShaderBody += "\t\t\t\to.worldPos = worldPos;\n";
 						ShaderBody += "\t\t\t\tTRANSFER_SHADOW_CASTER_NORMALOFFSET( o )\n";
@@ -2369,14 +2257,18 @@ namespace AmplifyShaderEditor
 						ShaderBody += "\t\t\t\tUNITY_SETUP_INSTANCE_ID( IN );\n";
 						ShaderBody += "\t\t\t\tInput surfIN;\n";
 						ShaderBody += "\t\t\t\tUNITY_INITIALIZE_OUTPUT( Input, surfIN );\n";
-						if ( m_currentDataCollector.UsingTexcoord0 )
-							ShaderBody += "\t\t\t\tsurfIN.uv_texcoord.xy = IN.texcoords01.xy;\n";
-						if ( m_currentDataCollector.UsingTexcoord1 )
-							ShaderBody += "\t\t\t\tsurfIN.uv2_texcoord2.xy = IN.texcoords01.zw;\n";
-						if ( m_currentDataCollector.UsingTexcoord2 )
-							ShaderBody += "\t\t\t\tsurfIN.uv3_texcoord3.xy = IN.texcoords23.xy;\n";
-						if ( m_currentDataCollector.UsingTexcoord3 )
-							ShaderBody += "\t\t\t\tsurfIN.uv4_texcoord4.xy = IN.texcoords23.zw;\n";
+
+						for( int i = 0; i < m_currentDataCollector.CustomShadowCoordsList.Count; i++ )
+						{
+							int size = UIUtils.GetChannelsAmount( m_currentDataCollector.CustomShadowCoordsList[ i ].DataType );
+							string channels = string.Empty;
+							for( int j = 0; j < size; j++ )
+							{
+								channels += Convert.ToChar( 120 + m_currentDataCollector.CustomShadowCoordsList[ i ].TextureIndex + j );
+							}
+							channels = channels.Replace( '{', 'w' );
+							ShaderBody += "\t\t\t\tsurfIN."+ m_currentDataCollector.CustomShadowCoordsList[ i ].CoordName + " = IN.customPack"+ ( m_currentDataCollector.CustomShadowCoordsList[ i ].TextureSlot + 1 ) + "." + channels + ";\n";
+						}
 
 						if ( m_currentDataCollector.UsingInternalData )
 							ShaderBody += "\t\t\t\tfloat3 worldPos = float3( IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w );\n";
@@ -2532,7 +2424,7 @@ namespace AmplifyShaderEditor
 				m_dummyProperty = null;
 			}
 
-			m_propertyReordableList = null;
+			
 			m_translucencyPort = null;
 			m_transmissionPort = null;
 			m_refractionPort = null;
@@ -2552,7 +2444,7 @@ namespace AmplifyShaderEditor
 			m_renderingPlatformOpHelper = null;
 			m_inspectorDefaultStyle = null;
 			m_inspectorFoldoutStyle = null;
-			m_propertyAdjustment = null;
+			
 			m_zBufferHelper = null;
 			m_stencilBufferHelper = null;
 			m_blendOpsHelper = null;

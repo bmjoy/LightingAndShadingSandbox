@@ -14,17 +14,21 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private ViewSpace m_normalSpace = ViewSpace.Tangent;
 
+		private const string DefaultErrorMessage = "This node only returns correct information using a custom light model, otherwise returns 0";
+		private bool m_upgradeMessage = false;
+
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
 			AddInputPort( WirePortDataType.FLOAT3, false, "Normal" );
-			AddInputPort( WirePortDataType.FLOAT, false, "Roughness" );
+			AddInputPort( WirePortDataType.FLOAT, false, "Smoothness" );
 			AddInputPort( WirePortDataType.FLOAT, false, "Occlusion" );
+			m_inputPorts[ 1 ].FloatInternalData = 0.5f;
 			m_inputPorts[ 2 ].FloatInternalData = 1;
 			m_autoWrapProperties = true;
 			AddOutputPort( WirePortDataType.FLOAT3, "RGB" );
 			m_errorMessageTypeIsError = NodeMessageType.Warning;
-			m_errorMessageTooltip = "This node only returns correct information using a custom light model, otherwise returns 0";
+			m_errorMessageTooltip = DefaultErrorMessage;
 		}
 
 		public override void PropagateNodeData( NodeData nodeData, ref MasterNodeDataCollector dataCollector )
@@ -63,7 +67,7 @@ namespace AmplifyShaderEditor
 		public override void Draw( DrawInfo drawInfo )
 		{
 			base.Draw( drawInfo );
-			if( ContainerGraph.CurrentCanvasMode == NodeAvailability.TemplateShader || ( ContainerGraph.CurrentStandardSurface != null && ContainerGraph.CurrentStandardSurface.CurrentLightingModel != StandardShaderLightModel.CustomLighting ) )
+			if( m_upgradeMessage || ContainerGraph.CurrentCanvasMode == NodeAvailability.TemplateShader || ( ContainerGraph.CurrentStandardSurface != null && ContainerGraph.CurrentStandardSurface.CurrentLightingModel != StandardShaderLightModel.CustomLighting ) )
 				m_showErrorMessage = true;
 			else
 				m_showErrorMessage = false;
@@ -96,7 +100,7 @@ namespace AmplifyShaderEditor
 				normal = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId );
 			}
 
-			string roughness = m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector );
+			string smoothness = m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector );
 			string occlusion = m_inputPorts[ 2 ].GeneratePortInstructions( ref dataCollector );
 			string viewDir = "data.worldViewDir";
 
@@ -123,9 +127,7 @@ namespace AmplifyShaderEditor
 				dataCollector.AddLocalVariable( UniqueId, "#endif //specdataif1" );
 			}
 
-			dataCollector.AddLocalVariable( UniqueId, "Unity_GlossyEnvironmentData g" + OutputId + ";" );
-			dataCollector.AddLocalVariable( UniqueId, "g" + OutputId + ".roughness = " + roughness + ";" );
-			dataCollector.AddLocalVariable( UniqueId, "g" + OutputId + ".reflUVW = reflect( -"+ viewDir + ", " + normal + " );" );
+			dataCollector.AddLocalVariable( UniqueId, "Unity_GlossyEnvironmentData g" + OutputId + " = UnityGlossyEnvironmentSetup( "+ smoothness + ", "+ viewDir + ", "+ normal + ", float3(0,0,0));" );
 			dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, WirePortDataType.FLOAT3, "indirectSpecular" + OutputId, "UnityGI_IndirectSpecular( data, " + occlusion + ", " + normal + ", g" + OutputId + " )" );
 
 			return "indirectSpecular" + OutputId;
@@ -137,6 +139,13 @@ namespace AmplifyShaderEditor
 			if( UIUtils.CurrentShaderVersion() > 13002 )
 				m_normalSpace = ( ViewSpace ) Enum.Parse( typeof( ViewSpace ), GetCurrentParam( ref nodeParams ) );
 
+			if( UIUtils.CurrentShaderVersion() < 13804 )
+			{
+				m_errorMessageTooltip = "Smoothness port was previously being used as Roughness, please check if you are correctly using it and save to confirm.";
+				m_upgradeMessage = true;
+				UIUtils.ShowMessage( "Indirect Specular Light node: Smoothness port was previously being used as Roughness, please check if you are correctly using it and save to confirm." );
+			}
+
 			UpdatePort();
 		}
 
@@ -144,6 +153,9 @@ namespace AmplifyShaderEditor
 		{
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_normalSpace );
+
+			m_errorMessageTooltip = DefaultErrorMessage;
+			m_upgradeMessage = false;
 		}
 	}
 }

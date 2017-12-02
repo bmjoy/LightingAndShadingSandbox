@@ -1,4 +1,38 @@
 Release Notes:
+v1.3.9 dev 03:
+* New Nodes:
+    * 'Projector Matrix'
+    * 'Projector Clip Matrix'
+    * 'Texture Transform'
+
+* Improvements:
+    * Properties can be re-ordered on Template shaders
+    * Cull, Blend Mode, Blend Ops, Color Mask and Stencil Buffer data can be read and modified on Template shaders
+    * Added new custom Time port into 'Flipbook UV Animation' node
+    * Templates no longer need /*ase_pass*/ tag to be declared
+    * Adding UnityEngine.Object redundancy on its usage to prevent issues with other plugins
+    * Outline can now take fog into account
+
+* Fixes:
+    * Fixed issue on shader function headers being placed last on shader property list
+
+v1.3.9 dev 02:
+* Fixes:
+    * Additional fix on custom colored categories
+
+v1.3.9 dev 01:
+* Fixes:
+    * Fixed issue with 'Texture Coordinates' node not generating proper code for sizes bigger than float2 
+    * Fixed issue on reading old shaders data into new ASE versions
+    * Fixed issue on custom colored categories
+
+* Improvements:
+    * Updated various samples that were still compiled on older ASE versions
+    * ASE window now loses text focus when losing its focus to prevent UI issues
+    * Added proper Texcoord support in custom shadow caster
+    * Added new toggle on 'Screen Depth' and 'Depth Fade' nodes to disable conversion from log to linear space 
+        * Important for Orthographic camera projections where Depth Buffer values are already stored in linear space
+
 v1.3.8 dev 02/03:
 * Improvements:
     * Added new custom lighting port and migrated the emission connection to this port

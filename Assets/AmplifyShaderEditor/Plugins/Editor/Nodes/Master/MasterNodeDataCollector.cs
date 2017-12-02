@@ -22,6 +22,26 @@ namespace AmplifyShaderEditor
 		}
 	}
 
+	public class InputCoordsCollector
+	{
+		public int NodeId;
+		public string CoordName;
+		public WirePortDataType DataType;
+		public PrecisionType Precision;
+		public int TextureSlot;
+		public int TextureIndex;
+
+		public InputCoordsCollector( int nodeId, string coordName, WirePortDataType dataType, PrecisionType precision, int textureSlot, int textureIndex )
+		{
+			NodeId = nodeId;
+			CoordName = coordName;
+			DataType = dataType;
+			Precision = precision;
+			TextureSlot = textureSlot;
+			TextureIndex = textureIndex;
+		}
+	}
+
 	public class TextureDefaultsDataColector
 	{
 		private List<string> m_names = new List<string>();
@@ -88,6 +108,9 @@ namespace AmplifyShaderEditor
 		private List<PropertyDataCollector> m_functionsList;
 		private List<PropertyDataCollector> m_grabPassList;
 
+		private List<InputCoordsCollector> m_customShadowCoordsList;
+		private List<int> m_packSlotsList;
+
 		private Dictionary<string, PropertyDataCollector> m_inputDict;
 		private Dictionary<string, PropertyDataCollector> m_customInputDict;
 		private Dictionary<string, PropertyDataCollector> m_propertiesDict;
@@ -105,6 +128,8 @@ namespace AmplifyShaderEditor
 		private Dictionary<string, PropertyDataCollector> m_customOutputDict;
 		private Dictionary<string, string> m_localFunctions;
 		private Dictionary<string, string> m_grabPassDict;
+
+		private Dictionary<string, InputCoordsCollector> m_customShadowCoordsDict;
 
 		private TextureChannelUsage[] m_requireTextureProperty = { TextureChannelUsage.Not_Used, TextureChannelUsage.Not_Used, TextureChannelUsage.Not_Used, TextureChannelUsage.Not_Used };
 
@@ -125,10 +150,6 @@ namespace AmplifyShaderEditor
 		private bool m_forceNormal;
 
 		private bool m_usingInternalData;
-		private bool m_usingTexcoord0;
-		private bool m_usingTexcoord1;
-		private bool m_usingTexcoord2;
-		private bool m_usingTexcoord3;
 		private bool m_usingWorldPosition;
 		private bool m_usingWorldNormal;
 		private bool m_usingScreenPos;
@@ -205,6 +226,8 @@ namespace AmplifyShaderEditor
 			m_functionsList = new List<PropertyDataCollector>();
 			m_grabPassList = new List<PropertyDataCollector>();
 
+			m_customShadowCoordsList = new List<InputCoordsCollector>();
+			m_packSlotsList = new List<int>();
 
 			m_inputDict = new Dictionary<string, PropertyDataCollector>();
 			m_customInputDict = new Dictionary<string, PropertyDataCollector>();
@@ -224,6 +247,8 @@ namespace AmplifyShaderEditor
 			m_vertexDataDict = new Dictionary<string, PropertyDataCollector>();
 			m_customOutputDict = new Dictionary<string, PropertyDataCollector>();
 			m_grabPassDict = new Dictionary<string, string>();
+
+			m_customShadowCoordsDict = new Dictionary<string, InputCoordsCollector>();
 
 			m_dirtyInputs = false;
 			m_dirtyCustomInputs = false;
@@ -358,6 +383,32 @@ namespace AmplifyShaderEditor
 		{
 			string value = UIUtils.FinalPrecisionWirePortToCgType( precision, dataType ) + " " + interpName;
 			AddToInput( nodeId, value, addSemiColon );
+
+			if( !m_customShadowCoordsDict.ContainsKey( interpName ) )
+			{
+				int slot = 0;
+				int index = 0;
+				int size = UIUtils.GetChannelsAmount( dataType );
+
+				if( m_packSlotsList.Count == 0 )
+					m_packSlotsList.Add( 4 );
+
+				for( int i = 0; i < m_packSlotsList.Count; i++ )
+				{
+					slot = i;
+					if( m_packSlotsList[ i ] >= size )
+					{
+						index = 4 - m_packSlotsList[ i ];
+						m_packSlotsList[ i ] -= size;
+						break;
+					} else if( i == m_packSlotsList.Count-1 )
+					{
+						m_packSlotsList.Add( 4 );
+					}
+				}
+				m_customShadowCoordsDict.Add( interpName, new InputCoordsCollector( nodeId, interpName, dataType, precision, slot, index ) );
+				m_customShadowCoordsList.Add( m_customShadowCoordsDict[ interpName ] );
+			}
 		}
 
 		public void AddToInput( int nodeId, SurfaceInputs surfaceInput, PrecisionType precision = PrecisionType.Float, bool addSemiColon = true )
@@ -405,19 +456,6 @@ namespace AmplifyShaderEditor
 
 				m_input += "\t\t\t" + value + ( ( addSemiColon ) ? ( ";\n" ) : "\n" );
 				m_dirtyInputs = true;
-
-				// TODO: remove this after proper shadow caster packing
-				if( m_input.Contains( "uv_texcoord;" ) )
-					UsingTexcoord0 = true;
-
-				if( m_input.Contains( "uv2_texcoord2;" ) )
-					UsingTexcoord1 = true;
-
-				if( m_input.Contains( "uv3_texcoord3;" ) )
-					UsingTexcoord2 = true;
-
-				if( m_input.Contains( "uv4_texcoord4;" ) )
-					UsingTexcoord3 = true;
 			}
 		}
 
@@ -522,7 +560,8 @@ namespace AmplifyShaderEditor
 			//}
 
 			list.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
-			m_properties = IOUtils.PropertiesBegin;
+            CleanUpList( ref list );
+            m_properties = IOUtils.PropertiesBegin;
 			for ( int i = 0; i < list.Count; i++ )
 			{
 				m_properties += string.Format( IOUtils.PropertiesElement, list[ i ].PropertyName );
@@ -532,7 +571,34 @@ namespace AmplifyShaderEditor
 			return m_properties;
 		}
 
-		public void CloseProperties()
+        public string[] BuildUnformatedPropertiesStringArr()
+        {
+            List<PropertyDataCollector> list = new List<PropertyDataCollector>( m_propertiesDict.Values );
+            list.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
+            CleanUpList( ref list );
+            string[] arr = new string[ list.Count ];
+            for( int i = 0; i < list.Count; i++ )
+            {
+                arr[ i ] = list[ i ].PropertyName;
+            }
+            return arr;
+        }
+
+        public void CleanUpList( ref List<PropertyDataCollector> list )
+        {
+            if( list.Count == 0 )
+                return;
+
+            if( list[ list.Count - 1 ].PropertyName.Contains( "[Header(" ) )
+            {
+                list.RemoveAt( list.Count - 1 );
+                CleanUpList( ref list );
+            }
+                    
+        }
+
+
+        public void CloseProperties()
 		{
 			if ( m_dirtyProperties )
 			{
@@ -1273,6 +1339,15 @@ namespace AmplifyShaderEditor
 
 			m_templateDataCollector.Destroy();
 			m_templateDataCollector = null;
+
+			m_customShadowCoordsDict.Clear();
+			m_customShadowCoordsDict = null;
+
+			m_customShadowCoordsList.Clear();
+			m_customShadowCoordsDict = null;
+
+			m_packSlotsList.Clear();
+			m_packSlotsList = null;
 		}
 
 		public string Inputs { get { return m_input; } }
@@ -1411,30 +1486,6 @@ namespace AmplifyShaderEditor
 			set { m_usingViewDirection = value; }
 		}
 
-		public bool UsingTexcoord0
-		{
-			get { return m_usingTexcoord0; }
-			set { m_usingTexcoord0 = value; }
-		}
-
-		public bool UsingTexcoord1
-		{
-			get { return m_usingTexcoord1; }
-			set { m_usingTexcoord1 = value; }
-		}
-
-		public bool UsingTexcoord2
-		{
-			get { return m_usingTexcoord2; }
-			set { m_usingTexcoord2 = value; }
-		}
-
-		public bool UsingTexcoord3
-		{
-			get { return m_usingTexcoord3; }
-			set { m_usingTexcoord3 = value; }
-		}
-
 		public bool UsingCustomOutput
 		{
 			get { return m_usingCustomOutput; }
@@ -1475,6 +1526,9 @@ namespace AmplifyShaderEditor
 		public List<PropertyDataCollector> CustomOutputList { get { return m_customOutputList; } }
 		public List<PropertyDataCollector> FunctionsList { get { return m_functionsList; } }
 		public List<PropertyDataCollector> GrabPassList { get { return m_grabPassList; } }
+		public List<InputCoordsCollector> CustomShadowCoordsList { get { return m_customShadowCoordsList; } }
+		public List<int> PackSlotsList { get { return m_packSlotsList; } }
+
 		//Templates
 		public List<string> VertexInputList { get { return m_vertexInputList; } }
 		public List<string> InterpolatorList { get { return m_interpolatorsList; } }

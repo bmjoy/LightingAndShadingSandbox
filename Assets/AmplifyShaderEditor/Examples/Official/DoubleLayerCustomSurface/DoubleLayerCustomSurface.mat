@@ -231,7 +231,7 @@ Material:
       second: 1
     - first:
         name: __dirty
-      second: 0
+      second: 1
     m_Colors:
     - first:
         name: _BaseColor

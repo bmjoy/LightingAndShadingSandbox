@@ -311,7 +311,22 @@ namespace AmplifyShaderEditor
 
 		public virtual void OnEnable()
 		{
-			m_tooltipTimestamp = Time.realtimeSinceStartup;
+            if( m_nodeAttribs != null )
+            {
+                if( UIUtils.HasColorCategory( m_nodeAttribs.Category ) )
+                {
+                    m_headerColor = UIUtils.GetColorFromCategory( m_nodeAttribs.Category );
+                }
+                else
+                {
+                    if( !string.IsNullOrEmpty( m_nodeAttribs.CustomCategoryColor ) )
+                    {
+                        m_headerColor = UIUtils.AddColorCategory( m_nodeAttribs.Category, m_nodeAttribs.CustomCategoryColor );
+                    }
+                }
+            }
+
+            m_tooltipTimestamp = Time.realtimeSinceStartup;
 
 			hideFlags = HideFlags.DontSave;
 
@@ -342,7 +357,6 @@ namespace AmplifyShaderEditor
 				//m_content.tooltip = m_nodeAttribs.Description;
 				m_tooltipText = m_nodeAttribs.Description;
 				m_selected = false;
-				m_headerColor = UIUtils.GetColorFromCategory( m_nodeAttribs.Category );
 			}
 
 			m_sizeContentAux = new GUIContent();
@@ -1039,8 +1053,23 @@ namespace AmplifyShaderEditor
 			UIUtils.LinearMaterial.SetFloat( m_cachedDrawSphereId, ( SpherePreview ? 1 : 0 ) );
 			UIUtils.LinearMaterial.SetFloat( m_cachedInvertedZoomId, drawInfo.InvertedZoom );
 			UIUtils.LinearMaterial.SetVector( "_Mask", mask );
-			EditorGUI.DrawPreviewTexture( rect, PreviewTexture, UIUtils.LinearMaterial );
 
+			bool cached = GL.sRGBWrite;
+			GL.sRGBWrite = true;
+			//EditorGUI.DrawPreviewTexture( rect, PreviewTexture, UIUtils.LinearMaterial );
+			int pass = 0;
+			if( SpherePreview )
+			{
+				if( mask.w == 1 )
+					pass = 3;
+				else
+					pass = 1;
+			}
+			else if( mask.w == 1 )
+				pass = 2;
+			
+			Graphics.DrawTexture( rect, PreviewTexture, UIUtils.LinearMaterial, pass );
+			GL.sRGBWrite = cached;
 			//Preview buttons
 			if( m_drawPreviewMaskButtons )
 				DrawPreviewMaskButtonsRepaint( drawInfo, rect );

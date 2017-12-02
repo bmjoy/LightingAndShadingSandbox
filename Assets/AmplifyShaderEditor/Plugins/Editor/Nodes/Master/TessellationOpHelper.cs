@@ -26,11 +26,7 @@ namespace AmplifyShaderEditor
 											"\t\t\tfloat4 texcoord2 : TEXCOORD2;\n" +
 											"\t\t\tfloat4 texcoord3 : TEXCOORD3;\n" +
 											"\t\t\tfixed4 color : COLOR;\n" +
-#if UNITY_5_5_OR_NEWER
 											"\t\t\tUNITY_VERTEX_INPUT_INSTANCE_ID\n" +
-#else
-											"\t\t\tUNITY_INSTANCE_ID\n" +
-#endif
 											"\t\t};\n\n";
 
 

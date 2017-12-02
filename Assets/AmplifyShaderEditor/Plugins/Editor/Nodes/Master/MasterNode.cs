@@ -1,10 +1,11 @@
 // Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
-using UnityEngine;
 using System;
-using UnityEditor;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using UnityEditorInternal;
 
 namespace AmplifyShaderEditor
 {
@@ -32,7 +33,9 @@ namespace AmplifyShaderEditor
 	[Serializable]
 	public class MasterNode : OutputNode
 	{
-		protected MasterNodeDataCollector m_currentDataCollector;
+        private const string PropertyOderFoldoutStr = " Material Properties";
+
+        protected MasterNodeDataCollector m_currentDataCollector;
 
 		protected const string ShaderNameStr = "Shader Name";
 		protected GUIContent m_shaderNameContent;
@@ -108,8 +111,16 @@ namespace AmplifyShaderEditor
 		protected GUIContent[] m_availableCategoryLabels;
 		protected MasterNodeCategoriesData[] m_availableCategories;
 
+        [SerializeField]
+        private List<PropertyNode> m_propertyNodes = new List<PropertyNode>();
 
-		void CommonInit()
+        private ReorderableList m_propertyReordableList;
+        //private int m_availableCount = 0;
+        private int m_lastCount = 0;
+
+        private GUIStyle m_propertyAdjustment;
+
+        void CommonInit()
 		{
 			m_currentMaterial = null;
 			m_masterNodeIconCoords = new Rect( 0, 0, 64, 64 );
@@ -488,7 +499,146 @@ namespace AmplifyShaderEditor
 			m_currentDataCollector = null;
 		}
 
-		public virtual void UpdateFromShader( Shader newShader ) { }
+
+        public void InvalidateMaterialPropertyCount()
+        {
+            m_lastCount = -1;
+        }
+
+        public void DrawMaterialInputs( GUIStyle toolbarstyle )
+        {
+            Color cachedColor = GUI.color;
+            GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, 0.5f );
+            EditorGUILayout.BeginHorizontal( toolbarstyle );
+            GUI.color = cachedColor;
+
+            EditorGUI.BeginChangeCheck();
+            ContainerGraph.ParentWindow.ExpandedProperties = GUILayoutToggle( ContainerGraph.ParentWindow.ExpandedProperties, PropertyOderFoldoutStr, UIUtils.MenuItemToggleStyle );
+            if( EditorGUI.EndChangeCheck() )
+            {
+                EditorPrefs.SetBool( "ExpandedProperties", ContainerGraph.ParentWindow.ExpandedProperties );
+            }
+
+            EditorGUILayout.EndHorizontal();
+            if( !ContainerGraph.ParentWindow.ExpandedProperties )
+                return;
+
+            cachedColor = GUI.color;
+            GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, ( EditorGUIUtility.isProSkin ? 0.5f : 0.25f ) );
+            EditorGUILayout.BeginVertical( UIUtils.MenuItemBackgroundStyle );
+            GUI.color = cachedColor;
+            List<PropertyNode> nodes = UIUtils.PropertyNodesList();
+            if( m_propertyReordableList == null || nodes.Count != m_lastCount )
+            {
+                m_propertyNodes.Clear();
+
+                for( int i = 0; i < nodes.Count; i++ )
+                {
+                    ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
+                    if( ( rnode == null || !rnode.IsInside ) && ( !m_propertyNodes.Exists( x => x.PropertyName.Equals( nodes[ i ].PropertyName ) ) ) )
+                        m_propertyNodes.Add( nodes[ i ] );
+                }
+
+                m_propertyNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
+
+                m_propertyReordableList = new ReorderableList( m_propertyNodes, typeof( PropertyNode ), true, false, false, false )
+                {
+                    headerHeight = 0,
+                    footerHeight = 0,
+                    showDefaultBackground = false,
+
+                    drawElementCallback = ( Rect rect, int index, bool isActive, bool isFocused ) =>
+                    {
+                        EditorGUI.LabelField( rect, m_propertyNodes[ index ].PropertyInspectorName );
+                    },
+
+                    onReorderCallback = ( list ) =>
+                    {
+                        ReorderList( ref nodes );
+
+                        //RecursiveLog();
+                    }
+                };
+                ReorderList( ref nodes );
+
+                m_lastCount = nodes.Count;
+            }
+
+            if( m_propertyReordableList != null )
+            {
+                if( m_propertyAdjustment == null )
+                {
+                    m_propertyAdjustment = new GUIStyle();
+                    m_propertyAdjustment.padding.left = 17;
+                }
+                EditorGUILayout.BeginVertical( m_propertyAdjustment );
+                m_propertyReordableList.DoLayoutList();
+                EditorGUILayout.EndVertical();
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        public void ForceReordering()
+        {
+            List<PropertyNode> nodes = UIUtils.PropertyNodesList();
+            ReorderList( ref nodes );
+            //RecursiveLog();
+        }
+
+        private void ReorderList( ref List<PropertyNode> nodes )
+        {
+            // clear lock list before reordering because of multiple sf being used
+            for( int i = 0; i < nodes.Count; i++ )
+            {
+                ReordenatorNode rnode = nodes[ i ] as ReordenatorNode;
+                if( rnode != null )
+                    rnode.RecursiveClear();
+            }
+
+            int propoffset = 0;
+            int count = 0;
+            for( int i = 0; i < m_propertyNodes.Count; i++ )
+            {
+                ReordenatorNode renode = m_propertyNodes[ i ] as ReordenatorNode;
+                if( renode != null )
+                {
+                    if( !renode.IsInside )
+                    {
+                        m_propertyNodes[ i ].OrderIndex = count + propoffset;
+
+                        if( renode.PropertyListCount > 0 )
+                        {
+                            propoffset += renode.RecursiveCount();
+                            // the same reordenator can exist multiple times, apply ordering to all of them
+                            for( int j = 0; j < nodes.Count; j++ )
+                            {
+                                ReordenatorNode pnode = ( nodes[ j ] as ReordenatorNode );
+                                if( pnode != null && pnode.PropertyName.Equals( renode.PropertyName ) )
+                                {
+                                    pnode.OrderIndex = renode.RawOrderIndex;
+                                    pnode.RecursiveSetOrderOffset( renode.RawOrderIndex, true );
+                                }
+                            }
+                        }
+                        else
+                        {
+                            count++;
+                        }
+                    }
+                    else
+                    {
+                        m_propertyNodes[ i ].OrderIndex = 0;
+                    }
+                }
+                else
+                {
+                    m_propertyNodes[ i ].OrderIndex = count + propoffset;
+                    count++;
+                }
+            }
+        }
+
+        public virtual void UpdateFromShader( Shader newShader ) { }
 
 		public void ClearUpdateEvents()
 		{
@@ -528,8 +678,9 @@ namespace AmplifyShaderEditor
 			m_smallRemoveShaderKeywordStyle = null;
 			m_shaderKeywords.Clear();
 			m_shaderKeywords = null;
-
-			if( m_currentDataCollector != null )
+            m_propertyReordableList = null;
+            m_propertyAdjustment = null;
+            if( m_currentDataCollector != null )
 			{
 				m_currentDataCollector.Destroy();
 				m_currentDataCollector = null;

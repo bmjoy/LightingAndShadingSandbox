@@ -1634,14 +1634,36 @@ namespace AmplifyShaderEditor
 		public static string AddBrackets( string value ) { return "( " + value + " )"; }
 		public static Color GetColorFromWireStatus( WireStatus status ) { return m_wireStatusToColor[ status ]; }
 		public static bool HasColorCategory( string category ) { return m_nodeCategoryToColor.ContainsKey( category ); }
-		public static void AddColorCategory( string category, Color color ) { m_nodeCategoryToColor.Add( category, color ); }
+		public static void AddColorCategory( string category, Color color )
+        {
+            m_nodeCategoryToColor.Add( category, color );
+        }
 
-		public static Color GetColorFromCategory( string category )
+        public static Color AddColorCategory( string category, string hexColor )
+        {
+            try
+            {
+                Color color = new Color();
+                ColorUtility.TryParseHtmlString( hexColor, out color );
+                m_nodeCategoryToColor.Add( category, color );
+                return color;
+            }
+            catch( System.Exception e )
+            {
+                Debug.LogException( e );    
+            }
+            return m_nodeCategoryToColor[ "Default" ];
+        }
+
+        public static Color GetColorFromCategory( string category )
 		{
 			if( m_nodeCategoryToColor.ContainsKey( category ) )
 				return m_nodeCategoryToColor[ category ];
 
-			Debug.LogWarning( category + " category does not contain an associated color" );
+
+            if(DebugConsoleWindow.DeveloperMode) 
+			    Debug.LogWarning( category + " category does not contain an associated color" );
+
 			return m_nodeCategoryToColor[ "Default" ];
 		}
 

@@ -7,10 +7,7 @@ using System.Collections.Generic;
 
 namespace AmplifyShaderEditor
 {
-
-
-
-	public enum OutlineMode
+    public enum OutlineMode
 	{
 		VertexOffset,
 		VertexScale
@@ -22,11 +19,13 @@ namespace AmplifyShaderEditor
 		private readonly string[] OutlineBodyBegin = {  "Tags{ }",
 														"Cull Front",
 														"CGPROGRAM",
-														"#pragma target 3.0",
-														"#pragma surface outlineSurf Outline keepalpha noshadow noambient novertexlights nolightmap nodynlightmap nodirlightmap nofog nometa noforwardadd vertex:outlineVertexDataFunc"
+														"#pragma target 3.0"
 														};
 
-		private readonly string[] OutlineBodyStruct = {"struct Input",
+        private readonly string OutlineSurfaceConfig = "#pragma surface outlineSurf Outline {0}keepalpha noshadow noambient novertexlights nolightmap nodynlightmap nodirlightmap nometa noforwardadd vertex:outlineVertexDataFunc";
+
+
+        private readonly string[] OutlineBodyStruct = {"struct Input",
 														"{",
 														"\tfixed filler;",
 														"};",
@@ -80,7 +79,9 @@ namespace AmplifyShaderEditor
 
 		private const string ModePropertyStr = "Mode";
 
-		private const string BillboardInstructionFormat = "\t{0};";
+        private const string NoFogStr = "No Fog";
+
+        private const string BillboardInstructionFormat = "\t{0};";
 
 		[SerializeField]
 		private Color m_outlineColor;
@@ -93,8 +94,12 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private OutlineMode m_mode = OutlineMode.VertexOffset;
+        
+        [SerializeField]
+        private bool m_noFog = true;
 
-		public void Draw( UndoParentNode owner, GUIStyle toolbarstyle, Material mat )
+
+        public void Draw( UndoParentNode owner, GUIStyle toolbarstyle, Material mat )
 		{
 			Color cachedColor = GUI.color;
 			GUI.color = new Color( cachedColor.r, cachedColor.g, cachedColor.b, 0.5f );
@@ -145,7 +150,10 @@ namespace AmplifyShaderEditor
 							mat.SetFloat( WidthPropertyName, m_outlineWidth );
 						}
 					}
-				}
+
+                    m_noFog = owner.EditorGUILayoutToggle( NoFogStr, m_noFog );
+                }
+
 				EditorGUI.indentLevel -= 1;
 				EditorGUI.EndDisabledGroup();
 				EditorGUILayout.Separator();
@@ -174,8 +182,15 @@ namespace AmplifyShaderEditor
 			m_enabled = Convert.ToBoolean( nodeParams[ index++ ] );
 			m_outlineWidth = Convert.ToSingle( nodeParams[ index++ ] );
 			m_outlineColor = IOUtils.StringToColor( nodeParams[ index++ ] );
-			if ( UIUtils.CurrentShaderVersion() > 5004 )
-				m_mode = ( OutlineMode ) Enum.Parse( typeof( OutlineMode ), nodeParams[ index++ ] );
+            if( UIUtils.CurrentShaderVersion() > 5004 )
+            {
+                m_mode = (OutlineMode)Enum.Parse( typeof( OutlineMode ), nodeParams[ index++ ] );
+            }
+
+            if( UIUtils.CurrentShaderVersion() > 13902 )
+            {
+                m_noFog = Convert.ToBoolean( nodeParams[ index++ ] );
+            }
 		}
 
 		public void WriteToString( ref string nodeInfo )
@@ -184,7 +199,8 @@ namespace AmplifyShaderEditor
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_outlineWidth );
 			IOUtils.AddFieldValueToString( ref nodeInfo, IOUtils.ColorToString( m_outlineColor ) );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_mode );
-		}
+            IOUtils.AddFieldValueToString( ref nodeInfo, m_noFog );
+        }
 
 		public void AddToDataCollector( ref MasterNodeDataCollector dataCollector )
 		{
@@ -213,7 +229,10 @@ namespace AmplifyShaderEditor
 				body.Add( OutlineBodyBegin[ i ] );
 			}
 
-			if ( instanced )
+            string surfConfig = string.Format( OutlineSurfaceConfig, m_noFog ? "nofog " : string.Empty);
+            body.Add( surfConfig );
+
+            if ( instanced )
 			{
 				body.Add( OutlineInstancedHeader );
 			}

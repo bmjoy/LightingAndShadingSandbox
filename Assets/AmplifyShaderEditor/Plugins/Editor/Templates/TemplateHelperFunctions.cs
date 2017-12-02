@@ -59,15 +59,26 @@ namespace AmplifyShaderEditor
 		Type = 1,
 		Name = 2
 	}
+    public enum TemplateDataCheck
+    {
+        Valid,
+        Invalid,
+        Unreadable
+    }
 
-	[Serializable]
-	public class TemplateStencilData
-	{
-		public bool ValidStencilData = false;
-
+    [Serializable]
+    public class TemplateModuleData
+    {
+        public TemplateDataCheck DataCheck = TemplateDataCheck.Invalid;
+    }
+    
+    [Serializable]
+	public sealed class TemplateStencilData : TemplateModuleData
+    {
+        public string StencilBufferId;
 		public int Reference;
-		public int ReadMask;
-		public int WriteMask;
+		public int ReadMask = 255;
+		public int WriteMask = 255;
 
 		public string ComparisonFront;
 		public string PassFront;
@@ -81,10 +92,8 @@ namespace AmplifyShaderEditor
 	}
 	
 	[Serializable]
-	public class TemplateBlendData
-	{
-		public bool ValidBlendData = false;
-
+	public sealed class TemplateBlendData : TemplateModuleData
+    {
 		public bool ValidBlendMode = false;
 		public string BlendModeId;
 		public bool SeparateBlendFactors = false;
@@ -102,18 +111,16 @@ namespace AmplifyShaderEditor
 	}
 
 	[Serializable]
-	public class TemplateCullModeData
-	{
-		public bool ValidCullData = false;
-		public string CullModeId;
+	public sealed class TemplateCullModeData : TemplateModuleData
+    {
+        public string CullModeId;
 		public CullMode CullModeData = CullMode.Front;
 	}
 
 	[Serializable]
-	public class TemplateColorMaskData
-	{
-		public bool ValidColorMaskData = false;
-		public string ColorMaskId;
+	public sealed class TemplateColorMaskData : TemplateModuleData
+    {
+        public string ColorMaskId;
 		public bool[] ColorMaskData = { true, true, true, true };
 	}
 
@@ -356,16 +363,23 @@ namespace AmplifyShaderEditor
 
 		public static void CreateStencilOps( string stencilData, ref TemplateStencilData stencilDataObj )
 		{
+            stencilDataObj.DataCheck = TemplateDataCheck.Unreadable;
 			MatchCollection overallGlobalMatch = Regex.Matches( stencilData, StencilOpGlobalPattern );
 			if( overallGlobalMatch.Count == 1 && overallGlobalMatch[ 0 ].Groups.Count == 2 )
 			{
 				string value = overallGlobalMatch[ 0 ].Groups[ 1 ].Value;
 				foreach( Match match in Regex.Matches( value, StencilOpLinePattern ) )
 				{
-					if( match.Groups.Count == 3 )
+                    stencilDataObj.DataCheck = TemplateDataCheck.Valid;
+                    if( match.Groups.Count == 3 )
 					{
 						switch( match.Groups[ 1 ].Value )
 						{
+                            default:
+                            {
+                                stencilDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                                return;
+                            }
 							case "Ref":
 							{
 								try
@@ -375,31 +389,37 @@ namespace AmplifyShaderEditor
 								catch( Exception e )
 								{
 									Debug.LogException( e );
-								}
+                                    stencilDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                                    return;
+                                }
 							}
 							break;
 							case "ReadMask":
 							{
 								try
 								{
-								stencilDataObj.ReadMask =  Convert.ToInt32( match.Groups[ 2 ].Value );
+								    stencilDataObj.ReadMask =  Convert.ToInt32( match.Groups[ 2 ].Value );
 								}
 								catch( Exception e )
 								{
 									Debug.LogException( e );
-								}
+                                    stencilDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                                    return;
+                                }
 							}
 							break;
 							case "WriteMask":
 							{
 								try
 								{
-								stencilDataObj.WriteMask = Convert.ToInt32( match.Groups[ 2 ].Value );
+								    stencilDataObj.WriteMask = Convert.ToInt32( match.Groups[ 2 ].Value );
 								}
 								catch( Exception e )
 								{
 									Debug.LogException( e );
-								}
+                                    stencilDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                                    return;
+                                }
 							}
 							break;
 							case "CompFront":
@@ -454,63 +474,71 @@ namespace AmplifyShaderEditor
 
 		public static void CreateColorMask( string colorMaskData, ref TemplateColorMaskData colorMaskObj )
 		{
-			colorMaskObj.ValidColorMaskData = true;
-			foreach( Match match in Regex.Matches( colorMaskData, ColorMaskPattern ) )
+            colorMaskObj.DataCheck = TemplateDataCheck.Unreadable;
+            foreach( Match match in Regex.Matches( colorMaskData, ColorMaskPattern ) )
 			{
 				if( match.Groups.Count == 2 )
 				{
-					for( int i = 0; i < 4; i++ )
+                    for( int i = 0; i < 4; i++ )
 					{
 						colorMaskObj.ColorMaskData[ i ] = false;
 					}
 
-					try
+                    colorMaskObj.DataCheck = TemplateDataCheck.Valid;
+                    try
 					{
-						bool breakCycle = false;
 						for( int i = 0; i < match.Groups[ 1 ].Value.Length; i++ )
-						{
-							if( breakCycle )
-								break;
-							
+						{	
 							switch( Char.ToLower( match.Groups[ 1 ].Value[ i ] ) )
 							{
-								case'0':
-								{
-									breakCycle = true;
-									for( int j = 0; j < 4; j++ )
-									{
-										colorMaskObj.ColorMaskData[ j ] = false;
-									}
-								}break;
 								case 'r': colorMaskObj.ColorMaskData[ 0 ] = true;break;
 								case 'g': colorMaskObj.ColorMaskData[ 1 ] = true;break;
 								case 'b': colorMaskObj.ColorMaskData[ 2 ] = true;break;
 								case 'a': colorMaskObj.ColorMaskData[ 3 ] = true;break;
-							}
+                                case '0':
+                                {
+                                    for( int j = 0; j < 4; j++ )
+                                    {
+                                        colorMaskObj.ColorMaskData[ j ] = false;
+                                    }
+                                    return;
+                                }
+                                default:
+                                {
+                                    colorMaskObj.DataCheck = TemplateDataCheck.Unreadable;
+                                    return;
+                                }
+                            }
 						}
 					}
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-					}
+                        colorMaskObj.DataCheck = TemplateDataCheck.Unreadable;
+                        return;
+                    }
 				}
 			}
-		}
+            
+        }
 
 		public static void CreateCullMode( string cullModeData, ref TemplateCullModeData cullDataObj )
 		{
-			cullDataObj.ValidCullData = true;
+			cullDataObj.DataCheck = TemplateDataCheck.Unreadable;
 			foreach( Match match in Regex.Matches( cullModeData, CullModePattern ) )
 			{
 				if( match.Groups.Count == 2 )
 				{
-					try
+                    cullDataObj.DataCheck = TemplateDataCheck.Valid;
+                    try
 					{
 						cullDataObj.CullModeData = (CullMode)Enum.Parse( typeof( CullMode ), match.Groups[1].Value );
 					}
 					catch( Exception e )
 					{
-						Debug.LogException( e );
+                        cullDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                        Debug.LogException( e );
+                        return;
 					}
 				}
 			}
@@ -535,7 +563,10 @@ namespace AmplifyShaderEditor
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-					}
+                        blendDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                        return;
+
+                    }
 					break;
 				}
 				else if( match.Groups.Count == 5 )
@@ -563,7 +594,9 @@ namespace AmplifyShaderEditor
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-					}
+                        blendDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                        return;
+                    }
 					break;
 				}
 			}
@@ -586,7 +619,9 @@ namespace AmplifyShaderEditor
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-					}
+                        blendDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                        return;
+                    }
 					break;
 				}
 				else if( match.Groups.Count == 3 )
@@ -610,7 +645,9 @@ namespace AmplifyShaderEditor
 					catch( Exception e )
 					{
 						Debug.LogException( e );
-					}
+                        blendDataObj.DataCheck = TemplateDataCheck.Unreadable;
+                        return;
+                    }
 					break;
 				}
 			}

@@ -9,7 +9,9 @@ namespace AmplifyShaderEditor
 	[Serializable]
 	public sealed class TemplateCullModeModule : TemplateModuleParent
 	{
-		private static readonly string CullModeStr = "Cull Mode";
+        public TemplateCullModeModule() : base("Cull Mode"){ }
+
+        private static readonly string CullModeStr = "Cull Mode";
 
 		[SerializeField]
 		private CullMode m_cullMode = CullMode.Back;
@@ -38,5 +40,7 @@ namespace AmplifyShaderEditor
 		{
 			m_cullMode = data.CullModeData;
 		}
+
+        public CullMode CurrentCullMode { get { return m_cullMode; } }
 	}
 }

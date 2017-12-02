@@ -444,11 +444,7 @@ namespace AmplifyShaderEditor
 
 				if( additionalCheck )
 					AdditionalCheck();
-#if UNITY_5_5_OR_NEWER
 				m_linearTexture = !importer.sRGBTexture;
-#else
-				m_linearTexture = importer.linearTexture;
-#endif
 			}
 
 			if( ( texture as Texture2DArray ) != null )

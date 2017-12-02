@@ -124,12 +124,12 @@ namespace AmplifyShaderEditor
 		Pragmas		= 4,
 		Pass		= 5,
 		Params_Vert = 6,
-		Params_Frag = 7,
-		CullMode	= 8,
-		BlendMode   = 9,
-		BlendOp		= 10,
-		ColorMask	= 11,
-		StencilOp	= 12
+		Params_Frag = 7
+		//CullMode	= 8,
+		//BlendMode   = 9,
+		//BlendOp		= 10,
+		//ColorMask	= 11,
+		//StencilOp	= 12
 	}
 
 	public class TemplatesManager
@@ -147,11 +147,11 @@ namespace AmplifyShaderEditor
 		public static readonly string TemplateFunctionsTag = "/*ase_functions*/\n";
 		public static readonly string TemplateTagsTag = "/*ase_tags*/";
 
-		public static readonly string TemplateCullModeTag = "/*ase_cull_mode*/";
-		public static readonly string TemplateBlendModeTag = "/*ase_blend_mode*/";
-		public static readonly string TemplateBlendOpTag = "/*ase_blend_op*/";
-		public static readonly string TemplateColorMaskTag = "/*ase_color_mask*/";
-		public static readonly string TemplateStencilOpTag = "/*ase_stencil*/";
+		//public static readonly string TemplateCullModeTag = "/*ase_cull_mode*/";
+		//public static readonly string TemplateBlendModeTag = "/*ase_blend_mode*/";
+		//public static readonly string TemplateBlendOpTag = "/*ase_blend_op*/";
+		//public static readonly string TemplateColorMaskTag = "/*ase_color_mask*/";
+		//public static readonly string TemplateStencilOpTag = "/*ase_stencil*/";
 
 		public static readonly string TemplateCodeSnippetAttribBegin = "#CODE_SNIPPET_ATTRIBS_BEGIN#";
 		public static readonly string TemplateCodeSnippetAttribEnd = "#CODE_SNIPPET_ATTRIBS_END#\n";
@@ -184,12 +184,12 @@ namespace AmplifyShaderEditor
 																new TemplateTagData( TemplatePragmaTag,true),
 																new TemplateTagData( TemplatePassTag,true),
 																new TemplateTagData( TemplateInputsVertParamsTag,false),
-																new TemplateTagData( TemplateInputsFragParamsTag,false),
-																new TemplateTagData( TemplateCullModeTag,false),
-																new TemplateTagData( TemplateBlendModeTag,false),
-																new TemplateTagData( TemplateBlendOpTag,false),
-																new TemplateTagData( TemplateColorMaskTag,false),
-																new TemplateTagData( TemplateStencilOpTag,false),
+																new TemplateTagData( TemplateInputsFragParamsTag,false)
+																//new TemplateTagData( TemplateCullModeTag,false),
+																//new TemplateTagData( TemplateBlendModeTag,false),
+																//new TemplateTagData( TemplateBlendOpTag,false),
+																//new TemplateTagData( TemplateColorMaskTag,false),
+																//new TemplateTagData( TemplateStencilOpTag,true),
 																};
 
 		
