@@ -338,7 +338,7 @@ Prefab:
         type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: d7010dfac8eb25e4bb6e1166a26fc05a, type: 2}
+      objectReference: {fileID: 2100000, guid: 36c5a7775fc295f4f8058e059dcd916c, type: 2}
     - target: {fileID: 1000012017197192, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_Name
       value: ShaderBall
