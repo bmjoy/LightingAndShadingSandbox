@@ -124,10 +124,10 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn" {
 			o.Normal = fixed3(normals.x * _NormalScale, normals.y * _NormalScale, normals.z);
 
 			// Fresnel rim lighting.
+			half3 worldNormal = WorldNormalVector(IN, o.Normal);
 			half rim = FresnelSchlick(IN.viewDir, o.Normal);
 
 			// Refactor the rim effect to "wrap", similar to HalfLambert.
-			half3 worldNormal = WorldNormalVector(IN, o.Normal);
 			rim *= saturate(dot(fixed3(0, 1, 0), worldNormal) * 0.5 + 0.5) * saturate(dot(fixed3(0, 1, 0), -IN.viewDir) + 1.75);
 			o.Emission = _RimColor.rgb * rim;
 
