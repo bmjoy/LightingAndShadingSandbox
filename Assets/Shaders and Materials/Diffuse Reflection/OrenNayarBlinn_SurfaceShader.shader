@@ -1,5 +1,5 @@
 ﻿// Oren Nayar Blinn BRDF shader.
-Shader "Pipeworks_Custom/Oren Nayar Blinn" {
+Shader "Pipeworks_Custom/Oren Nayar Blinn_SurfaceShader" {
 	Properties {
 		_ColorTint ("Color Tint", Color) = (1,1,1,1)
 		_MainTex ("Main (RGB) Spec (A)", 2D) = "white" {}
