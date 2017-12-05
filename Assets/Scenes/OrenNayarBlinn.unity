@@ -139,8 +139,8 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 895560151}
-  m_LocalRotation: {x: 0.0001684837, y: -0.9997239, z: 0.022806942, w: 0.0056571662}
-  m_LocalPosition: {x: -0.07321094, y: 1.061265, z: 2.845829}
+  m_LocalRotation: {x: 0.00020548292, y: -0.9981785, z: 0.060271457, w: 0.0026518141}
+  m_LocalPosition: {x: -0.01925033, y: 1.3422947, z: 2.7545204}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1581393222}
@@ -338,14 +338,14 @@ Prefab:
         type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 36c5a7775fc295f4f8058e059dcd916c, type: 2}
+      objectReference: {fileID: 2100000, guid: d7010dfac8eb25e4bb6e1166a26fc05a, type: 2}
     - target: {fileID: 1000012017197192, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_Name
       value: ShaderBall
       objectReference: {fileID: 0}
     - target: {fileID: 1000012017197192, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000010319129062, guid: 5fb901ed376616a4d800b32547cef664, type: 2}
       propertyPath: m_LocalScale.x
@@ -857,7 +857,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1845604333
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -872,7 +872,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 2518b6048e194fc4baa8d621cbd3da75, type: 2}
+  - {fileID: 2100000, guid: 6523ae3e58fdf9443a1476b36c92ca70, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

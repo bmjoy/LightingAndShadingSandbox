@@ -85,45 +85,50 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 			#endif
 			float2 uv_Normal = i.uv_texcoord * _Normal_ST.xy + _Normal_ST.zw;
 			float3 temp_output_3_0 = (UnpackScaleNormal( tex2D( _Normal, uv_Normal ) ,_NormalScale )).xyz;
-			float3 temp_output_51_0_g481 = temp_output_3_0;
-			float3 newWorldNormal50_g481 = WorldNormalVector( i , temp_output_51_0_g481 );
+			float3 temp_output_51_0_g495 = temp_output_3_0;
+			float3 newWorldNormal50_g495 = WorldNormalVector( i , temp_output_51_0_g495 );
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
-			float3 temp_output_24_0_g481 = ase_worldlightDir;
-			float dotResult3_g482 = dot( newWorldNormal50_g481 , temp_output_24_0_g481 );
-			half NdotL34_g481 = saturate( max( dotResult3_g482 , 0.0 ) );
-			float temp_output_2_0_g481 = _Roughness;
-			float temp_output_6_0_g481 = ( temp_output_2_0_g481 * temp_output_2_0_g481 );
-			half3 orenNayar16_g481 = ( half3(1,0,0) + ( half3(-0.5,0.17,0.45) * ( temp_output_6_0_g481 / ( temp_output_6_0_g481 + half3(0.33,0.13,0.09) ) ) ) );
+			float3 temp_output_24_0_g495 = ase_worldlightDir;
+			float dotResult3_g496 = dot( newWorldNormal50_g495 , temp_output_24_0_g495 );
+			half NdotL34_g495 = saturate( max( dotResult3_g496 , 0.0 ) );
+			float temp_output_2_0_g495 = _Roughness;
+			float temp_output_6_0_g495 = ( temp_output_2_0_g495 * temp_output_2_0_g495 );
+			half3 orenNayar16_g495 = ( half3(1,0,0) + ( half3(-0.5,0.17,0.45) * ( temp_output_6_0_g495 / ( temp_output_6_0_g495 + half3(0.33,0.13,0.09) ) ) ) );
 			float2 uv_MainRGBSpecA = i.uv_texcoord * _MainRGBSpecA_ST.xy + _MainRGBSpecA_ST.zw;
-			float4 temp_output_92_0_g481 = tex2D( _MainRGBSpecA, uv_MainRGBSpecA );
-			half3 albedo93_g481 = ( (_ColorTint).rgb * (temp_output_92_0_g481).rgb );
+			float4 temp_output_92_0_g495 = tex2D( _MainRGBSpecA, uv_MainRGBSpecA );
+			half3 albedo93_g495 = ( (_ColorTint).rgb * (temp_output_92_0_g495).rgb );
 			float3 ase_worldViewDir = normalize( UnityWorldSpaceViewDir( ase_worldPos ) );
-			float3 temp_output_22_0_g481 = ase_worldViewDir;
-			float dotResult31_g481 = dot( temp_output_24_0_g481 , temp_output_22_0_g481 );
-			float dotResult4_g487 = dot( newWorldNormal50_g481 , temp_output_22_0_g481 );
-			half NdotV35_g481 = saturate( max( dotResult4_g487 , 0.0 ) );
-			float temp_output_39_0_g481 = ( saturate( dotResult31_g481 ) - ( NdotL34_g481 * NdotV35_g481 ) );
-			float lerpResult44_g481 = lerp( max( NdotL34_g481 , NdotV35_g481 ) , 1.0 , step( temp_output_39_0_g481 , 0.0 ));
-			half orenNayar_s49_g481 = ( temp_output_39_0_g481 / lerpResult44_g481 );
-			float3 temp_output_108_0_g481 = ( NdotL34_g481 * ( orenNayar16_g481.x + ( albedo93_g481 * orenNayar16_g481.y ) + ( orenNayar16_g481.z * orenNayar_s49_g481 ) ) );
-			float3 temp_output_69_0_g481 = _LightColor0.rgb;
-			half3 lightColor113_g481 = temp_output_69_0_g481;
-			half lightAtten112_g481 = ase_lightAtten;
-			float temp_output_11_0_g486 = ( 1.0 / 1.31 );
-			float temp_output_130_0_g481 = ( 1.0 - ( pow( ( 1.0 - temp_output_11_0_g486 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g486 ) , 2.0 ) ) );
-			half3 difuseL137_g481 = saturate( ( ( temp_output_108_0_g481 * albedo93_g481 * lightColor113_g481 * lightAtten112_g481 * temp_output_130_0_g481 ) + float3( 0,0,0 ) ) );
-			float3 normalizeResult5_g483 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
-			float dotResult6_g483 = dot( WorldNormalVector( i , temp_output_51_0_g481 ) , normalizeResult5_g483 );
-			float4 temp_output_61_0_g481 = _SpecularColor;
-			fixed specMap99_g481 = (temp_output_92_0_g481).a;
-			float3 temp_output_7_0_g484 = temp_output_22_0_g481;
-			float3 normalizeResult10_g484 = normalize( ( temp_output_24_0_g481 + temp_output_7_0_g484 ) );
-			float dotResult13_g484 = dot( normalizeResult10_g484 , temp_output_7_0_g484 );
-			float temp_output_31_0_g484 = pow( ( 1.0 - dotResult13_g484 ) , _RimPower );
-			float temp_output_11_0_g485 = ( 1.0 / 1.31 );
-			float fresnel82_g481 = ( temp_output_31_0_g484 + ( ( 1.0 - temp_output_31_0_g484 ) * ( pow( ( 1.0 - temp_output_11_0_g485 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g485 ) , 2.0 ) ) ) );
-			half3 specL114_g481 = ( ( saturate( pow( max( dotResult6_g483 , 0.0 ) , ( _SpecularPower * 128.0 ) ) ) * (temp_output_61_0_g481).rgb * (temp_output_61_0_g481).a * specMap99_g481 ) * ( 1.0 - fresnel82_g481 ) * ( temp_output_69_0_g481 * ase_lightAtten ) );
+			float3 temp_output_22_0_g495 = ase_worldViewDir;
+			float dotResult31_g495 = dot( temp_output_24_0_g495 , temp_output_22_0_g495 );
+			float dotResult4_g501 = dot( newWorldNormal50_g495 , temp_output_22_0_g495 );
+			half NdotV35_g495 = saturate( max( dotResult4_g501 , 0.0 ) );
+			float temp_output_39_0_g495 = ( saturate( dotResult31_g495 ) - ( NdotL34_g495 * NdotV35_g495 ) );
+			float lerpResult44_g495 = lerp( max( NdotL34_g495 , NdotV35_g495 ) , 1.0 , step( temp_output_39_0_g495 , 0.0 ));
+			half orenNayar_s49_g495 = ( temp_output_39_0_g495 / lerpResult44_g495 );
+			float3 temp_output_108_0_g495 = ( NdotL34_g495 * ( orenNayar16_g495.x + ( albedo93_g495 * orenNayar16_g495.y ) + ( orenNayar16_g495.z * orenNayar_s49_g495 ) ) );
+			float3 temp_output_69_0_g495 = _LightColor0.rgb;
+			half3 lightColor113_g495 = temp_output_69_0_g495;
+			half lightAtten112_g495 = ase_lightAtten;
+			float temp_output_11_0_g500 = ( 1.0 / 1.31 );
+			float temp_output_130_0_g495 = ( 1.0 - ( pow( ( 1.0 - temp_output_11_0_g500 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g500 ) , 2.0 ) ) );
+			half3 worldSpaceNormals73_g495 = newWorldNormal50_g495;
+			UnityGI gi157_g495 = gi;
+			gi157_g495 = UnityGI_Base( data, 1, worldSpaceNormals73_g495 );
+			float3 indirectDiffuse157_g495 = gi157_g495.indirect.diffuse;
+			float3 normalizeResult156_g495 = normalize( indirectDiffuse157_g495 );
+			half3 difuseL137_g495 = saturate( ( ( temp_output_108_0_g495 * albedo93_g495 * lightColor113_g495 * lightAtten112_g495 * temp_output_130_0_g495 ) + ( normalizeResult156_g495 * 0.1 ) ) );
+			float3 normalizeResult5_g497 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
+			float dotResult6_g497 = dot( WorldNormalVector( i , temp_output_51_0_g495 ) , normalizeResult5_g497 );
+			float4 temp_output_61_0_g495 = _SpecularColor;
+			fixed specMap99_g495 = (temp_output_92_0_g495).a;
+			float3 temp_output_7_0_g498 = temp_output_22_0_g495;
+			float3 normalizeResult10_g498 = normalize( ( temp_output_24_0_g495 + temp_output_7_0_g498 ) );
+			float dotResult13_g498 = dot( normalizeResult10_g498 , temp_output_7_0_g498 );
+			float temp_output_31_0_g498 = pow( ( 1.0 - dotResult13_g498 ) , _RimPower );
+			float temp_output_11_0_g499 = ( 1.0 / 1.31 );
+			float fresnel82_g495 = ( temp_output_31_0_g498 + ( ( 1.0 - temp_output_31_0_g498 ) * ( pow( ( 1.0 - temp_output_11_0_g499 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g499 ) , 2.0 ) ) ) );
+			half3 specL114_g495 = ( ( saturate( pow( max( dotResult6_g497 , 0.0 ) , ( _SpecularPower * 128.0 ) ) ) * (temp_output_61_0_g495).rgb * (temp_output_61_0_g495).a * specMap99_g495 ) * ( 1.0 - fresnel82_g495 ) * ( temp_output_69_0_g495 * ase_lightAtten ) );
 			float3 newWorldNormal14 = WorldNormalVector( i , temp_output_3_0 );
 			float3 temp_output_7_0_g73 = ase_worldViewDir;
 			float3 normalizeResult10_g73 = normalize( ( newWorldNormal14 + temp_output_7_0_g73 ) );
@@ -133,7 +138,7 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 			float3 _Const3_01 = float3(0,1,0);
 			float dotResult17 = dot( newWorldNormal14 , _Const3_01 );
 			float dotResult27 = dot( _Const3_01 , ( ase_worldViewDir * -1.0 ) );
-			c.rgb = ( ( difuseL137_g481 + specL114_g481 ) + (( ( (_RimColor).rgb * _RimColor.a ) * ( ( temp_output_31_0_g73 + ( ( 1.0 - temp_output_31_0_g73 ) * ( pow( ( 1.0 - temp_output_11_0_g74 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g74 ) , 2.0 ) ) ) ) * saturate( ( ( dotResult17 * 0.5 ) + 0.5 ) ) * saturate( ( dotResult27 + 1.75 ) ) ) )).xyz );
+			c.rgb = ( ( difuseL137_g495 + specL114_g495 ) + (( ( (_RimColor).rgb * _RimColor.a ) * ( ( temp_output_31_0_g73 + ( ( 1.0 - temp_output_31_0_g73 ) * ( pow( ( 1.0 - temp_output_11_0_g74 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g74 ) , 2.0 ) ) ) ) * saturate( ( ( dotResult17 * 0.5 ) + 0.5 ) ) * saturate( ( dotResult27 + 1.75 ) ) ) )).xyz );
 			c.a = 1;
 			return c;
 		}
@@ -235,7 +240,7 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 }
 /*ASEBEGIN
 Version=13903
-1939;35;1796;1125;2026.814;744.6954;2.048206;True;False
+1939;35;1796;1125;644.8187;284.305;1;True;False
 Node;AmplifyShaderEditor.RangedFloatNode;1;-1512.124,112.5015;Float;False;Property;_NormalScale;Normal Scale;3;0;0;0;5;0;1;FLOAT
 Node;AmplifyShaderEditor.SamplerNode;2;-1230.727,67.28145;Float;True;Property;_Normal;Normal;2;0;None;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
 Node;AmplifyShaderEditor.ComponentMaskNode;3;-941.7271,67.28145;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
@@ -266,7 +271,7 @@ Node;AmplifyShaderEditor.RangedFloatNode;11;-471.5658,463.5935;Float;False;Prope
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;36;867.3781,401.1596;Float;False;2;2;0;FLOAT3;0,0,0,0;False;1;FLOAT;0,0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.SamplerNode;8;-975.373,-389.003;Float;True;Property;_MainRGBSpecA;Main (RGB) Spec (A);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
 Node;AmplifyShaderEditor.RangedFloatNode;10;-474.5658,395.5935;Half;False;Property;_SpecularPower;Specular Power;7;0;0.33;0;1;0;1;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;112;-11.84969,28.74247;Float;False;Oren Nayar Blinn;-1;;481;213c3d6404f827644885750c46cbd46c;10;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;COLOR;0,0,0,0;False;5;FLOAT;0.0;False;6;FLOAT;0.0;False;7;FLOAT3;0,0,0;False;8;FLOAT3;0,0,0;False;9;FLOAT3;0,0,0;False;1;FLOAT3
+Node;AmplifyShaderEditor.FunctionNode;116;-11.84969,28.74247;Float;False;Oren Nayar Blinn;-1;;495;213c3d6404f827644885750c46cbd46c;10;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;COLOR;0,0,0,0;False;5;FLOAT;0.0;False;6;FLOAT;0.0;False;7;FLOAT3;0,0,0;False;8;FLOAT3;0,0,0;False;9;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.ComponentMaskNode;37;1003.378,396.1596;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.SimpleAddOpNode;111;1314.501,31.43998;Float;False;2;2;0;FLOAT3;0.0;False;1;FLOAT3;0,0,0;False;1;FLOAT3
 Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;1487.672,-198.3297;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Oren Nayar Blinn ASE;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
@@ -298,16 +303,16 @@ WireConnection;114;0;113;0
 WireConnection;114;1;5;4
 WireConnection;36;0;114;0
 WireConnection;36;1;31;0
-WireConnection;112;0;8;0
-WireConnection;112;1;7;0
-WireConnection;112;2;3;0
-WireConnection;112;3;6;0
-WireConnection;112;4;4;0
-WireConnection;112;5;10;0
-WireConnection;112;6;11;0
+WireConnection;116;0;8;0
+WireConnection;116;1;7;0
+WireConnection;116;2;3;0
+WireConnection;116;3;6;0
+WireConnection;116;4;4;0
+WireConnection;116;5;10;0
+WireConnection;116;6;11;0
 WireConnection;37;0;36;0
-WireConnection;111;0;112;0
+WireConnection;111;0;116;0
 WireConnection;111;1;37;0
 WireConnection;0;13;111;0
 ASEEND*/
-//CHKSM=E9AA6C54509FE99F3F06AF5680A0F6E178F91554
+//CHKSM=099330C1C800B8F81D0354BAA99EECE6D6843B36

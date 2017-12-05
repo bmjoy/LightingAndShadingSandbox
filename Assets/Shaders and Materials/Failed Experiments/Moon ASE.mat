@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Moon - Harvest
-  m_Shader: {fileID: 4800000, guid: 4e5b966409ca05b45bc9ccafbf627336, type: 3}
+  m_Name: Moon ASE
+  m_Shader: {fileID: 4800000, guid: 0d6f57c5204d0834aab6b80d9ef1ea9a, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -18,6 +18,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _MainRGBSpecA:
+        m_Texture: {fileID: 2800000, guid: 6b5dafaecc6c47a4f986cee9521d6cd0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 6b5dafaecc6c47a4f986cee9521d6cd0, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -26,14 +30,21 @@ Material:
         m_Texture: {fileID: 2800000, guid: e8c0794500e6b7b4d8035e500ed8a4ab, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _NormalScale: 0.3
-    - _RimPower: 0.66
-    - _Roughness: 0.5
+    - _NormalScale: 1
+    - _RimPower: 2
+    - _Roughness: 0.8
     - _SpecPower: 0.5
+    - _SpecularPower: 0.02
+    - __dirty: 0
     - _specPower: 0.3
     m_Colors:
-    - _ColorTint: {r: 0.9191176, g: 0.49168995, b: 0.23805147, a: 1}
-    - _RimColor: {r: 0.684, g: 0.24623999, b: 0, a: 1}
+    - _ColorTint: {r: 1, g: 1, b: 1, a: 1}
+    - _RimColor: {r: 0.43727502, g: 0.46603313, b: 0.584, a: 1}
     - _SpecColor: {r: 0.891, g: 0.891, b: 0.891, a: 1}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _specularColor: {r: 1, g: 1, b: 1, a: 1}

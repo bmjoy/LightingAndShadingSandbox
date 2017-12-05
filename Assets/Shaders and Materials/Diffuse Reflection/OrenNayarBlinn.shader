@@ -1,5 +1,5 @@
 ﻿// Oren Nayar Blinn BRDF shader.
-Shader "Pipeworks_Custom/Oren Nayar Blinn_SurfaceShader" {
+Shader "Pipeworks_Custom/Oren Nayar Blinn" {
 	Properties {
 		_ColorTint ("Color Tint", Color) = (1,1,1,1)
 		_MainTex ("Main (RGB) Spec (A)", 2D) = "white" {}
@@ -121,7 +121,7 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn_SurfaceShader" {
 
 			// Bumpity bump...
 			half3 normals = UnpackNormal(tex2D(_Normal, IN.uv_Normal));
-			o.Normal = fixed3(normals.x * _NormalScale, normals.y * _NormalScale, normals.z);
+			o.Normal = saturate(fixed3(normals.x * _NormalScale, normals.y * _NormalScale, normals.z));
 
 			// Fresnel rim lighting.
 			half3 worldNormal = WorldNormalVector(IN, o.Normal);
@@ -129,9 +129,9 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn_SurfaceShader" {
 
 			// Refactor the rim effect to "wrap", similar to HalfLambert.
 			rim *= saturate(dot(fixed3(0, 1, 0), worldNormal) * 0.5 + 0.5) * saturate(dot(fixed3(0, 1, 0), -IN.viewDir) + 1.75);
-			o.Emission = _RimColor.rgb * rim;
+			o.Emission = saturate(_RimColor.rgb * rim);
 
-			o.Albedo = c.rgb;
+			o.Albedo = saturate(c.rgb);
 			o.Alpha = specMap;
 		}
 		ENDCG
