@@ -10,6 +10,13 @@ using System.Globalization;
 
 namespace AmplifyShaderEditor
 {
+	public enum ASEColorSpace
+	{
+		Auto,
+		Gamma,
+		Linear
+	}
+
 	public enum SurfaceInputs
 	{
 		DEPTH = 0,
@@ -79,7 +86,9 @@ namespace AmplifyShaderEditor
 		ShaderFunctionMode,
 		RightShaderMode,
 		FlatBackground,
-		DocumentationLink
+		DocumentationLink,
+		GraphButtonIcon,
+		GraphButton
 	}
 
 	public enum MasterNodePortCategory
@@ -220,6 +229,10 @@ namespace AmplifyShaderEditor
 		public static GUIStyle MiniObjectFieldThumbOverlay;
 		public static GUIStyle MiniSamplerButton;
 
+		public static GUIStyle GraphButtonIcon;
+		public static GUIStyle GraphButton;
+		public static GUIStyle GraphDropDown;
+
 		public static GUIStyle EmptyStyle = new GUIStyle();
 
 		public static GUIStyle TooltipBox;
@@ -258,6 +271,7 @@ namespace AmplifyShaderEditor
 		public static Texture2D SmallInfoIcon = null;
 
 		public static Texture2D CheckmarkIcon = null;
+		public static Texture2D PopupIcon = null;
 
 		public static Texture2D MasterNodeOnTexture = null;
 		public static Texture2D MasterNodeOffTexture = null;
@@ -265,6 +279,8 @@ namespace AmplifyShaderEditor
 		public static Texture2D GPUInstancedOnTexture = null;
 		public static Texture2D GPUInstancedOffTexture = null;
 
+		public static GUIContent LockIconOpen = null;
+		public static GUIContent LockIconClosed = null;
 
 		public static bool ShowContextOnPick = true;
 
@@ -303,6 +319,7 @@ namespace AmplifyShaderEditor
 		public static Shader Vector3Shader = null;
 		public static Shader Vector4Shader = null;
 		public static Shader ColorShader = null;
+		public static Shader Texture2DShader = null;
 		public static Shader MaskingShader = null;
 
 		public static bool InhibitMessages = false;
@@ -321,7 +338,7 @@ namespace AmplifyShaderEditor
 		private static FontStyle m_fontStyle;
 
 
-		private static TextInfo m_textInfo;
+		private static System.Globalization.TextInfo m_textInfo;
 		private static string m_latestOpenedFolder = string.Empty;
 		private static Dictionary<int, UndoParentNode> m_undoHelper = new Dictionary<int, UndoParentNode>();
 
@@ -687,6 +704,7 @@ namespace AmplifyShaderEditor
 			Vector3Shader = null;
 			Vector4Shader = null;
 			ColorShader = null;
+			Texture2DShader = null;
 
 			MaskingShader = null;
 
@@ -694,6 +712,10 @@ namespace AmplifyShaderEditor
 			BoldWarningStyle = null;
 			BoldInfoStyle = null;
 			Separator = null;
+
+			GraphButtonIcon = null;
+			GraphButton = null;
+			GraphDropDown = null;
 
 			MiniButtonTopLeft = null;
 			MiniButtonTopMid = null;
@@ -711,9 +733,14 @@ namespace AmplifyShaderEditor
 			Resources.UnloadAsset( SmallInfoIcon );
 			SmallInfoIcon = null;
 
+			LockIconOpen = null;
+			LockIconClosed = null;
 
 			Resources.UnloadAsset( CheckmarkIcon );
 			CheckmarkIcon = null;
+
+			Resources.UnloadAsset( PopupIcon );
+			PopupIcon = null;
 
 			Resources.UnloadAsset( MasterNodeOnTexture );
 			MasterNodeOnTexture = null;
@@ -778,7 +805,13 @@ namespace AmplifyShaderEditor
 			SmallWarningIcon = EditorGUIUtility.Load( "icons/d_console.warnicon.sml.png" ) as Texture2D;
 			SmallInfoIcon = EditorGUIUtility.Load( "icons/d_console.infoicon.sml.png" ) as Texture2D;
 
+			LockIconOpen = new GUIContent( EditorGUIUtility.IconContent( "LockIcon-On" ) );
+			LockIconOpen.tooltip = "Click to unlock and customize the variable name";
+			LockIconClosed = new GUIContent( EditorGUIUtility.IconContent( "LockIcon" ) );
+			LockIconClosed.tooltip = "Click to lock and auto-generate the variable name";
+
 			CheckmarkIcon = AssetDatabase.LoadAssetAtPath( AssetDatabase.GUIDToAssetPath( "e9c4642eaa083a54ab91406d8449e6ac" ), typeof( Texture2D ) ) as Texture2D;
+			PopupIcon = AssetDatabase.LoadAssetAtPath( AssetDatabase.GUIDToAssetPath( "d2384a227b4ac4943b73c8151393e502" ), typeof( Texture2D ) ) as Texture2D;
 
 			BoldErrorStyle = new GUIStyle( (GUIStyle)"BoldLabel" );
 			BoldErrorStyle.normal.textColor = Color.red;
@@ -798,7 +831,7 @@ namespace AmplifyShaderEditor
 			MiniObjectFieldThumbOverlay = new GUIStyle( (GUIStyle)"ObjectFieldThumbOverlay" );
 			MiniSamplerButton = new GUIStyle( MainSkin.customStyles[ (int)CustomStyle.SamplerButton ] );
 
-			m_textInfo = new CultureInfo( "en-US", false ).TextInfo;
+			m_textInfo = new System.Globalization.CultureInfo( "en-US", false ).TextInfo;
 			RangedFloatSliderStyle = new GUIStyle( GUI.skin.horizontalSlider );
 			RangedFloatSliderThumbStyle = new GUIStyle( GUI.skin.horizontalSliderThumb );
 			RangedFloatSliderThumbStyle.normal.background = SliderButton;
@@ -814,6 +847,11 @@ namespace AmplifyShaderEditor
 			SwitchNodePadding = new RectOffset( 6, 14, 2, 3 );
 			SwitchFixedHeight = 18;
 			SwitchFontSize = 10;
+
+			GraphButtonIcon = new GUIStyle( MainSkin.customStyles[ (int)CustomStyle.GraphButtonIcon ] );
+			GraphButton = new GUIStyle( MainSkin.customStyles[ (int)CustomStyle.GraphButton ] );
+			GraphDropDown = new GUIStyle( MainSkin.customStyles[ (int)CustomStyle.GraphButton ] );
+			GraphDropDown.padding.right = 20;
 
 			Box = new GUIStyle( GUI.skin.box );
 			Button = new GUIStyle( GUI.skin.button );
@@ -879,6 +917,8 @@ namespace AmplifyShaderEditor
 				ColorShader = AssetDatabase.LoadAssetAtPath<Shader>( AssetDatabase.GUIDToAssetPath( "6cf365ccc7ae776488ae8960d6d134c3" ) ); //color node
 			if( MaskingShader == null )
 				MaskingShader = AssetDatabase.LoadAssetAtPath<Shader>( AssetDatabase.GUIDToAssetPath( "9c34f18ebe2be3e48b201b748c73dec0" ) ); //masking shader
+			if( Texture2DShader == null )
+				Texture2DShader = AssetDatabase.LoadAssetAtPath<Shader>( AssetDatabase.GUIDToAssetPath( "13bd295c44d04e1419f20f792d331e33" ) ); //texture2d shader
 		}
 
 		private static void FetchMenuItemStyles()
@@ -967,6 +1007,10 @@ namespace AmplifyShaderEditor
 				UsingProSkin = EditorGUIUtility.isProSkin;
 				FetchMenuItemStyles();
 			}
+
+			GraphDropDown.padding.left = (int)( 2 * drawInfo.InvertedZoom + 2 );
+			GraphDropDown.padding.right = (int)( 20 * drawInfo.InvertedZoom );
+			GraphDropDown.fontSize = (int)( 10 * drawInfo.InvertedZoom );
 
 			PreviewExpander.fixedHeight = Constants.PreviewExpanderHeight * drawInfo.InvertedZoom;
 			PreviewExpander.fixedWidth = Constants.PreviewExpanderWidth * drawInfo.InvertedZoom;
@@ -1065,10 +1109,33 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				return m_dataTypeToColor[ dataType ];
+				if ( m_dataTypeToColor.ContainsKey( dataType ) )
+					return m_dataTypeToColor[ dataType ];
 			}
+			return m_dataTypeToColor[ WirePortDataType.OBJECT ];
 		}
 
+		public static bool IsValidType( WirePortDataType type )
+		{
+			switch ( type )
+			{
+				case WirePortDataType.OBJECT:
+				case WirePortDataType.FLOAT:
+				case WirePortDataType.FLOAT2:
+				case WirePortDataType.FLOAT3:
+				case WirePortDataType.FLOAT4:
+				case WirePortDataType.FLOAT3x3:
+				case WirePortDataType.FLOAT4x4:
+				case WirePortDataType.COLOR:
+				case WirePortDataType.INT:
+				case WirePortDataType.SAMPLER1D:
+				case WirePortDataType.SAMPLER2D:
+				case WirePortDataType.SAMPLER3D:
+				case WirePortDataType.SAMPLERCUBE:
+				return true;
+			}
+			return false;
+		}
 		public static string GetNameForDataType( WirePortDataType dataType ) { return m_dataTypeToName[ dataType ]; }
 
 		public static string GetInputDeclarationFromType( PrecisionType precision, SurfaceInputs inputType )
@@ -1565,6 +1632,14 @@ namespace AmplifyShaderEditor
 			return originalString;
 		}
 
+		public static string RemoveInvalidEnumCharacters( string originalString )
+		{
+			for( int i = 0; i < Constants.EnumInvalidChars.Length; i++ )
+			{
+				originalString = originalString.Replace( Constants.EnumInvalidChars[ i ], string.Empty );
+			}
+			return originalString;
+		}
 
 		public static string RemoveInvalidCharacters( string originalString )
 		{
@@ -2245,6 +2320,12 @@ namespace AmplifyShaderEditor
 		public static void UnregisterFunctionOutputNode( FunctionOutput node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionOutputNodes.RemoveNode( node ); } }
 		public static void UpdateFunctionOutputData( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionOutputNodes.UpdateDataOnNode( nodeIdx, data ); } }
 		public static List<FunctionOutput> FunctionOutputList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionOutputNodes.NodesList; } return null; }
+
+		// Function Switches
+		public static void RegisterFunctionSwitchNode( FunctionSwitch node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionSwitchNodes.AddNode( node ); } }
+		public static void UnregisterFunctionSwitchNode( FunctionSwitch node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionSwitchNodes.RemoveNode( node ); } }
+		public static void UpdateFunctionSwitchData( int nodeIdx, string data ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.FunctionSwitchNodes.UpdateDataOnNode( nodeIdx, data ); } }
+		public static List<FunctionSwitch> FunctionSwitchList() { if( CurrentWindow != null ) { return CurrentWindow.CurrentGraph.FunctionSwitchNodes.NodesList; } return null; }
 
 		// Screen Color Node
 		public static void RegisterScreenColorNode( ScreenColorNode node ) { if( CurrentWindow != null ) { CurrentWindow.CurrentGraph.ScreenColorNodes.AddNode( node ); } }

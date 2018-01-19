@@ -12,17 +12,21 @@ MonoBehaviour:
   m_Name: Phong
   m_EditorClassIdentifier: 
   m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
-    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=13803\n1953;34;1796;1125;909;492.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;8;-55,-279.5;Float;False;197;155;V
-    dot R;1;7;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;5;-572,38.5;Float;False;1;0;FLOAT;0.0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.SaturateNode;15;313,-229.5;Float;False;1;0;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.FunctionNode;18;-316,16.5;Float;False;Reflection
-    Vector;-1;;4;238f2485d2b293b4ab80b31019ecc882;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;11;323.9245,-87.5219;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.RangedFloatNode;21;-13,-115.5;Fixed;False;Constant;_Float1;Float
-    1;0;0;0.5;0;0;0;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;14;141.7004,-114.9207;Float;False;Spec
-    Power;1;0;False;1;0;FLOAT;3.0;False;1;FLOAT\nNode;AmplifyShaderEditor.RangedFloatNode;10;149.2197,-41.99181;Float;False;Constant;_Float0;Float
-    0;0;0;128;0;0;0;1;FLOAT\nNode;AmplifyShaderEditor.FunctionInput;17;-716,-101.5;Float;False;Normals;3;1;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3\nNode;AmplifyShaderEditor.ViewDirInputsCoordNode;6;-520,-235.5;Float;False;World;0;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.SimpleMaxOpNode;12;179.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.DotProductOpNode;7;-5,-229.5;Float;False;2;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT\nNode;AmplifyShaderEditor.PowerNode;13;479.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT\nNode;AmplifyShaderEditor.WorldNormalVector;20;-526,-96.5;Float;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.Vector3Node;19;-907,-100.5;Float;False;Constant;_Vector0;Vector
-    0;0;0;0,0,1;0;4;FLOAT3;FLOAT;FLOAT;FLOAT\nNode;AmplifyShaderEditor.FunctionOutput;0;670,-230;Float;False;True;Phong;0;True;1;0;FLOAT;0.0;False;1;FLOAT\nWireConnection;15;0;12;0\nWireConnection;18;0;20;0\nWireConnection;18;1;5;0\nWireConnection;11;0;14;0\nWireConnection;11;1;10;0\nWireConnection;14;0;21;0\nWireConnection;17;0;19;0\nWireConnection;12;0;7;0\nWireConnection;7;0;6;0\nWireConnection;7;1;18;0\nWireConnection;13;0;15;0\nWireConnection;13;1;11;0\nWireConnection;20;0;17;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=4874AB699D89111FE21D14AA2182F8A65C7C59E7"
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=14205\n1939;35;1796;1125;1038;643.5;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;8;-55,-279.5;Float;False;197;155;V
+    dot R;1;7;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.PowerNode;13;479.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.DotProductOpNode;7;-5,-229.5;Float;False;2;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionInput;17;-716,-101.5;Float;False;Normals;3;1;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.WorldNormalVector;20;-526,-96.5;Float;False;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.ViewDirInputsCoordNode;6;-520,-235.5;Float;False;World;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.SimpleMaxOpNode;12;179.0776,-229.5328;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.Vector3Node;19;-907,-100.5;Float;False;Constant;_Vector0;Vector
+    0;0;0;Create;True;0,0,1;0,0,0;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.SaturateNode;15;313,-229.5;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;5;-572,38.5;Float;False;1;0;FLOAT;0.0;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;11;323.9245,-87.5219;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;10;149.2197,-41.99181;Float;False;Constant;_Float0;Float
+    0;0;0;Create;True;128;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionInput;14;141.7004,-114.9207;Float;False;Spec
+    Power;1;0;False;1;0;FLOAT;3.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;21;-13,-115.5;Fixed;False;Constant;_Float1;Float
+    1;0;0;Create;True;0.5;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionNode;18;-316,15.5;Float;False;Reflection
+    Vector;-1;;4;238f2485d2b293b4ab80b31019ecc882;0;2;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;0;667,-235;Float;True;True;Phong;0;True;1;0;FLOAT;0.0;False;1;FLOAT;0\nWireConnection;13;0;15;0\nWireConnection;13;1;11;0\nWireConnection;7;0;6;0\nWireConnection;7;1;18;0\nWireConnection;17;0;19;0\nWireConnection;20;0;17;0\nWireConnection;12;0;7;0\nWireConnection;15;0;12;0\nWireConnection;11;0;14;0\nWireConnection;11;1;10;0\nWireConnection;14;0;21;0\nWireConnection;18;2;20;0\nWireConnection;18;3;5;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=DABB3164586046069581661190E768443072E0A0"
   m_functionName: 
   m_description: "Calculates Phong specular \nlighting."
   m_additionalIncludes:
     m_additionalIncludes: []
     m_outsideIncludes: []
+  m_additionalPragmas:
+    m_additionalPragmas: []
+    m_outsidePragmas: []
   m_nodeCategory: 3
   m_customNodeCategory: 
+  m_previewPosition: 0

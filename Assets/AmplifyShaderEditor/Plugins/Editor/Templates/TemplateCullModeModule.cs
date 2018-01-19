@@ -16,7 +16,7 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private CullMode m_cullMode = CullMode.Back;
 		
-		public override void Draw( UndoParentNode owner )
+		public override void Draw( ParentNode owner )
 		{
 			m_cullMode = (CullMode)owner.EditorGUILayoutEnumPopup( CullModeStr, m_cullMode );
 		}

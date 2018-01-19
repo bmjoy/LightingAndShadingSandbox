@@ -226,8 +226,8 @@ namespace UnityEditor
 			if ( shader.isSupported )
 			{
 				EditorGUILayout.LabelField( "Cast shadows", ( !ShaderUtilEx.HasShadowCasterPass( shader ) ) ? "no" : "yes", new GUILayoutOption[ 0 ] );
-				EditorGUILayout.LabelField( "Render queue", ShaderUtilEx.GetRenderQueue( shader ).ToString( CultureInfo.InvariantCulture ), new GUILayoutOption[ 0 ] );
-				EditorGUILayout.LabelField( "LOD", ShaderUtilEx.GetLOD( shader ).ToString( CultureInfo.InvariantCulture ), new GUILayoutOption[ 0 ] );
+				EditorGUILayout.LabelField( "Render queue", ShaderUtilEx.GetRenderQueue( shader ).ToString( System.Globalization.CultureInfo.InvariantCulture ), new GUILayoutOption[ 0 ] );
+				EditorGUILayout.LabelField( "LOD", ShaderUtilEx.GetLOD( shader ).ToString( System.Globalization.CultureInfo.InvariantCulture ), new GUILayoutOption[ 0 ] );
 				EditorGUILayout.LabelField( "Ignore projector", ( !ShaderUtilEx.DoesIgnoreProjector( shader ) ) ? "no" : "yes", new GUILayoutOption[ 0 ] );
 				string label;
 				switch ( ShaderEx.GetDisableBatching( shader ) )
@@ -334,11 +334,11 @@ namespace UnityEditor
 					GUIContent content;
 					if ( string.IsNullOrEmpty( lastPathNameComponent ) )
 					{
-						content = EditorGUIUtilityEx.TempContent( line.ToString( CultureInfo.InvariantCulture ) );
+						content = EditorGUIUtilityEx.TempContent( line.ToString( System.Globalization.CultureInfo.InvariantCulture ) );
 					}
 					else
 					{
-						content = EditorGUIUtilityEx.TempContent( lastPathNameComponent + ":" + line.ToString( CultureInfo.InvariantCulture ) );
+						content = EditorGUIUtilityEx.TempContent( lastPathNameComponent + ":" + line.ToString( System.Globalization.CultureInfo.InvariantCulture ) );
 					}
 					Vector2 vector = EditorStyles.miniLabel.CalcSize( content );
 					rect.xMin -= vector.x;

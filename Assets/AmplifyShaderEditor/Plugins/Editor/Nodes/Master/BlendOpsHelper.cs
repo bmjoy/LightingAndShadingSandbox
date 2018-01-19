@@ -288,7 +288,7 @@ namespace AmplifyShaderEditor
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_blendOpAlpha );
 		}
 
-		public void SetBlendOpsFromBlendMode( AlphaMode mode )
+		public void SetBlendOpsFromBlendMode( AlphaMode mode, bool customBlendAvailable )
 		{
 			switch( mode )
 			{
@@ -307,6 +307,7 @@ namespace AmplifyShaderEditor
 				m_destFactorRGB = m_commonBlendTypes[ m_currentIndex ].DestFactor;
 				break;
 			}
+			m_enabled = customBlendAvailable;
 		}
 
 		public string CreateBlendOps()

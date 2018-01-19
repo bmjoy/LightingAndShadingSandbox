@@ -130,7 +130,7 @@ namespace AmplifyShaderEditor
             EditorVariablesManager.ExpandedBlendModeModule.Value = blendModeIsVisible;
         }
 
-        public override void Draw( UndoParentNode owner )
+        public override void Draw( ParentNode owner )
         {
             bool blendModeIsVisible = EditorVariablesManager.ExpandedBlendModeModule.Value;
             NodeUtils.DrawPropertyGroup( ref blendModeIsVisible, BlendModeStr, () =>

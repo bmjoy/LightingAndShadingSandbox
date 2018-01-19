@@ -413,7 +413,18 @@ namespace AmplifyShaderEditor
 			return newValue;
 		}
 
-		public Enum EditorGUIEnumPopup( Rect position, Enum selected, [UnityEngine.Internal.DefaultValue( "EditorStyles.popup" )] GUIStyle style )
+        public float GUIHorizontalSlider( Rect position, float value, float leftValue, float rightValue, GUIStyle slider, GUIStyle thumb )
+        {
+            float newValue = GUI.HorizontalSlider( position, value, leftValue, rightValue, slider, thumb );
+            if( newValue != value )
+            {
+                UndoRecordObject( this, string.Format( MessageFormat, "GUIHorizontalSlider", ( ( m_nodeAttribs != null ) ? m_nodeAttribs.Name : GetType().ToString() ) ) );
+            }
+            return newValue;
+        }
+
+
+        public Enum EditorGUIEnumPopup( Rect position, Enum selected, [UnityEngine.Internal.DefaultValue( "EditorStyles.popup" )] GUIStyle style )
 		{
 			Enum newValue = EditorGUI.EnumPopup( position, selected, style );
 			if ( !newValue.ToString().Equals( selected.ToString() ) )
@@ -423,7 +434,7 @@ namespace AmplifyShaderEditor
 			}
 			return newValue;
 		}
-
+        
 		public int EditorGUIIntPopup( Rect position, int selectedValue, GUIContent[] displayedOptions, int[] optionValues, [UnityEngine.Internal.DefaultValue( "EditorStyles.popup" )] GUIStyle style )
 		{
 			int newValue = EditorGUI.IntPopup( position, selectedValue, displayedOptions, optionValues, style );

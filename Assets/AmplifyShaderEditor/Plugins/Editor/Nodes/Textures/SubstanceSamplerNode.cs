@@ -1,6 +1,5 @@
 // Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
-
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -68,6 +67,7 @@ namespace AmplifyShaderEditor
 			m_selectedLocation = PreviewLocation.TopCenter;
 			m_cacheNodeConnections = new CacheNodeConnections();
 			m_previewShaderGUID = "6f322c1da33f1e744941aafcb0ad1a2d";
+			m_showAutoRegisterUI = false;
 		}
 
 		public override void RenderNodePreview()

@@ -103,6 +103,9 @@ namespace AmplifyShaderEditor
 
 		private OutputPort m_colorPort;
 		
+		private TexturePropertyNode m_previewTextProp = null;
+		private ReferenceState m_state = ReferenceState.Self;
+		
 		public SamplerNode() : base() { }
 		public SamplerNode( int uniqueId, float x, float y, float width, float height ) : base( uniqueId, x, y, width, height ) { }
 		protected override void CommonInit( int uniqueId )
@@ -176,53 +179,30 @@ namespace AmplifyShaderEditor
 				m_typeId = Shader.PropertyToID( "_Type" );
 
 			bool usingTexture = false;
-			if( SoftValidReference && m_referenceSampler.TextureProperty != null )
+			if( m_texPort.IsConnected )
+			{
+				usingTexture = true;
+				SetPreviewTexture( m_texPort.InputPreviewTexture );
+			}
+			else if( SoftValidReference && m_referenceSampler.TextureProperty != null )
 			{
 				if( m_referenceSampler.TextureProperty.Value != null )
 				{
 					usingTexture = true;
-					if( m_referenceSampler.TextureProperty.Value is Cubemap )
-					{
-						PreviewMaterial.SetInt( m_typeId, 3 );
-
-						if( m_cachedSamplerIdCube == -1 )
-							m_cachedSamplerIdCube = Shader.PropertyToID( "_Cube" );
-
-						PreviewMaterial.SetTexture( m_cachedSamplerIdCube, m_referenceSampler.TextureProperty.Value as Cubemap );
-					}
-					else if( m_referenceSampler.TextureProperty.Value is Texture2DArray )
-					{
-						PreviewMaterial.SetInt( m_typeId, 4 );
-
-						if( m_cachedSamplerIdArray == -1 )
-							m_cachedSamplerIdArray = Shader.PropertyToID( "_Array" );
-
-						PreviewMaterial.SetTexture( m_cachedSamplerIdArray, m_referenceSampler.TextureProperty.Value as Texture2DArray );
-					}
-					else if( m_referenceSampler.TextureProperty.Value is Texture3D )
-					{
-						PreviewMaterial.SetInt( m_typeId, 2 );
-
-						if( m_cachedSamplerId3D == -1 )
-							m_cachedSamplerId3D = Shader.PropertyToID( "_Sampler3D" );
-
-						PreviewMaterial.SetTexture( m_cachedSamplerId3D, m_referenceSampler.TextureProperty.Value as Texture3D );
-					}
-					else
-					{
-						PreviewMaterial.SetInt( m_typeId, 1 );
-
-						if( m_cachedSamplerId == -1 )
-							m_cachedSamplerId = Shader.PropertyToID( "_Sampler" );
-
-						PreviewMaterial.SetTexture( m_cachedSamplerId, m_referenceSampler.TextureProperty.Value );
-					}
+					SetPreviewTexture( m_referenceSampler.TextureProperty.Value );
+				} else
+				{
+					usingTexture = true;
+					SetPreviewTexture( m_referenceSampler.PreviewTexture );
 				}
 			}
 			else if( TextureProperty != null )
 			{
 				if( TextureProperty.Value != null )
+				{
 					usingTexture = true;
+					SetPreviewTexture( TextureProperty.Value );
+				}
 			}
 
 			if( m_defaultId == -1 )
@@ -576,7 +556,6 @@ namespace AmplifyShaderEditor
 				if ( m_texPort.IsConnected )
 				{
 					m_drawAttributes = false;
-					m_textureCoordSet = EditorGUILayoutIntPopup( Constants.AvailableUVSetsLabel, m_textureCoordSet, Constants.AvailableUVSetsStr, Constants.AvailableUVSets );
 					DrawSamplerOptions();
 				} else
 				{
@@ -634,7 +613,7 @@ namespace AmplifyShaderEditor
 		{
 			base.DrawGUIControls( drawInfo );
 
-			if ( m_state != ReferenceState.Self && drawInfo.CurrentEventType == EventType.mouseDown && m_previewRect.Contains( drawInfo.MousePosition ) && drawInfo.LeftMouseButtonPressed )
+			if ( m_state != ReferenceState.Self && drawInfo.CurrentEventType == EventType.MouseDown && m_previewRect.Contains( drawInfo.MousePosition ) && drawInfo.LeftMouseButtonPressed )
 			{
 				UIUtils.FocusOnNode( m_previewTextProp, 1, true );
 				Event.current.Use();
@@ -678,12 +657,7 @@ namespace AmplifyShaderEditor
 				m_previewTextProp = this;
 
 		}
-
 		
-
-		private TexturePropertyNode m_previewTextProp = null;
-		private ReferenceState m_state = ReferenceState.Self;
-
 		public override void OnNodeRepaint( DrawInfo drawInfo )
 		{
 			base.OnNodeRepaint( drawInfo );
@@ -1195,8 +1169,17 @@ namespace AmplifyShaderEditor
 		public override void ReadFromString( ref string[] nodeParams )
 		{
 			base.ReadFromString( ref nodeParams );
-			string textureName = GetCurrentParam( ref nodeParams );
-			m_defaultValue = AssetDatabase.LoadAssetAtPath<Texture>( textureName );
+			string defaultTextureGUID = GetCurrentParam( ref nodeParams );
+			if( UIUtils.CurrentShaderVersion() > 14101 )
+			{
+				m_defaultValue = AssetDatabase.LoadAssetAtPath<Texture>( AssetDatabase.GUIDToAssetPath( defaultTextureGUID ));
+				string materialTextureGUID = GetCurrentParam( ref nodeParams );
+				m_materialValue = AssetDatabase.LoadAssetAtPath<Texture>( AssetDatabase.GUIDToAssetPath( materialTextureGUID ) );
+			}
+			else
+			{
+				m_defaultValue = AssetDatabase.LoadAssetAtPath<Texture>( defaultTextureGUID );
+			}
 			m_useSemantics = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 			m_textureCoordSet = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
 			m_isNormalMap = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
@@ -1238,9 +1221,17 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				ConfigFromObject( m_defaultValue , false );
+				if( m_materialValue == null )
+				{
+					ConfigFromObject( m_defaultValue, false, false );
+				}
+				else
+				{
+					CheckTextureImporter( false, false );
+				}
+				ConfigureInputPorts();
+				ConfigureOutputPorts();
 			}
-
 		}
 
 		public override void RefreshExternalReferences()
@@ -1276,7 +1267,8 @@ namespace AmplifyShaderEditor
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
 		{
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );
-			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_defaultValue != null ) ? AssetDatabase.GetAssetPath( m_defaultValue ) : Constants.NoStringValue );
+			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_defaultValue != null ) ? AssetDatabase.AssetPathToGUID( AssetDatabase.GetAssetPath( m_defaultValue )) : Constants.NoStringValue );
+			IOUtils.AddFieldValueToString( ref nodeInfo, ( m_materialValue != null ) ? AssetDatabase.AssetPathToGUID( AssetDatabase.GetAssetPath( m_materialValue) ) : Constants.NoStringValue );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_useSemantics.ToString() );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_textureCoordSet.ToString() );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_isNormalMap.ToString() );

@@ -12,6 +12,9 @@ Shader /*ase_name*/ "ASETemplateShaders/DefaultUnlit" /*end*/
 		Tags { "RenderType"="Opaque" "LightMode" = "ForwardBase" /*ase_tags*/}
 		LOD 100
 		Cull Off
+		ZWrite On
+		ZTest Less
+		Offset  2.5 , -0.23
 		/*ase_pass*/
 
 		Pass

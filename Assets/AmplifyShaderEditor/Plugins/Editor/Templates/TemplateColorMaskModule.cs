@@ -29,7 +29,7 @@ namespace AmplifyShaderEditor
 			}
 		}
 		
-		public override void Draw( UndoParentNode owner )
+		public override void Draw( ParentNode owner )
 		{
 			if( m_leftToggleColorMask == null || m_leftToggleColorMask.normal.background == null )
 			{

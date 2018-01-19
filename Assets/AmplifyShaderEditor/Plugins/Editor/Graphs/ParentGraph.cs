@@ -84,6 +84,9 @@ namespace AmplifyShaderEditor
 		private UsageListFunctionOutputNodes m_functionOutputNodes;
 
 		[SerializeField]
+		private UsageListFunctionSwitchNodes m_functionSwitchNodes;
+
+		[SerializeField]
 		private int m_masterNodeId = Constants.INVALID_NODE_ID;
 
 		[SerializeField]
@@ -162,6 +165,7 @@ namespace AmplifyShaderEditor
 			m_functionInputNodes = new UsageListFunctionInputNodes();
 			m_functionNodes = new UsageListFunctionNodes();
 			m_functionOutputNodes = new UsageListFunctionOutputNodes();
+			m_functionSwitchNodes = new UsageListFunctionSwitchNodes();
 
 			m_selectedNodes = new List<ParentNode>();
 			m_markedForDeletion = new List<ParentNode>();
@@ -192,6 +196,7 @@ namespace AmplifyShaderEditor
 			m_functionInputNodes.UpdateNodeArr();
 			m_functionNodes.UpdateNodeArr();
 			m_functionOutputNodes.UpdateNodeArr();
+			m_functionSwitchNodes.UpdateNodeArr();
 			m_texturePropertyNodes.UpdateNodeArr();
 			m_textureArrayNodes.UpdateNodeArr();
 			m_screenColorNodes.UpdateNodeArr();
@@ -286,6 +291,7 @@ namespace AmplifyShaderEditor
 			m_functionInputNodes.Clear();
 			m_functionNodes.Clear();
 			m_functionOutputNodes.Clear();
+			m_functionSwitchNodes.Clear();
 			m_texturePropertyNodes.Clear();
 			m_textureArrayNodes.Clear();
 			m_screenColorNodes.Clear();
@@ -392,6 +398,17 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		public void CheckPropertiesAutoRegister( ref MasterNodeDataCollector dataCollector )
+		{
+			List<PropertyNode> nodesList = m_propertyNodes.NodesList;
+			int count = nodesList.Count;
+			for( int i = 0; i < count; i++ )
+			{
+				nodesList[ i ].CheckIfAutoRegister( ref dataCollector );
+			}
+			nodesList = null;
+		}
+
 		public void Destroy()
 		{
 			for( int i = 0; i < m_nodes.Count; i++ )
@@ -430,6 +447,9 @@ namespace AmplifyShaderEditor
 
 			m_functionOutputNodes.Destroy();
 			m_functionOutputNodes = null;
+
+			m_functionSwitchNodes.Destroy();
+			m_functionSwitchNodes = null;
 
 			m_texturePropertyNodes.Destroy();
 			m_texturePropertyNodes = null;
@@ -901,17 +921,17 @@ namespace AmplifyShaderEditor
 			{
 				node = m_nodes[ i ];
 				bool restoreMouse = false;
-				if( drawInfo.CurrentEventType == EventType.mouseDown && m_nodeClicked > -1 && node.UniqueId != m_nodeClicked )
+				if( drawInfo.CurrentEventType == EventType.MouseDown && m_nodeClicked > -1 && node.UniqueId != m_nodeClicked )
 				{
 					restoreMouse = true;
-					drawInfo.CurrentEventType = EventType.ignore;
+					drawInfo.CurrentEventType = EventType.Ignore;
 				}
 
 				node.DrawGUIControls( drawInfo );
 
 				if( restoreMouse )
 				{
-					drawInfo.CurrentEventType = EventType.mouseDown;
+					drawInfo.CurrentEventType = EventType.MouseDown;
 				}
 			}
 
@@ -925,22 +945,22 @@ namespace AmplifyShaderEditor
 			{
 				node = m_nodes[ i ];
 				bool restoreMouse = false;
-				if( drawInfo.CurrentEventType == EventType.mouseDown && m_nodeClicked > -1 && node.UniqueId != m_nodeClicked )
+				if( drawInfo.CurrentEventType == EventType.MouseDown && m_nodeClicked > -1 && node.UniqueId != m_nodeClicked )
 				{
 					restoreMouse = true;
-					drawInfo.CurrentEventType = EventType.ignore;
+					drawInfo.CurrentEventType = EventType.Ignore;
 				}
 
 				node.Draw( drawInfo );
 
 				if( restoreMouse )
 				{
-					drawInfo.CurrentEventType = EventType.mouseDown;
+					drawInfo.CurrentEventType = EventType.MouseDown;
 				}
 			}
 
 			// Draw Tooltip
-			if( drawInfo.CurrentEventType == EventType.Repaint || drawInfo.CurrentEventType == EventType.mouseDown )
+			if( drawInfo.CurrentEventType == EventType.Repaint || drawInfo.CurrentEventType == EventType.MouseDown )
 			{
 				nodeCount = m_nodes.Count;
 				for( int i = nodeCount - 1; i >= 0; i-- )
@@ -1393,7 +1413,7 @@ namespace AmplifyShaderEditor
 			ParentNode outputNode = GetNode( outNodeId );
 			if( outputNode != null )
 			{
-				OutputPort outputPort = outputNode.OutputPorts[ outPortId ];
+				OutputPort outputPort = outputNode.GetOutputPortByUniqueId( outPortId );
 				if( outputPort != null )
 				{
 					ParentNode inputNode = GetNode( inNodeId );
@@ -1519,7 +1539,8 @@ namespace AmplifyShaderEditor
 
 					if( node.ConnStatus == NodeConnectionStatus.Connected )
 					{
-						inputPort.GetOutputNode().DeactivateNode( portId, false );
+						node.DeactivateInputPortNode( portId, false );
+						//inputPort.GetOutputNode().DeactivateNode( portId, false );
 						m_checkSelectedWireHighlights = true;
 					}
 
@@ -2170,6 +2191,12 @@ namespace AmplifyShaderEditor
 		{
 			if( CurrentOutputNode != null )
 				CurrentOutputNode.GenerateSignalPropagation();
+			List<FunctionOutput> allOutputs = m_functionOutputNodes.NodesList;
+			for( int i = 0; i < allOutputs.Count; i++ )
+			{
+				allOutputs[ i ].GenerateSignalPropagation();
+			}
+
 			List<RegisterLocalVarNode> localVarNodes = m_localVarNodes.NodesList;
 			int count = localVarNodes.Count;
 			for( int i = 0; i < count; i++ )
@@ -2739,6 +2766,7 @@ namespace AmplifyShaderEditor
 		public UsageListFunctionInputNodes FunctionInputNodes { get { return m_functionInputNodes; } }
 		public UsageListFunctionNodes FunctionNodes { get { return m_functionNodes; } }
 		public UsageListFunctionOutputNodes FunctionOutputNodes { get { return m_functionOutputNodes; } }
+		public UsageListFunctionSwitchNodes FunctionSwitchNodes { get { return m_functionSwitchNodes; } }
 		public PrecisionType CurrentPrecision
 		{
 			get { return m_currentPrecision; }

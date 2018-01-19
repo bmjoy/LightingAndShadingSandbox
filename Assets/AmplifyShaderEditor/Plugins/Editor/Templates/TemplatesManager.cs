@@ -2,7 +2,6 @@
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
-using System.Text;
 using UnityEditor;
 using System.Collections.Generic;
 
@@ -277,7 +276,7 @@ namespace AmplifyShaderEditor
 			if ( m_sortedTemplates == null || m_sortedTemplates.Count == 0 )
 				return;
 
-			StringBuilder fileContents = new StringBuilder();
+			System.Text.StringBuilder fileContents = new System.Text.StringBuilder();
 			fileContents.Append( "// Amplify Shader Editor - Visual Shader Editing Tool\n" );
 			fileContents.Append( "// Copyright (c) Amplify Creations, Lda <info@amplify.pt>\n" );
 			fileContents.Append( "using UnityEditor;\n" );

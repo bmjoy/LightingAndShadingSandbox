@@ -38,6 +38,7 @@ Material:
     - _Float0: 0.2
     - _Float1: 1
     - _NormalScale: 1.02
+    - _SpecEnable: 0
     - _SpecularIntensity: 1
     - _SpecularPower: 0.2
     - __dirty: 0

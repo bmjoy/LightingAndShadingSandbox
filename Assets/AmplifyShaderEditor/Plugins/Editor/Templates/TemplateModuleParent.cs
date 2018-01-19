@@ -16,16 +16,21 @@ namespace AmplifyShaderEditor
         [SerializeField]
 		protected bool m_validData = false;
         public TemplateModuleParent( string moduleName ) { m_unreadableMessage = UnreadableDataMessagePrefix + moduleName; }
-        public virtual void Draw( UndoParentNode owner ) { }
+        public virtual void Draw( ParentNode owner ) { }
 		public virtual void ReadFromString( ref uint index, ref string[] nodeParams ) { }
 		public virtual void WriteToString( ref string nodeInfo ) { }
 		public virtual string GenerateShaderData() { return string.Empty; }
 		public virtual void Destroy() { }
 		public bool ValidData { get { return m_validData; } }
 
-        public virtual void ShowUnreadableDataMessage()
+        public virtual void ShowUnreadableDataMessage( ParentNode owner )
         {
-            EditorGUILayout.HelpBox( m_unreadableMessage, MessageType.Info );
-        }
+			ShowUnreadableDataMessage();
+		}
+
+		public virtual void ShowUnreadableDataMessage()
+		{
+			EditorGUILayout.HelpBox( m_unreadableMessage, MessageType.Info );
+		}
 	}
 }

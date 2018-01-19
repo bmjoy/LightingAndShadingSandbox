@@ -81,8 +81,9 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 			float temp_output_6_0_g90 = (saturate( max( dotResult3_g91 , 0.0 ) )*0.5 + ( 1.0 - 0.5 ));
 			float3 normalizeResult24_g89 = normalize( newWorldNormal22_g89 );
 			UnityGI gi37_g89 = gi;
-			gi37_g89 = UnityGI_Base( data, 1, normalizeResult24_g89 );
-			float3 indirectDiffuse37_g89 = gi37_g89.indirect.diffuse;
+			float3 diffNorm37_g89 = normalizeResult24_g89;
+			gi37_g89 = UnityGI_Base( data, 1, diffNorm37_g89 );
+			float3 indirectDiffuse37_g89 = gi37_g89.indirect.diffuse + diffNorm37_g89 * 0.0001;
 			float2 uv_BaseRGB = i.uv_texcoord * _BaseRGB_ST.xy + _BaseRGB_ST.zw;
 			float4 temp_output_28_0_g89 = tex2D( _BaseRGB, uv_BaseRGB );
 			c.rgb = saturate( ( ( ( saturate( max( ( temp_output_6_0_g90 * temp_output_6_0_g90 ) , 0.0 ) ) * ( _LightColor0.rgb * ase_lightAtten ) ) + indirectDiffuse37_g89 ) * (_BaseTint).rgb * (temp_output_28_0_g89).rgb ) );
@@ -128,10 +129,10 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 			struct v2f
 			{
 				V2F_SHADOW_CASTER;
-				float4 tSpace0 : TEXCOORD1;
-				float4 tSpace1 : TEXCOORD2;
-				float4 tSpace2 : TEXCOORD3;
-				float4 texcoords01 : TEXCOORD4;
+				float2 customPack1 : TEXCOORD1;
+				float4 tSpace0 : TEXCOORD2;
+				float4 tSpace1 : TEXCOORD3;
+				float4 tSpace2 : TEXCOORD4;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 			v2f vert( appdata_full v )
@@ -140,6 +141,7 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 				UNITY_SETUP_INSTANCE_ID( v );
 				UNITY_INITIALIZE_OUTPUT( v2f, o );
 				UNITY_TRANSFER_INSTANCE_ID( v, o );
+				Input customInputData;
 				float3 worldPos = mul( unity_ObjectToWorld, v.vertex ).xyz;
 				fixed3 worldNormal = UnityObjectToWorldNormal( v.normal );
 				fixed3 worldTangent = UnityObjectToWorldDir( v.tangent.xyz );
@@ -148,7 +150,8 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 				o.tSpace0 = float4( worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x );
 				o.tSpace1 = float4( worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y );
 				o.tSpace2 = float4( worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z );
-				o.texcoords01 = float4( v.texcoord.xy, v.texcoord1.xy );
+				o.customPack1.xy = customInputData.uv_texcoord;
+				o.customPack1.xy = v.texcoord;
 				TRANSFER_SHADOW_CASTER_NORMALOFFSET( o )
 				return o;
 			}
@@ -161,7 +164,7 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 				UNITY_SETUP_INSTANCE_ID( IN );
 				Input surfIN;
 				UNITY_INITIALIZE_OUTPUT( Input, surfIN );
-				surfIN.uv_texcoord.xy = IN.texcoords01.xy;
+				surfIN.uv_texcoord = IN.customPack1.xy;
 				float3 worldPos = float3( IN.tSpace0.w, IN.tSpace1.w, IN.tSpace2.w );
 				fixed3 worldViewDir = normalize( UnityWorldSpaceViewDir( worldPos ) );
 				surfIN.worldPos = worldPos;
@@ -184,22 +187,22 @@ Shader "Pipeworks_Custom/Lambert Wrap"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=13803
-1953;34;1796;1125;1619.023;330.2203;1;True;False
-Node;AmplifyShaderEditor.RangedFloatNode;44;-1354.356,343.4463;Half;False;Property;_NormalScale;Normal Scale;3;0;1;0;4;0;1;FLOAT
-Node;AmplifyShaderEditor.SamplerNode;46;-1056.356,297.4463;Float;True;Property;_Normals;Normals;2;0;None;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.ColorNode;3;-840.786,133.3279;Half;False;Property;_BaseTint;Base Tint;0;0;0.9191176,0.5205312,0.2840074,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.ComponentMaskNode;45;-736.3559,297.4463;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.SamplerNode;1;-902.875,-51.0062;Float;True;Property;_BaseRGB;Base (RGB);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;47;-492.1688,45.30499;Float;False;Lambert Wrap;-1;;89;31f8f5f80290a284a82e58e8d6bb3fef;5;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;2;FLOAT3;FLOAT
-Node;AmplifyShaderEditor.SaturateNode;25;-72.02295,45.77969;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;113,-1;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert Wrap;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Version=14205
+1939;35;1796;1125;1460.023;333.2203;1;True;False
+Node;AmplifyShaderEditor.RangedFloatNode;44;-1354.356,343.4463;Half;False;Property;_NormalScale;Normal Scale;3;0;Create;True;1;2;0;4;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SamplerNode;46;-1056.356,297.4463;Float;True;Property;_Normals;Normals;2;0;Create;True;None;066f29fd0fc3d0341b96857dcf2cede3;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SamplerNode;1;-902.875,-51.0062;Float;True;Property;_BaseRGB;Base (RGB);1;0;Create;True;None;a9f953c7353804247b8c3ed6e1c46a2e;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ComponentMaskNode;45;-736.3559,297.4463;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.ColorNode;3;-840.786,133.3279;Half;False;Property;_BaseTint;Base Tint;0;0;Create;True;0.9191176,0.5205312,0.2840074,1;0.7426471,0.4033718,0.2020437,1;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.FunctionNode;47;-492.1688,45.30499;Float;False;Lambert Wrap;-1;;89;31f8f5f80290a284a82e58e8d6bb3fef;0;5;28;COLOR;0,0,0,0;False;32;COLOR;0,0,0,0;False;26;FLOAT3;0,0,0;False;34;FLOAT3;0,0,0;False;43;FLOAT3;0,0,0;False;2;FLOAT3;0;FLOAT;39
+Node;AmplifyShaderEditor.SaturateNode;25;-72.02295,45.77969;Float;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;113,-1;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Lambert Wrap;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;False;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;46;5;44;0
 WireConnection;45;0;46;0
-WireConnection;47;0;1;0
-WireConnection;47;1;3;0
-WireConnection;47;2;45;0
+WireConnection;47;28;1;0
+WireConnection;47;32;3;0
+WireConnection;47;26;45;0
 WireConnection;25;0;47;0
 WireConnection;0;13;25;0
 ASEEND*/
-//CHKSM=434B15B47BCE60CA2612073E5026BAA6D988EF2A
+//CHKSM=EE9005DDDFAFD4A3AA80B6935E9C844EC758AC56

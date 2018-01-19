@@ -90,8 +90,8 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 			float3 ase_worldPos = i.worldPos;
 			float3 ase_worldlightDir = normalize( UnityWorldSpaceLightDir( ase_worldPos ) );
 			float3 temp_output_24_0_g495 = ase_worldlightDir;
-			float dotResult3_g496 = dot( newWorldNormal50_g495 , temp_output_24_0_g495 );
-			half NdotL34_g495 = saturate( max( dotResult3_g496 , 0.0 ) );
+			float dotResult3_g501 = dot( newWorldNormal50_g495 , temp_output_24_0_g495 );
+			half NdotL34_g495 = saturate( max( dotResult3_g501 , 0.0 ) );
 			float temp_output_2_0_g495 = _Roughness;
 			float temp_output_6_0_g495 = ( temp_output_2_0_g495 * temp_output_2_0_g495 );
 			half3 orenNayar16_g495 = ( half3(1,0,0) + ( half3(-0.5,0.17,0.45) * ( temp_output_6_0_g495 / ( temp_output_6_0_g495 + half3(0.33,0.13,0.09) ) ) ) );
@@ -101,8 +101,8 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 			float3 ase_worldViewDir = normalize( UnityWorldSpaceViewDir( ase_worldPos ) );
 			float3 temp_output_22_0_g495 = ase_worldViewDir;
 			float dotResult31_g495 = dot( temp_output_24_0_g495 , temp_output_22_0_g495 );
-			float dotResult4_g501 = dot( newWorldNormal50_g495 , temp_output_22_0_g495 );
-			half NdotV35_g495 = saturate( max( dotResult4_g501 , 0.0 ) );
+			float dotResult4_g499 = dot( newWorldNormal50_g495 , temp_output_22_0_g495 );
+			half NdotV35_g495 = saturate( max( dotResult4_g499 , 0.0 ) );
 			float temp_output_39_0_g495 = ( saturate( dotResult31_g495 ) - ( NdotL34_g495 * NdotV35_g495 ) );
 			float lerpResult44_g495 = lerp( max( NdotL34_g495 , NdotV35_g495 ) , 1.0 , step( temp_output_39_0_g495 , 0.0 ));
 			half orenNayar_s49_g495 = ( temp_output_39_0_g495 / lerpResult44_g495 );
@@ -110,25 +110,26 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 			float3 temp_output_69_0_g495 = _LightColor0.rgb;
 			half3 lightColor113_g495 = temp_output_69_0_g495;
 			half lightAtten112_g495 = ase_lightAtten;
-			float temp_output_11_0_g500 = ( 1.0 / 1.31 );
-			float temp_output_130_0_g495 = ( 1.0 - ( pow( ( 1.0 - temp_output_11_0_g500 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g500 ) , 2.0 ) ) );
+			float temp_output_11_0_g496 = ( 1.0 / 1.31 );
+			float temp_output_130_0_g495 = ( 1.0 - ( pow( ( 1.0 - temp_output_11_0_g496 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g496 ) , 2.0 ) ) );
 			half3 worldSpaceNormals73_g495 = newWorldNormal50_g495;
 			UnityGI gi157_g495 = gi;
-			gi157_g495 = UnityGI_Base( data, 1, worldSpaceNormals73_g495 );
-			float3 indirectDiffuse157_g495 = gi157_g495.indirect.diffuse;
+			float3 diffNorm157_g495 = worldSpaceNormals73_g495;
+			gi157_g495 = UnityGI_Base( data, 1, diffNorm157_g495 );
+			float3 indirectDiffuse157_g495 = gi157_g495.indirect.diffuse + diffNorm157_g495 * 0.0001;
 			float3 normalizeResult156_g495 = normalize( indirectDiffuse157_g495 );
 			half3 difuseL137_g495 = saturate( ( ( temp_output_108_0_g495 * albedo93_g495 * lightColor113_g495 * lightAtten112_g495 * temp_output_130_0_g495 ) + ( normalizeResult156_g495 * 0.1 ) ) );
-			float3 normalizeResult5_g497 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
-			float dotResult6_g497 = dot( WorldNormalVector( i , temp_output_51_0_g495 ) , normalizeResult5_g497 );
+			float3 normalizeResult5_g500 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
+			float dotResult6_g500 = dot( WorldNormalVector( i , temp_output_51_0_g495 ) , normalizeResult5_g500 );
 			float4 temp_output_61_0_g495 = _SpecularColor;
 			fixed specMap99_g495 = (temp_output_92_0_g495).a;
-			float3 temp_output_7_0_g498 = temp_output_22_0_g495;
-			float3 normalizeResult10_g498 = normalize( ( temp_output_24_0_g495 + temp_output_7_0_g498 ) );
-			float dotResult13_g498 = dot( normalizeResult10_g498 , temp_output_7_0_g498 );
-			float temp_output_31_0_g498 = pow( ( 1.0 - dotResult13_g498 ) , _RimPower );
-			float temp_output_11_0_g499 = ( 1.0 / 1.31 );
-			float fresnel82_g495 = ( temp_output_31_0_g498 + ( ( 1.0 - temp_output_31_0_g498 ) * ( pow( ( 1.0 - temp_output_11_0_g499 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g499 ) , 2.0 ) ) ) );
-			half3 specL114_g495 = ( ( saturate( pow( max( dotResult6_g497 , 0.0 ) , ( _SpecularPower * 128.0 ) ) ) * (temp_output_61_0_g495).rgb * (temp_output_61_0_g495).a * specMap99_g495 ) * ( 1.0 - fresnel82_g495 ) * ( temp_output_69_0_g495 * ase_lightAtten ) );
+			float3 temp_output_7_0_g497 = temp_output_22_0_g495;
+			float3 normalizeResult10_g497 = normalize( ( temp_output_24_0_g495 + temp_output_7_0_g497 ) );
+			float dotResult13_g497 = dot( normalizeResult10_g497 , temp_output_7_0_g497 );
+			float temp_output_31_0_g497 = pow( ( 1.0 - dotResult13_g497 ) , _RimPower );
+			float temp_output_11_0_g498 = ( 1.0 / 1.31 );
+			float fresnel82_g495 = ( temp_output_31_0_g497 + ( ( 1.0 - temp_output_31_0_g497 ) * ( pow( ( 1.0 - temp_output_11_0_g498 ) , 2.0 ) / pow( ( 1.0 + temp_output_11_0_g498 ) , 2.0 ) ) ) );
+			half3 specL114_g495 = ( ( saturate( pow( max( dotResult6_g500 , 0.0 ) , ( _SpecularPower * 128.0 ) ) ) * (temp_output_61_0_g495).rgb * (temp_output_61_0_g495).a * specMap99_g495 ) * ( 1.0 - fresnel82_g495 ) * ( temp_output_69_0_g495 * ase_lightAtten ) );
 			float3 newWorldNormal14 = WorldNormalVector( i , temp_output_3_0 );
 			float3 temp_output_7_0_g73 = ase_worldViewDir;
 			float3 normalizeResult10_g73 = normalize( ( newWorldNormal14 + temp_output_7_0_g73 ) );
@@ -239,80 +240,80 @@ Shader "Pipeworks_Custom/Oren Nayar Blinn ASE"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=13903
-1939;35;1796;1125;644.8187;284.305;1;True;False
-Node;AmplifyShaderEditor.RangedFloatNode;1;-1512.124,112.5015;Float;False;Property;_NormalScale;Normal Scale;3;0;0;0;5;0;1;FLOAT
-Node;AmplifyShaderEditor.SamplerNode;2;-1230.727,67.28145;Float;True;Property;_Normal;Normal;2;0;None;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.ComponentMaskNode;3;-941.7271,67.28145;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.ViewDirInputsCoordNode;22;-277.5781,996.7413;Float;False;World;0;4;FLOAT3;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.WorldNormalVector;14;-632.7298,673.6462;Float;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.Vector3Node;15;-638.9064,924.5498;Float;False;Constant;_Const3_01;Const3_01;9;0;0,1,0;0;4;FLOAT3;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;24;-257.5781,1138.741;Float;False;Constant;_Const1_02;Const1_02;9;0;-1;0;0;0;1;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;19;-382.578,872.7411;Float;False;Constant;_Const1_01;Const1_01;9;0;0.5;0;0;0;1;FLOAT
-Node;AmplifyShaderEditor.DotProductOpNode;17;-347.578,759.7411;Float;False;2;0;FLOAT3;0.0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;23;-88.57803,1063.741;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;18;-212.578,805.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.DotProductOpNode;27;188.422,929.7411;Float;False;2;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;30;147.4219,1033.741;Float;False;Constant;_Const1_03;Const1_03;9;0;1.75;0;0;0;1;FLOAT
-Node;AmplifyShaderEditor.SimpleAddOpNode;29;337.422,929.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.ViewDirInputsCoordNode;35;-629.9889,536.6292;Float;False;World;0;4;FLOAT3;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;6;-474.1099,149.1785;Float;False;Property;_RimPower;Rim Power;5;0;0;0;1;0;1;FLOAT
-Node;AmplifyShaderEditor.SimpleAddOpNode;20;-71.57803,854.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.ColorNode;5;-20.36818,326.5058;Fixed;False;Property;_RimColor;Rim Color;6;0;1,1,1,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.SaturateNode;28;470.4221,929.7411;Float;False;1;0;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.SaturateNode;21;53.42191,854.7411;Float;False;1;0;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.ComponentMaskNode;113;243.962,326.5164;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.FunctionNode;49;-145.0281,518.4412;Float;False;Schlick Fresnel;-1;;73;a1f21a3cacd7a6d46965aa8e3cd29501;3;0;FLOAT;0.0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;1;FLOAT
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;31;642.4219,837.7411;Float;False;3;3;0;FLOAT;0.0;False;1;FLOAT;0.0;False;2;FLOAT;0.0;False;1;FLOAT
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;114;457.9619,400.5164;Float;False;2;2;0;FLOAT3;0.0;False;1;FLOAT;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.ColorNode;7;-896.827,-202.3186;Fixed;False;Property;_ColorTint;Color Tint;0;0;1,1,1,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.ColorNode;4;-454.0401,228.7914;Fixed;False;Property;_SpecularColor;Specular Color;8;0;1,1,1,1;0;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;11;-471.5658,463.5935;Float;False;Property;_Roughness;Roughness;4;0;0;0;1;0;1;FLOAT
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;36;867.3781,401.1596;Float;False;2;2;0;FLOAT3;0,0,0,0;False;1;FLOAT;0,0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.SamplerNode;8;-975.373,-389.003;Float;True;Property;_MainRGBSpecA;Main (RGB) Spec (A);1;0;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;FLOAT;FLOAT;FLOAT;FLOAT
-Node;AmplifyShaderEditor.RangedFloatNode;10;-474.5658,395.5935;Half;False;Property;_SpecularPower;Specular Power;7;0;0.33;0;1;0;1;FLOAT
-Node;AmplifyShaderEditor.FunctionNode;116;-11.84969,28.74247;Float;False;Oren Nayar Blinn;-1;;495;213c3d6404f827644885750c46cbd46c;10;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;COLOR;0,0,0,0;False;5;FLOAT;0.0;False;6;FLOAT;0.0;False;7;FLOAT3;0,0,0;False;8;FLOAT3;0,0,0;False;9;FLOAT3;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.ComponentMaskNode;37;1003.378,396.1596;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.SimpleAddOpNode;111;1314.501,31.43998;Float;False;2;2;0;FLOAT3;0.0;False;1;FLOAT3;0,0,0;False;1;FLOAT3
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;1487.672,-198.3297;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Oren Nayar Blinn ASE;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Version=14205
+1939;35;1796;1125;7.818726;153.305;1;True;False
+Node;AmplifyShaderEditor.RangedFloatNode;1;-1512.124,112.5015;Float;False;Property;_NormalScale;Normal Scale;3;0;Create;True;0;0.85;0;5;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SamplerNode;2;-1230.727,67.28145;Float;True;Property;_Normal;Normal;2;0;Create;True;None;da4e19039a74e4c44bc25a8c6a89f029;True;0;True;bump;Auto;True;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ComponentMaskNode;3;-941.7271,67.28145;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.Vector3Node;15;-638.9064,924.5498;Float;False;Constant;_Const3_01;Const3_01;9;0;Create;True;0,1,0;0,0,0;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
+Node;AmplifyShaderEditor.RangedFloatNode;24;-257.5781,1138.741;Float;False;Constant;_Const1_02;Const1_02;9;0;Create;True;-1;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.ViewDirInputsCoordNode;22;-277.5781,996.7413;Float;False;World;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
+Node;AmplifyShaderEditor.WorldNormalVector;14;-632.7298,673.6462;Float;False;False;1;0;FLOAT3;0,0,0;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;23;-88.57803,1063.741;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.DotProductOpNode;17;-347.578,759.7411;Float;False;2;0;FLOAT3;0.0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;19;-382.578,872.7411;Float;False;Constant;_Const1_01;Const1_01;9;0;Create;True;0.5;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;30;147.4219,1033.741;Float;False;Constant;_Const1_03;Const1_03;9;0;Create;True;1.75;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.DotProductOpNode;27;188.422,929.7411;Float;False;2;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;18;-212.578,805.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;20;-71.57803,854.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.ColorNode;5;-20.36818,326.5058;Fixed;False;Property;_RimColor;Rim Color;6;0;Create;True;1,1,1,1;0.761,0.9448462,1,0.491;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;6;-474.1099,149.1785;Float;False;Property;_RimPower;Rim Power;5;0;Create;True;0;1;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;29;337.422,929.7411;Float;False;2;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.ViewDirInputsCoordNode;35;-629.9889,536.6292;Float;False;World;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
+Node;AmplifyShaderEditor.ComponentMaskNode;113;243.962,326.5164;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.FunctionNode;49;-145.0281,518.4412;Float;False;Schlick Fresnel;-1;;73;a1f21a3cacd7a6d46965aa8e3cd29501;0;3;6;FLOAT;0.0;False;7;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SaturateNode;28;470.4221,929.7411;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SaturateNode;21;53.42191,854.7411;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;114;457.9619,400.5164;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;31;642.4219,837.7411;Float;False;3;3;0;FLOAT;0.0;False;1;FLOAT;0.0;False;2;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;36;867.3781,401.1596;Float;False;2;2;0;FLOAT3;0,0,0,0;False;1;FLOAT;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SamplerNode;8;-975.373,-389.003;Float;True;Property;_MainRGBSpecA;Main (RGB) Spec (A);1;0;Create;True;None;2dc9cec3ac1cc0b4680a180dbf023683;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0.0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1.0;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;10;-474.5658,395.5935;Half;False;Property;_SpecularPower;Specular Power;7;0;Create;True;0.33;0.5;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.ColorNode;7;-896.827,-202.3186;Fixed;False;Property;_ColorTint;Color Tint;0;0;Create;True;1,1,1,1;1,0.9737073,0.902,1;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ColorNode;4;-454.0401,228.7914;Fixed;False;Property;_SpecularColor;Specular Color;8;0;Create;True;1,1,1,1;0.891,0.891,0.891,1;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.RangedFloatNode;11;-471.5658,463.5935;Float;False;Property;_Roughness;Roughness;4;0;Create;True;0;0.3;0;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.FunctionNode;116;-11.84969,28.74247;Float;False;Oren Nayar Blinn;-1;;495;213c3d6404f827644885750c46cbd46c;0;10;92;COLOR;0,0,0,0;False;94;COLOR;0,0,0,0;False;51;FLOAT3;0,0,0;False;83;FLOAT;0.0;False;61;COLOR;0,0,0,0;False;54;FLOAT;0.0;False;2;FLOAT;0.0;False;69;FLOAT3;0,0,0;False;24;FLOAT3;0,0,0;False;22;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.ComponentMaskNode;37;1003.378,396.1596;Float;False;True;True;True;False;1;0;FLOAT3;0,0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;111;1314.501,31.43998;Float;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;1487.672,-198.3297;Float;False;True;2;Float;ASEMaterialInspector;0;0;CustomLighting;Pipeworks_Custom/Oren Nayar Blinn ASE;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;False;0;Opaque;0.5;True;True;0;False;Opaque;Geometry;All;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;True;False;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;;-1;-1;-1;-1;0;0;0;False;0;0;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0.0,0,0;False;4;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;2;5;1;0
 WireConnection;3;0;2;0
 WireConnection;14;0;3;0
-WireConnection;17;0;14;0
-WireConnection;17;1;15;0
 WireConnection;23;0;22;0
 WireConnection;23;1;24;0
-WireConnection;18;0;17;0
-WireConnection;18;1;19;0
+WireConnection;17;0;14;0
+WireConnection;17;1;15;0
 WireConnection;27;0;15;0
 WireConnection;27;1;23;0
-WireConnection;29;0;27;0
-WireConnection;29;1;30;0
+WireConnection;18;0;17;0
+WireConnection;18;1;19;0
 WireConnection;20;0;18;0
 WireConnection;20;1;19;0
+WireConnection;29;0;27;0
+WireConnection;29;1;30;0
+WireConnection;113;0;5;0
+WireConnection;49;6;6;0
+WireConnection;49;7;35;0
+WireConnection;49;3;14;0
 WireConnection;28;0;29;0
 WireConnection;21;0;20;0
-WireConnection;113;0;5;0
-WireConnection;49;0;6;0
-WireConnection;49;1;35;0
-WireConnection;49;2;14;0
+WireConnection;114;0;113;0
+WireConnection;114;1;5;4
 WireConnection;31;0;49;0
 WireConnection;31;1;21;0
 WireConnection;31;2;28;0
-WireConnection;114;0;113;0
-WireConnection;114;1;5;4
 WireConnection;36;0;114;0
 WireConnection;36;1;31;0
-WireConnection;116;0;8;0
-WireConnection;116;1;7;0
-WireConnection;116;2;3;0
-WireConnection;116;3;6;0
-WireConnection;116;4;4;0
-WireConnection;116;5;10;0
-WireConnection;116;6;11;0
+WireConnection;116;92;8;0
+WireConnection;116;94;7;0
+WireConnection;116;51;3;0
+WireConnection;116;83;6;0
+WireConnection;116;61;4;0
+WireConnection;116;54;10;0
+WireConnection;116;2;11;0
 WireConnection;37;0;36;0
 WireConnection;111;0;116;0
 WireConnection;111;1;37;0
 WireConnection;0;13;111;0
 ASEEND*/
-//CHKSM=099330C1C800B8F81D0354BAA99EECE6D6843B36
+//CHKSM=E82DD9B8F7EE42E2D3934D7FCF6B861AB5E20560

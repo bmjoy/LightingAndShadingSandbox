@@ -13,6 +13,7 @@ namespace AmplifyShaderEditor
 	[Serializable] public class UsageListFunctionInputNodes : NodeUsageRegister<FunctionInput> { }
 	[Serializable] public class UsageListFunctionNodes : NodeUsageRegister<FunctionNode> { }
 	[Serializable] public class UsageListFunctionOutputNodes : NodeUsageRegister<FunctionOutput> { }
+	[Serializable] public class UsageListFunctionSwitchNodes : NodeUsageRegister<FunctionSwitch> { }
 
 	[Serializable]
 	public class NodeUsageRegister<T> where T : ParentNode

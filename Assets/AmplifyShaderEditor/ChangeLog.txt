@@ -1,4 +1,189 @@
 Release Notes:
+v1.4.2 dev 05:
+* Fixes:
+    * Fixed Undo issues with connections created/deleted by drag + Alt
+    * Fixed issue on templates vertex local variables when using 'Vertex To Fragment' node
+    * Fixed bug where 'Function Switch' node options were being incorrectly saved which caused a crash on load
+    * Fixed shader 'Function Switch' node options not being correctly ordered all the time 
+    * Fixed connection signal detection to make 'Function Switch' nodes know when to turn on
+
+v1.4.2 dev 04:
+* New Node:
+    * Function Switch
+        * Node specific to shader functions which allows switching options at compile time on them
+
+* New Shader Function:
+    * Flipbook
+
+* Improvements:
+    * Changed switch type nodes port order to match 'Function Switch' and maintain consistency
+
+* Fixes:
+    * Fixed issue on duplicated functions when both outline and shadow caster passes are active
+    * Fixed issue with calculating label size for nodes
+    * Fixed UI issue when not being able to read depth info from template
+
+v1.4.2 dev 03:
+* Improvements:
+    * Added Depth module into templates
+    * Minor improvement on Four Splats First Pass Terrain shader function
+    * Minor improvement on TerrainSnowCoverage and SimpleTerrain samples
+    * Added preview and access to internal data into 'HSV To RGB' and 'RGB To HSV' nodes
+    * Added preview to 'If' node
+    * Added new Normalize option into 'World Normal' and 'World Reflection' nodes
+    * 'Outline' node now supports transparency and mask operations through the new Alpha Mode option
+    * An additional depth pass can be added via the new Extra Depth Pass option on the Output Node properties
+    * Property nodes can now register its properties/global variables without being connected to Output node
+        * Done via the new Auto-Register option
+
+* Fixes:
+    * Fixed minor issue on 'Rotate About Axis' node UI
+    * Fixed issue with 'World Reflection' node on templates
+
+v1.4.2 dev 02:
+* Improvements:
+    * 'Toggle Switch' node can now share properties
+    *  Added lock button to property name on property type nodes
+        * Allows to customize the internal variable name used
+    * Added support for 'View Dir' node on templates
+    * Added preview position selection to shader functions to further customize function nodes
+
+* Fixes:
+    * Fixed issue where custom shadows were ignoring vertex colors
+    * Fixed issue on 'Fresnel' node using a non-normalized normal vector
+    * Small fix on 'Static Switch' node getting and setting values from the material
+
+v1.4.2 dev 01:
+* Improvements:
+    * Lowered Shader Model target of Custom Lighting Toon example to be compatible with MacOs
+    * Improved generated code for 'Grab Screen Color' and 'Grab Screen Position' nodes
+    * Changed automatic generation of 'Grab Screen Color' node to make sure normalization is happening only once 
+    * Added a toggle on 'Grab Screen Color' node which chooses if it normalizes/projects the input or not (default OFF)
+
+* Fixes:
+    * Fixed issue on generating default values for shader functions
+    * Fixed issue on normal generation with the following nodes:
+        * 'Fresnel'
+        * 'Indirect Specular Light'
+        * 'World Reflection'
+
+v1.4.1 dev 02:
+* New Nodes:
+    * Decode Depth Normal
+    * Encode Depth Normal
+
+* Improvements:
+    * Added internal data into shader functions 
+        * If inputs are unconnected is now possible to change the default value from its node property panel
+    * Property type nodes can now keep material value when not connected to an Output node
+    * Tweaked 'Static Switch' node properties
+    * Initial opened tab on property nodes depends on material mode
+
+* Fixes:
+    * Fixed issue on 'Custom Expression' node when using out variables in Call mode
+    * Preventing 'Commentary' node from generating infinite loops when copy-pasted
+    * Fixed issue with incorrect refresh call order on pasted nodes
+    * Fixed issue on nodes are not being correctly nested into their parent 'Commentary' node when copy-pasted
+    * Fixed issue on 'Toggle Switch' node not updating port names correctly after loading
+    * Fixed focus issue on pickers with Mac
+
+v1.4.1 dev 01:
+* Fixes:
+    * Fixed issue on 'Texture Sampler' node getting incorrectly configured on load
+        * When default texture type different from material texture type
+
+v1.4.0 dev 06:
+* New Samples:
+    * Simple Terrain
+    * Terrain Snow Coverage
+    * Custom Outline Toon
+
+* New Nodes:
+    * Rotate About Axis
+    * Outline
+
+* New Shader Functions:
+    * Four Splats First Pass Terrain
+
+* Improvements:
+    * Tweaked 'Scale And Offset' node behavior
+    * Added Defines tab into Output node properties
+    * Preventing possible compilation errors on Experimental .NET 4.6
+
+* Fixes:
+    * Fixed issue on 'Texture Sampler' node not previewing a connected 'Texture Object' node
+    * Fixed issue on texture picker not working correctly on texture nodes
+    * Fixed incorrect version reading Convert To Linear parameter at 'Screen Depth' and 'Depth Fade' node
+    * Fixed issue on duplicate UV Set on 'Texture Sampler' node when connected to a 'Texture Object'
+    * Fixed issue shader function inputs and outputs getting lost when re-focusing  on them by double clicking the shader function node
+    * Fixed issue on 'Custom Expression' node name editing on node body
+
+v1.4.0 dev 05:
+* Fixes:
+    * Fixed issue on shadow caster for legacy samples:
+        * Matcap
+        * Parallax Mapping Iterations
+        * Reflect Refract Soap Bubble
+        * Screen Space Curvature
+    * Fixed typo in 'Toggle Switch' node
+    * Fixed issue on incorrectly accessing port through array id instead of unique id
+    * Fixed issue on deprecated internal data not being correctly read into new 'Append' node
+
+* Improvements:
+    * Up and Down arrow keys can now change the focus of the node element in the context palette search similar to the Tab key
+
+v1.4.0 dev 04:
+* New Samples:
+    * Animated UV Distortion
+
+* Fixes:
+    * Fixed issue on a shader function node crashing when its corresponding asset is not found
+    * Fixed issue on applying Undo on Material Inspector not being caught by ASE canvas
+    * Fixed issue on 'Float' node slider not being registered on Undo stack
+    * Fixed issue on generating duplicate function names at 'Noise Generator' node
+    * Fixed issue on returning to from a shader function to a main graph using with that shader function selected
+
+* Improvements:
+    * Added new Variable Mode property into property nodes when their type are not Constant
+        * Create Mode, this is the current option on which an uniform variable is always created when the node is analyzed
+        * Fetch Mode, assumes that this variable is already declared elsewhere, p.e. an external lib and doesn't declare it
+            * When Property Type is selected, the property declaration is still created
+    * Added explicit call to both Thread and CultureInfo system classes to avoid conflicts with user classes without proper namespace
+    * Shader function's input and output ports maintain correct connections after being internally re-ordered
+    * Automatically adding spaces into camelcase'd shader function node titles
+
+v1.4.0 dev 03:
+* Improvements:
+    * Added validity check on Output and Input data types
+    * Improved color code request for ports
+
+v1.4.0 dev 02:
+* New Shader Functions:
+    * Compute Filter Width
+
+* Improvements:
+    * Explicitly calling System.Globalization on TextInfo usage to avoid compilation errors
+    * Added custom pragmas for shader functions
+    * Updated Vertex Normal Reconstruction sample
+    * Added Reflection and Specular Highlight toggles into the Rendering Options group that mimic Unity's Standard
+    * Added ToggleOff option to 'Static Switch' node which should now allow the creation of OFF toggles
+
+* Fixes:
+    * Fixed issue of properties not being properly ordered if their material property group wasn't open
+        * Blend modes now update properly even if group is collapsed
+
+v1.4.0 dev 01:
+* Fixes:
+    * Fixed issue with 'World Space Light Pos', 'World Space Light Dir' and 'Object Space Light Dir' nodes
+    * Fixed issue on 'Texture Coordinates' node forcing a sampler to be picked even when none was selected
+    * Fixed issue on 'Indirect Diffuse Light'node ignoring the tangent space normal completely
+    * Small fix to shader functions so they can refresh their custom include list properly on change
+
+* Improvements:
+    * Added node previews for 'Light Attenuation' and both Indirect Light nodes
+    * Added explicit call to Unity Editor ShaderUtil on Material Inspector to prevent class issues
+    * Added Dependencies List on the Output Node properties
+
 v1.3.9 dev 03:
 * New Nodes:
     * 'Projector Matrix'
@@ -46,7 +231,7 @@ v1.3.8 dev 02/03:
     * Fixed issue on screen position for 'Dither' node
         * Now it changes the screen position interpolator globally to make it work on the shadow caster
 
- v1.3.8 dev 01 ( the same as v1.3.7 dev 07 but bumped version for Asset Store release ):
+v1.3.8 dev 01 ( the same as v1.3.7 dev 07 but bumped version for Asset Store release ):
 * Improvements:
     * Added Shader Function previews
     * Improved node list update on current focused window when renaming a shader function
@@ -1457,7 +1642,6 @@ v0.2.4 dev 004
 * Fixed issue with ASE Custom Material Inspector 
 * Tweaked 'Local Vertex Pos' node to output differently if generating code for vertex or fragment ports
 
-Release Notes:
 v0.2.4 dev 003
 * Added Texture Reference dropdown to 'Texture Coordinates' node
 * Added Render Path dropdown in Master Node
@@ -1627,14 +1811,14 @@ v0.1.3 dev 001
 v0.1.2 dev 003
 * Fixed issues with opening materials via inspector with no ASE window initialized  
 
-Release Notes v0.1.2 dev 002
+v0.1.2 dev 002
 * Added GPU Instancing ( see Samples/SimpleGPUInstancing example )
 * Added Screen Color node 
 * Fixed issue on version testing
 * Tweaked Master Node icon 
 * Added additional icon into top-left master node node indicating if gpu instancing is being used or not
 
-Release Notes v0.1.2 dev 001
+v0.1.2 dev 001
 * Fixed typo on Texture Coordinate node
 * Added explicit control on Render Type and Queue. They will be automatically set when a Blend Mode is selected.
 * Added Fresnel node
