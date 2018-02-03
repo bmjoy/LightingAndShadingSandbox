@@ -10,7 +10,7 @@ Shader /*ase_name*/ "ASETemplateShaders/PostProcess" /*end*/
 
 	SubShader
 	{
-		Tags{ /*ase_tags*/ }
+		Tags{ }
 		
 		ZTest Always
 		Cull Off

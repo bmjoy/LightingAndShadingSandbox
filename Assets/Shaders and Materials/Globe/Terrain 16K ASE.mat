@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Terrain 16K ASE
+  m_Shader: {fileID: 4800000, guid: 4e36e216d20db344e88828854ee9a5da, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - L0:
+        m_Texture: {fileID: 2800000, guid: 6f880d905c22d0c4eb078657b338fac2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DispTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: c205eb53136d7484eb4969665cda9906, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex0:
+        m_Texture: {fileID: 2800000, guid: b3074ab1d3ced204084544ecec896513, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex1:
+        m_Texture: {fileID: 2800000, guid: efc83b3b98af07f498a277cbe5e62e1b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 2800000, guid: a6c0073ca9d323a469598e1e597959a5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex3:
+        m_Texture: {fileID: 2800000, guid: f7c6daf87d46ecd42a9c03dd6d80b123, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NightLights:
+        m_Texture: {fileID: 2800000, guid: bd30aec6bcbd12e4b82e2e583b7e6dff, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NightLights0:
+        m_Texture: {fileID: 2800000, guid: 6f880d905c22d0c4eb078657b338fac2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NightLights1:
+        m_Texture: {fileID: 2800000, guid: a704d32bfc64f624d94dad8349a4595c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NightLights2:
+        m_Texture: {fileID: 2800000, guid: fe790ff149f12184c9cb8b9a5b9d1c9b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NightLights3:
+        m_Texture: {fileID: 2800000, guid: d27f9e8198a04d64ebe1a1177634e46a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 832b069de320ff245b2d3e16fc2e97b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap0:
+        m_Texture: {fileID: 2800000, guid: c05d9e04db0126a4bb723589a49bef3f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap1:
+        m_Texture: {fileID: 2800000, guid: ebd1ea588cb27c1468c48f9c8997cdc6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap2:
+        m_Texture: {fileID: 2800000, guid: 85e5992790e849e41ad515bb85e50381, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap3:
+        m_Texture: {fileID: 2800000, guid: 56d26c42a8e2618448ba0b6c7027fd88, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecMap:
+        m_Texture: {fileID: 2800000, guid: 05f355c72668ac3478b983e3887d3f6e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AtmosphereFalloff: 0.66
+    - _DisplacementScale: 1
+    - _NightLightBlue: 0.35
+    - _NightLightGreen: 0.75
+    - _NightLightRed: 1
+    - _NightLightsIntensity: 0.8
+    - _NightLightsSoftness: 0.3
+    - _NormalScale: 1
+    - _Shininess: 0.15
+    - _TessMax: 700
+    - _TessMin: 1
+    - _TessPhongStrength: 0.5
+    - _TessValue: 15
+    - __dirty: 0
+    m_Colors:
+    - _AtmosphereFar: {r: 0.359, g: 0.7974198, b: 1, a: 1}
+    - _AtmosphereNear: {r: 0.7426471, g: 0.5287186, b: 0.4017721, a: 1}
+    - _BaseTint: {r: 0.915, g: 0.915, b: 0.915, a: 1}
+    - _SpecularColor: {r: 0.609, g: 0.6077723, b: 0.565152, a: 1}

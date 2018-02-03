@@ -1,0 +1,36 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class RotateSun : MonoBehaviour
+{
+	private float mouseXAmount;
+
+	void Update ()
+	{
+		if(Input.GetMouseButton(0))
+		{
+			mouseXAmount = -Input.GetAxis("Mouse X") * 3f;
+			transform.Rotate(0,mouseXAmount,0);
+		}
+
+		if(Input.GetKey(KeyCode.Delete))
+		{
+			transform.Rotate(0,0.2f,0);
+		}
+
+		if(Input.GetKey(KeyCode.PageDown))
+		{
+			transform.Rotate(0,-0.2f,0);
+		}
+
+		if(Input.GetKey(KeyCode.Home))
+		{
+			transform.Rotate(0.2f,0,0);
+		}
+
+		if(Input.GetKey(KeyCode.End))
+		{
+			transform.Rotate(-0.2f,0,0);
+		}
+	}
+}

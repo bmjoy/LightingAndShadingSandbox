@@ -87,6 +87,9 @@ namespace AmplifyShaderEditor
 		private UsageListFunctionSwitchNodes m_functionSwitchNodes;
 
 		[SerializeField]
+		private UsageListFunctionSwitchCopyNodes m_functionSwitchCopyNodes;
+
+		[SerializeField]
 		private int m_masterNodeId = Constants.INVALID_NODE_ID;
 
 		[SerializeField]
@@ -166,6 +169,7 @@ namespace AmplifyShaderEditor
 			m_functionNodes = new UsageListFunctionNodes();
 			m_functionOutputNodes = new UsageListFunctionOutputNodes();
 			m_functionSwitchNodes = new UsageListFunctionSwitchNodes();
+			m_functionSwitchCopyNodes = new UsageListFunctionSwitchCopyNodes();
 
 			m_selectedNodes = new List<ParentNode>();
 			m_markedForDeletion = new List<ParentNode>();
@@ -197,6 +201,7 @@ namespace AmplifyShaderEditor
 			m_functionNodes.UpdateNodeArr();
 			m_functionOutputNodes.UpdateNodeArr();
 			m_functionSwitchNodes.UpdateNodeArr();
+			m_functionSwitchCopyNodes.UpdateNodeArr();
 			m_texturePropertyNodes.UpdateNodeArr();
 			m_textureArrayNodes.UpdateNodeArr();
 			m_screenColorNodes.UpdateNodeArr();
@@ -292,6 +297,7 @@ namespace AmplifyShaderEditor
 			m_functionNodes.Clear();
 			m_functionOutputNodes.Clear();
 			m_functionSwitchNodes.Clear();
+			m_functionSwitchCopyNodes.Clear();
 			m_texturePropertyNodes.Clear();
 			m_textureArrayNodes.Clear();
 			m_screenColorNodes.Clear();
@@ -332,6 +338,16 @@ namespace AmplifyShaderEditor
 					}
 				}
 			}
+
+			RegisterLocalVarNode regNode = node as RegisterLocalVarNode;
+			if( (object)regNode != null )
+			{
+				int count = regNode.NodeReferences.Count;
+				for( int i = 0; i < count; i++ )
+				{
+					HighlightWiresStartingNode( regNode.NodeReferences[ i ] );
+				}
+			}
 		}
 
 		void PropagateHighlightDeselection( ParentNode node, int portId = -1 )
@@ -361,6 +377,16 @@ namespace AmplifyShaderEditor
 					WireReference wireRef = node.OutputPorts[ outputIdx ].ExternalReferences[ extIdx ];
 					ParentNode nextNode = GetNode( wireRef.NodeId );
 					PropagateHighlightDeselection( nextNode, wireRef.PortId );
+				}
+			}
+			
+			RegisterLocalVarNode regNode = node as RegisterLocalVarNode;
+			if( (object)regNode != null )
+			{
+				int count = regNode.NodeReferences.Count;
+				for( int i = 0; i < count; i++ )
+				{
+					PropagateHighlightDeselection( regNode.NodeReferences[ i ],-1 );
 				}
 			}
 		}
@@ -450,6 +476,9 @@ namespace AmplifyShaderEditor
 
 			m_functionSwitchNodes.Destroy();
 			m_functionSwitchNodes = null;
+
+			m_functionSwitchCopyNodes.Destroy();
+			m_functionSwitchCopyNodes = null;
 
 			m_texturePropertyNodes.Destroy();
 			m_texturePropertyNodes = null;
@@ -882,8 +911,26 @@ namespace AmplifyShaderEditor
 			EditorGUI.BeginChangeCheck();
 			bool repaintMaterialInspector = false;
 
-			// Dont use nodeCount variable because node count can change in this loop???
 			int nodeCount = m_nodes.Count;
+			for( int i = 0; i < nodeCount; i++ )
+			{
+				m_nodes[ i ].OnNodeLogicUpdate( drawInfo );
+			}
+
+			//for( int i = 0; i < m_functionNodes.NodesList.Count; i++ )
+			//{
+			//	m_functionNodes.NodesList[ i ].LogicGraph();
+			//}
+
+			//for( int i = 0; i < UIUtils.FunctionSwitchCopyList().Count; i++ )
+			//{
+			//	UIUtils.FunctionSwitchCopyList()[ i ].CheckReference();
+			//}
+
+
+
+			// Dont use nodeCount variable because node count can change in this loop???
+			nodeCount = m_nodes.Count;
 			ParentNode node = null;
 			for( int i = 0; i < nodeCount; i++ )
 			{
@@ -1058,7 +1105,7 @@ namespace AmplifyShaderEditor
 			for( int nodeIdx = 0; nodeIdx < m_nodes.Count; nodeIdx++ )
 			{
 				ParentNode node = m_nodes[ nodeIdx ];
-				if( ( object ) node == null )
+				if( (object)node == null )
 					return;
 
 				for( int inputPortIdx = 0; inputPortIdx < node.InputPorts.Count; inputPortIdx++ )
@@ -1183,10 +1230,10 @@ namespace AmplifyShaderEditor
 			Vector3 startTangent = new Vector3( startPos.x + resizedMag, startPos.y );
 			Vector3 endTangent = new Vector3( endPos.x - resizedMag, endPos.y );
 
-			if( ( object ) inputNode != null && inputNode.GetType() == typeof( WireNode ) )
+			if( (object)inputNode != null && inputNode.GetType() == typeof( WireNode ) )
 				endTangent = endPos + ( ( inputNode as WireNode ).TangentDirection ) * mag * 0.33f;
 
-			if( ( object ) outputNode != null && outputNode.GetType() == typeof( WireNode ) )
+			if( (object)outputNode != null && outputNode.GetType() == typeof( WireNode ) )
 				startTangent = startPos - ( ( outputNode as WireNode ).TangentDirection ) * mag * 0.33f;
 
 			///////////////Draw tangents
@@ -1211,7 +1258,7 @@ namespace AmplifyShaderEditor
 			{
 				GLDraw.MultiLine = true;
 				Shader.SetGlobalFloat( "_InvertedZoom", invertedZoom );
-				
+
 				WirePortDataType smallest = ( (int)outputDataType < (int)inputDataType ? outputDataType : inputDataType );
 				smallest = ( (int)smallest < (int)outputVisualDataType ? smallest : outputVisualDataType );
 				smallest = ( (int)smallest < (int)inputVisualDataType ? smallest : inputVisualDataType );
@@ -1241,7 +1288,7 @@ namespace AmplifyShaderEditor
 			if( LodLevel <= ParentGraph.NodeLOD.LOD4 )
 				segments = Mathf.Clamp( Mathf.FloorToInt( mag * 0.2f * invertedZoom ), 11, 35 );
 			else
-				segments = ( int ) ( invertedZoom * 14.28f * 11 );
+				segments = (int)( invertedZoom * 14.28f * 11 );
 
 			if( ParentWindow.Options.ColoredPorts && wireStatus != WireStatus.Highlighted )
 				boundBox = GLDraw.DrawBezier( startPos, startTangent, endPos, endTangent, UIUtils.GetColorForDataType( outputVisualDataType, false, false ), UIUtils.GetColorForDataType( inputVisualDataType, false, false ), wireThickness, segments, ty );
@@ -1385,7 +1432,7 @@ namespace AmplifyShaderEditor
 						outNode.OnOutputPortConnected( OutPortId, InNodeId, InPortId );
 					}
 				}
-				else if( ( object ) inputPort == null )
+				else if( (object)inputPort == null )
 				{
 					if( DebugConsoleWindow.DeveloperMode )
 						UIUtils.ShowMessage( "Input Port " + InPortId + " doesn't exist on node " + InNodeId, MessageSeverity.Error );
@@ -1396,7 +1443,7 @@ namespace AmplifyShaderEditor
 						UIUtils.ShowMessage( "Output Port " + OutPortId + " doesn't exist on node " + OutNodeId, MessageSeverity.Error );
 				}
 			}
-			else if( ( object ) inNode == null )
+			else if( (object)inNode == null )
 			{
 				if( DebugConsoleWindow.DeveloperMode )
 					UIUtils.ShowMessage( "Input node " + InNodeId + " doesn't exist", MessageSeverity.Error );
@@ -1497,7 +1544,7 @@ namespace AmplifyShaderEditor
 		public void DeleteAllConnectionFromNode( int nodeId, bool registerOnLog, bool propagateCallback )
 		{
 			ParentNode node = GetNode( nodeId );
-			if( ( object ) node == null )
+			if( (object)node == null )
 				return;
 			DeleteAllConnectionFromNode( node, registerOnLog, propagateCallback );
 		}
@@ -1521,7 +1568,7 @@ namespace AmplifyShaderEditor
 		public void DeleteConnection( bool isInput, int nodeId, int portId, bool registerOnLog, bool propagateCallback, bool registerUndo = true )
 		{
 			ParentNode node = GetNode( nodeId );
-			if( ( object ) node == null )
+			if( (object)node == null )
 				return;
 
 			if( registerUndo )
@@ -2197,12 +2244,12 @@ namespace AmplifyShaderEditor
 				allOutputs[ i ].GenerateSignalPropagation();
 			}
 
-			List<RegisterLocalVarNode> localVarNodes = m_localVarNodes.NodesList;
-			int count = localVarNodes.Count;
-			for( int i = 0; i < count; i++ )
-			{
-				localVarNodes[ i ].GenerateSignalPropagation();
-			}
+			//List<RegisterLocalVarNode> localVarNodes = m_localVarNodes.NodesList;
+			//int count = localVarNodes.Count;
+			//for( int i = 0; i < count; i++ )
+			//{
+			//	localVarNodes[ i ].GenerateSignalPropagation();
+			//}
 		}
 
 		public void UpdateShaderOnMasterNode( Shader newShader )
@@ -2375,7 +2422,7 @@ namespace AmplifyShaderEditor
 					if( temp != null )
 						allOutputs.Add( temp );
 				}
-				
+
 				for( int j = 0; j < allOutputs.Count; j++ )
 				{
 					allOutputs[ j ].SetupNodeCategories();
@@ -2422,7 +2469,7 @@ namespace AmplifyShaderEditor
 		{
 			for( int i = 0; i < m_nodes.Count; i++ )
 			{
-				if( ( object ) m_nodes[ i ] == null )
+				if( (object)m_nodes[ i ] == null )
 				{
 					m_nodes.RemoveAt( i );
 					CleanCorruptedNodes();
@@ -2767,6 +2814,7 @@ namespace AmplifyShaderEditor
 		public UsageListFunctionNodes FunctionNodes { get { return m_functionNodes; } }
 		public UsageListFunctionOutputNodes FunctionOutputNodes { get { return m_functionOutputNodes; } }
 		public UsageListFunctionSwitchNodes FunctionSwitchNodes { get { return m_functionSwitchNodes; } }
+		public UsageListFunctionSwitchCopyNodes FunctionSwitchCopyNodes { get { return m_functionSwitchCopyNodes; } }
 		public PrecisionType CurrentPrecision
 		{
 			get { return m_currentPrecision; }

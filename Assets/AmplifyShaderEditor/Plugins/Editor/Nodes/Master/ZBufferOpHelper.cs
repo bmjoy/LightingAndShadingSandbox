@@ -107,17 +107,24 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private StandardSurfaceOutputNode m_parentSurface;
 
-		public string CreateDepthInfo()
+		public string CreateDepthInfo( bool outlineZWrite, bool outlineZTest )
 		{
 			string result = string.Empty;
 			if( m_zWriteMode != 0 )
 			{
 				MasterNode.AddRenderState( ref result, "ZWrite", ZWriteModeValues[ m_zWriteMode ] );
+			} else if( outlineZWrite )
+			{
+				MasterNode.AddRenderState( ref result, "ZWrite", ZWriteModeValues[ 1 ] );
 			}
 
 			if( m_zTestMode != 0 )
 			{
 				MasterNode.AddRenderState( ref result, "ZTest", ZTestModeValues[ m_zTestMode ] );
+			}
+			else if( outlineZTest )
+			{
+				MasterNode.AddRenderState( ref result, "ZTest", ZTestModeValues[ 3 ] );
 			}
 
 			if( m_offsetEnabled )

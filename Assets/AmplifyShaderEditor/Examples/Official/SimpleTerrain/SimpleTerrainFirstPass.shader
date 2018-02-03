@@ -108,27 +108,26 @@ Shader "ASESampleShaders/SimpleTerrainFirstPass"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=14203
-389;92;1064;673;939.9332;219.6981;1.347599;True;False
+Version=14206
+389;92;1064;473;507.3549;126.7139;1.347599;True;False
 Node;AmplifyShaderEditor.PosVertexDataNode;37;-423.6948,402.6638;Float;True;0;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.OneMinusNode;36;-126.6948,411.1436;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;39;-105.9117,557.5325;Float;False;Property;_Wetness;Wetness;18;0;Create;True;0;2.5;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.FunctionNode;31;-333.7468,45.5575;Float;False;Four Splats First Pass Terrain;0;;6;37452fdfb732e1443b7e39720d05b708;6;59;FLOAT4;0,0,0,0;False;60;FLOAT4;0,0,0,0;False;61;FLOAT3;0,0,0;False;57;FLOAT;0.0;False;58;FLOAT;0.0;False;62;FLOAT;0.0;False;6;FLOAT4;0;FLOAT3;14;FLOAT;56;FLOAT;45;FLOAT;19;FLOAT;17
+Node;AmplifyShaderEditor.FunctionNode;31;-333.7468,45.5575;Float;False;Four Splats First Pass Terrain;0;;6;37452fdfb732e1443b7e39720d05b708;0;6;59;FLOAT4;0,0,0,0;False;60;FLOAT4;0,0,0,0;False;61;FLOAT3;0,0,0;False;57;FLOAT;0.0;False;58;FLOAT;0.0;False;62;FLOAT;0.0;False;6;FLOAT4;0;FLOAT3;14;FLOAT;56;FLOAT;45;FLOAT;19;FLOAT;17
 Node;AmplifyShaderEditor.PowerNode;38;114.0559,459.6325;Float;False;2;0;FLOAT;0.0;False;1;FLOAT;0.0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;20;126.1189,234.9401;Float;False;Property;_Smoothness;Smoothness;19;0;Create;True;0;0;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;21;134.9534,153.83;Float;False;Property;_Metallic;Metallic;20;0;Create;True;0;0;0;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SaturateNode;41;391.3052,383.6638;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;21;134.9534,153.83;Float;False;Property;_Metallic;Metallic;19;0;Create;True;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.WireNode;29;92.84039,315.6637;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;657.0565,40.11808;Float;False;True;2;Float;ASEMaterialInspector;0;0;Standard;ASESampleShaders/SimpleTerrainFirstPass;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;Opaque;0.5;True;True;-100;False;Opaque;Geometry;All;True;True;True;False;True;True;True;True;True;True;True;True;True;True;True;True;True;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;Nature/Terrain/Diffuse;-1;-1;-1;-1;0;1;SplatCount=4;1;multi_compile_fog;False;1;BaseMapShader=ASESampleShaders/SimpleTerrainBase;0;16;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;5;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.SaturateNode;41;391.3052,383.6638;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;657.0565,40.11808;Float;False;True;2;Float;ASEMaterialInspector;0;0;Standard;ASESampleShaders/SimpleTerrainFirstPass;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;0;False;0;0;False;0;Opaque;0.5;True;True;-100;False;Opaque;Geometry;All;True;True;True;False;True;True;True;True;True;True;True;True;True;True;True;True;True;False;0;255;255;0;0;0;0;0;0;0;0;False;2;15;10;25;False;0.5;True;0;Zero;Zero;0;Zero;Zero;OFF;OFF;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;Relative;0;Nature/Terrain/Diffuse;-1;-1;-1;-1;0;1;SplatCount=4;1;multi_compile_fog;False;1;BaseMapShader=ASESampleShaders/SimpleTerrainBase;0;16;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT;0.0;False;4;FLOAT;0.0;False;5;FLOAT;0.0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0.0;False;9;FLOAT;0.0;False;10;FLOAT;0.0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
 WireConnection;36;0;37;2
 WireConnection;38;0;36;0
 WireConnection;38;1;39;0
-WireConnection;41;0;38;0
 WireConnection;29;0;31;17
+WireConnection;41;0;38;0
 WireConnection;0;0;31;0
 WireConnection;0;1;31;14
 WireConnection;0;3;21;0
 WireConnection;0;4;41;0
 WireConnection;0;11;29;0
 ASEEND*/
-//CHKSM=B9A44DB35EC025886A43A477FCD7121522B802C6
+//CHKSM=139CAC9EF67FCDAA305027A72E3C540A3A62FC97

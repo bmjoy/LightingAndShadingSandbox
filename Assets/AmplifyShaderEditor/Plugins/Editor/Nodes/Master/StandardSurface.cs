@@ -1245,6 +1245,20 @@ namespace AmplifyShaderEditor
 			m_currentDataCollector.TesselationActive = m_tessOpHelper.EnableTesselation;
 			m_currentDataCollector.CurrentRenderPath = m_renderPath;
 
+			StandardShaderLightModel cachedLightModel = m_currentLightModel;
+			NodeAvailability cachedAvailability = ContainerGraph.CurrentCanvasMode;
+
+			bool debugIsUsingCustomLighting = false;
+			bool usingDebugPort = false;
+			if( m_inputPorts[ m_inputPorts.Count - 1 ].IsConnected )
+			{
+				usingDebugPort = true;
+				debugIsUsingCustomLighting = m_currentLightModel == StandardShaderLightModel.CustomLighting;
+
+				m_currentDataCollector.GenType = PortGenType.CustomLighting;
+				m_currentLightModel = StandardShaderLightModel.CustomLighting;
+				ContainerGraph.CurrentCanvasMode = NodeAvailability.CustomLighting;
+			}
 
 			if( isInstancedShader )
 			{
@@ -1343,10 +1357,39 @@ namespace AmplifyShaderEditor
 			if( m_inputPorts[ m_inputPorts.Count - 1 ].IsConnected )
 			{
 				//Debug Port active
+
 				m_currentDataCollector.PortCategory = MasterNodePortCategory.Debug;
 				InputPort debugPort = m_inputPorts[ m_inputPorts.Count - 1 ];
 
-				CreateInstructionsForPort( debugPort, Constants.OutputVarStr + ".Emission", false, null, null, false, false );
+				if( debugIsUsingCustomLighting )
+				{
+					m_currentDataCollector.UsingCustomOutput = true;
+					WireReference connection = m_inputPorts[ m_inputPorts.Count - 1 ].GetConnection();
+					ParentNode node = UIUtils.GetNode( connection.NodeId );
+
+					//customLightingInstructions += "#if DIRECTIONAL\n";
+
+					customLightingCode = node.GetValueFromOutputStr( connection.PortId, WirePortDataType.FLOAT3, ref m_currentDataCollector, false );
+					customLightingInstructions = m_currentDataCollector.CustomOutput;
+
+					if( m_currentDataCollector.ForceNormal )
+					{
+						m_currentDataCollector.AddToStartInstructions( "\t\t\t" + Constants.OutputVarStr + ".Normal = float3(0,0,1);\n" );
+						m_currentDataCollector.DirtyNormal = true;
+						m_currentDataCollector.ForceNormal = false;
+					}
+
+					if( m_currentDataCollector.DirtyVertexVariables )
+					{
+						m_currentDataCollector.AddVertexInstruction( m_currentDataCollector.VertexLocalVariables, UniqueId, false );
+						m_currentDataCollector.ClearVertexLocalVariables();
+					}
+					m_currentDataCollector.UsingCustomOutput = false;
+				}
+				else
+				{
+					CreateInstructionsForPort( debugPort, Constants.OutputVarStr + ".Emission", false, null, null, false, false );
+				}
 			}
 			else
 			{
@@ -1720,7 +1763,8 @@ namespace AmplifyShaderEditor
 					// Add optionalPasses
 					if( m_outlineHelper.EnableOutline || ( m_currentDataCollector.UsingCustomOutlineColor || m_currentDataCollector.CustomOutlineSelectedAlpha > 0 || m_currentDataCollector.UsingCustomOutlineWidth ) )
 					{
-						AddMultilineBody( ref ShaderBody, m_outlineHelper.OutlineFunctionBody( ref m_currentDataCollector, isInstancedShader, m_customShadowCaster, UIUtils.RemoveInvalidCharacters( ShaderName ), ( m_billboardOpHelper.IsBillboard ? m_billboardOpHelper.GetInternalMultilineInstructions() : null ), ref m_tessOpHelper, ShaderModelTypeArr[ m_shaderModelIdx ] ) );
+						if( !usingDebugPort )
+							AddMultilineBody( ref ShaderBody, m_outlineHelper.OutlineFunctionBody( ref m_currentDataCollector, isInstancedShader, m_customShadowCaster, UIUtils.RemoveInvalidCharacters( ShaderName ), ( m_billboardOpHelper.IsBillboard && !usingDebugPort ? m_billboardOpHelper.GetInternalMultilineInstructions() : null ), ref m_tessOpHelper, ShaderModelTypeArr[ m_shaderModelIdx ] ) );
 					}
 
 					//Add SubShader tags
@@ -1736,9 +1780,9 @@ namespace AmplifyShaderEditor
 					AddShaderLOD( ref ShaderBody, m_shaderLOD );
 					AddRenderState( ref ShaderBody, "Cull", m_cullMode.ToString() );
 					m_customBlendAvailable = ( m_alphaMode == AlphaMode.Custom || m_alphaMode == AlphaMode.Opaque );
-					if( m_zBufferHelper.IsActive && m_customBlendAvailable )
+					if( ( m_zBufferHelper.IsActive && m_customBlendAvailable ) || m_outlineHelper.UsingZWrite || m_outlineHelper.UsingZTest )
 					{
-						ShaderBody += m_zBufferHelper.CreateDepthInfo();
+						ShaderBody += m_zBufferHelper.CreateDepthInfo( m_outlineHelper.UsingZWrite, m_outlineHelper.UsingZTest );
 					}
 					if( m_stencilBufferHelper.Active )
 					{
@@ -1880,6 +1924,11 @@ namespace AmplifyShaderEditor
 							OptionalParameters += "noshadow" + Constants.OptionalParametersSep;
 						}
 
+						if( m_renderingOptionsOpHelper.IsOptionActive( " Add Pass" ) )
+						{
+							OptionalParameters += "noforwardadd" + Constants.OptionalParametersSep;
+						}
+
 						switch( m_renderPath )
 						{
 							case RenderPath.All: break;
@@ -1901,7 +1950,7 @@ namespace AmplifyShaderEditor
 							if( m_currentDataCollector.DirtyPerVertexData )
 								OptionalParameters += "vertex:" + Constants.VertexDataFunc + Constants.OptionalParametersSep;
 
-							if( m_tessOpHelper.EnableTesselation )
+							if( m_tessOpHelper.EnableTesselation && !usingDebugPort )
 							{
 								m_tessOpHelper.WriteToOptionalParams( ref OptionalParameters );
 							}
@@ -1934,11 +1983,6 @@ namespace AmplifyShaderEditor
 						if( m_currentDataCollector.DirtyInputs )
 							ShaderBody += "\t\t" + m_currentDataCollector.Inputs + "\t\t};" + "\n\n";
 
-						//if ( m_tessOpHelper.EnableTesselation )
-						//{
-						//	ShaderBody += TessellationOpHelper.CustomAppData;
-						//}
-
 						// Add Custom Lighting struct
 						if( m_currentDataCollector.DirtyCustomInput )
 							ShaderBody += m_currentDataCollector.CustomInput + "\n\n";
@@ -1969,7 +2013,7 @@ namespace AmplifyShaderEditor
 
 
 						//Tesselation
-						if( m_tessOpHelper.EnableTesselation )
+						if( m_tessOpHelper.EnableTesselation && !usingDebugPort )
 						{
 							ShaderBody += m_tessOpHelper.GetCurrentTessellationFunction + "\n";
 						}
@@ -2151,7 +2195,7 @@ namespace AmplifyShaderEditor
 						if( m_currentDataCollector.DirtyPerVertexData )
 							OptionalParameters += "vertex:" + Constants.VertexDataFunc + Constants.OptionalParametersSep;
 
-						if( m_tessOpHelper.EnableTesselation )
+						if( m_tessOpHelper.EnableTesselation && !usingDebugPort )
 						{
 							m_tessOpHelper.WriteToOptionalParams( ref OptionalParameters );
 						}
@@ -2406,6 +2450,12 @@ namespace AmplifyShaderEditor
 				}
 			}
 			CloseShaderBody( ref ShaderBody );
+
+			if( usingDebugPort )
+			{
+				m_currentLightModel = cachedLightModel;
+				ContainerGraph.CurrentCanvasMode = cachedAvailability;
+			}
 
 			// Generate Graph info
 			ShaderBody += ContainerGraph.ParentWindow.GenerateGraphInfo();

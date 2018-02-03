@@ -67,26 +67,69 @@ namespace AmplifyShaderEditor
 	}
 
 	[Serializable]
-	public class TemplateDepthData : TemplateModuleData
+	public class TemplatesTagData
 	{
-		public bool ValidZWrite;
-		public string ZWriteModeId;
-		public ZWriteMode ZWriteModeValue;
-
-		public bool ValidZTest;
-		public string ZTestModeId;
-		public ZTestMode ZTestModeValue;
-
-		public bool ValidOffset;
-		public string OffsetId;
-		public float OffsetFactor;
-		public float OffsetUnits;
+		public string Name;
+		public string Value;
+		public TemplatesTagData( string name, string value )
+		{
+			Name = name;
+			Value = value;
+		}
 	}
 
 	[Serializable]
 	public class TemplateModuleData
 	{
 		public TemplateDataCheck DataCheck = TemplateDataCheck.Invalid;
+		public int StartIdx;
+	}
+
+	[Serializable]
+	public class TemplateTagsModuleData : TemplateModuleData
+	{
+		public string TagsId;
+		public List<TemplatesTagData> Tags = new List<TemplatesTagData>();
+		public void Destroy()
+		{
+			Tags.Clear();
+			Tags = null;
+		}
+
+		public void Reset()
+		{
+			Tags.Clear();
+		}
+
+		public void Dump()
+		{
+			string dump = string.Empty;
+			for( int i = 0; i < Tags.Count; i++ )
+			{
+				dump += string.Format( "[{0}] Name: {1} Value: {2}\n", i, Tags[ i ].Name, Tags[ i ].Value );
+			}
+			Debug.Log( dump );
+		}
+	}
+
+	[Serializable]
+	public class TemplateDepthData : TemplateModuleData
+	{
+		public bool ValidZWrite;
+		public string ZWriteModeId;
+		public ZWriteMode ZWriteModeValue;
+		public int ZWriteStartIndex;
+
+		public bool ValidZTest;
+		public string ZTestModeId;
+		public ZTestMode ZTestModeValue;
+		public int ZTestStartIndex;
+
+		public bool ValidOffset;
+		public string OffsetId;
+		public float OffsetFactor;
+		public float OffsetUnits;
+		public int OffsetStartIndex;
 	}
 
 	[Serializable]
@@ -116,15 +159,18 @@ namespace AmplifyShaderEditor
 		public bool SeparateBlendFactors = false;
 		public AvailableBlendFactor SourceFactorRGB = AvailableBlendFactor.One;
 		public AvailableBlendFactor DestFactorRGB = AvailableBlendFactor.Zero;
+		public int BlendRGBStartIndex;
 
 		public AvailableBlendFactor SourceFactorAlpha = AvailableBlendFactor.One;
 		public AvailableBlendFactor DestFactorAlpha = AvailableBlendFactor.Zero;
+		public int BlendAlphaStartIndex;
 
 		public bool ValidBlendOp = false;
 		public string BlendOpId;
 		public bool SeparateBlendOps = false;
 		public AvailableBlendOps BlendOpRGB = AvailableBlendOps.OFF;
 		public AvailableBlendOps BlendOpAlpha = AvailableBlendOps.OFF;
+		public int BlendOpStartIndex;
 	}
 
 	[Serializable]
@@ -289,6 +335,7 @@ namespace AmplifyShaderEditor
 			{"samplerCUBE"      ,WirePortDataType.SAMPLERCUBE}
 		};
 
+		public static readonly string TagsPattern = "\"(\\w +)\"\\s*=\\s*\"(\\w+\\+*\\w*)\"";
 		public static readonly string ZTestPattern = @"\s*ZTest\s+(\w+)";
 		public static readonly string ZWritePattern = @"\s*ZWrite\s+(\w+)";
 		public static readonly string ZOffsetPattern = @"\s*Offset\s+([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)";
@@ -691,6 +738,22 @@ namespace AmplifyShaderEditor
 					catch
 					{
 						depthDataObj.DataCheck = TemplateDataCheck.Unreadable;
+					}
+				}
+			}
+		}
+
+		public static void CreateTags( ref TemplateTagsModuleData tagsObj )
+		{
+			MatchCollection matchColl = Regex.Matches( tagsObj.TagsId, TagsPattern, RegexOptions.IgnorePatternWhitespace );
+			int count = matchColl.Count;
+			if( count > 0 )
+			{
+				for( int i = 0; i < count; i++ )
+				{
+					if( matchColl[ i ].Groups.Count == 3 )
+					{
+						tagsObj.Tags.Add( new TemplatesTagData( matchColl[ i ].Groups[ 1 ].Value, matchColl[ i ].Groups[ 2 ].Value ));
 					}
 				}
 			}

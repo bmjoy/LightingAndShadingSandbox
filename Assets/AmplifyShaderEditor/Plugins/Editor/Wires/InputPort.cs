@@ -888,7 +888,12 @@ namespace AmplifyShaderEditor
 
 		public bool InputNodeHasPreview()
 		{
-			return GetOutputNode( 0 ).HasPreviewShader;
+			ParentNode node = GetOutputNode( 0 );
+
+			if( node != null )
+				return node.HasPreviewShader;
+
+			return false;
 		}
 
 		public void PreparePortCacheID()

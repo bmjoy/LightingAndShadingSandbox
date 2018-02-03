@@ -121,6 +121,8 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private bool m_noFog = true;
 
+		private int m_zTestMode = 0;
+		private int m_zWriteMode = 0;
 		private bool m_dirtyInput = false;
 		private string m_inputs = string.Empty;
 		private List<PropertyDataCollector> m_inputList = new List<PropertyDataCollector>();
@@ -265,6 +267,10 @@ namespace AmplifyShaderEditor
 		{
 			List<string> body = new List<string>();
 			body.Add( ModeTags[ dataCollector.CustomOutlineSelectedAlpha ] );
+			if( m_zWriteMode != 0 )
+				body.Add( "ZWrite "+ ZBufferOpHelper.ZWriteModeValues[ m_zWriteMode ] );
+			if( m_zTestMode != 0 )
+				body.Add( "ZTest "+ ZBufferOpHelper.ZTestModeValues[ m_zTestMode ] );
 			for( int i = 0; i < OutlineBodyBegin.Length; i++ )
 			{
 				body.Add( OutlineBodyBegin[ i ] );
@@ -461,6 +467,10 @@ namespace AmplifyShaderEditor
 
 		public bool EnableOutline { get { return m_enabled; } }
 
+		public bool UsingZWrite { get { return m_zWriteMode != 0; } }
+		public bool UsingZTest { get { return m_zTestMode != 0; } }
+		public int ZWriteMode { get { return m_zWriteMode; } set { m_zWriteMode = value; } }
+		public int ZTestMode { get { return m_zTestMode; } set { m_zTestMode = value; } }
 		public string Inputs { get { return m_inputs; } set { m_inputs = value; } }
 		public string Uniforms { get { return m_uniforms; } set { m_uniforms = value; } }
 		public string Instructions { get { return m_instructions; } set { m_instructions = value; } }

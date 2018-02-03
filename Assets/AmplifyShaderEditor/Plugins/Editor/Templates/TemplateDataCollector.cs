@@ -745,13 +745,18 @@ namespace AmplifyShaderEditor
 			return varName;
 		}
 
-		public string GetEyeDepth( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment )
+		public string GetEyeDepth( bool useMasterNodeCategory = true, MasterNodePortCategory customCategory = MasterNodePortCategory.Fragment , int viewSpace = 0 )
 		{
 			string varName = "eyeDepth";
 			if ( HasCustomInterpolatedData( varName, useMasterNodeCategory, customCategory ) )
 				return varName;
 			string objectToView = GetObjectToViewPos( false, MasterNodePortCategory.Vertex );
 			string eyeDepthValue = string.Format( "-{0}.z", objectToView );
+			if( viewSpace == 1 )
+			{
+				eyeDepthValue += " * _ProjectionParams.w";
+			}
+
 			RegisterCustomInterpolatedData( varName, WirePortDataType.FLOAT, PrecisionType.Float, eyeDepthValue, useMasterNodeCategory, customCategory );
 			return varName;
 		}

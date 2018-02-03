@@ -9,7 +9,7 @@ Material:
   m_Name: Half Lambert Toon
   m_Shader: {fileID: 4800000, guid: b5105a5b84b82054785506952e8d7935, type: 3}
   m_ShaderKeywords: _USEHALFLAMBERT_ON _USERAMPTEX_ON
-  m_LightmapFlags: 0
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -35,7 +35,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CellShadingLevels: 5
+    - _CellShadingLevels: 2
     - _Float3: 0.66
     - _Float5: 1
     - _Gloss: 0.66

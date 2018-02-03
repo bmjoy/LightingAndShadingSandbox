@@ -32,83 +32,88 @@ namespace AmplifyShaderEditor
 			if( m_outputPorts[ 0 ].IsLocalValue )
 				return m_outputPorts[ 0 ].LocalValue;
 
-			//TEMPLATES
-			if( dataCollector.IsTemplate )
-			{
-				if( !dataCollector.IsFragmentCategory )
-					return m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
+			string varName = GenerateInputInVertex( ref dataCollector, 0, "vertexToFrag" + OutputId,true );
+			m_outputPorts[ 0 ].SetLocalValue( varName, dataCollector.PortCategory );
 
-				string varName = "vertexToFrag" + OutputId;
-				if( dataCollector.TemplateDataCollectorInstance.HasCustomInterpolatedData( varName ) )
-					return varName;
+			return varName;
 
-				MasterNodePortCategory category = dataCollector.PortCategory;
-				dataCollector.PortCategory = MasterNodePortCategory.Vertex;
-				bool dirtyVertexVarsBefore = dataCollector.DirtyVertexVariables;
-				ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
+			////TEMPLATES
+			//if( dataCollector.IsTemplate )
+			//{
+			//	if( !dataCollector.IsFragmentCategory )
+			//		return m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
 
-				string data = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
+			//	string varName = "vertexToFrag" + OutputId;
+			//	if( dataCollector.TemplateDataCollectorInstance.HasCustomInterpolatedData( varName ) )
+			//		return varName;
 
-				dataCollector.PortCategory = category;
-				if( !dirtyVertexVarsBefore && dataCollector.DirtyVertexVariables )
-				{
-					dataCollector.AddVertexInstruction( dataCollector.VertexLocalVariables, UniqueId, false );
-					dataCollector.ClearVertexLocalVariables();
-					ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
-				}
+			//	MasterNodePortCategory category = dataCollector.PortCategory;
+			//	dataCollector.PortCategory = MasterNodePortCategory.Vertex;
+			//	bool dirtyVertexVarsBefore = dataCollector.DirtyVertexVariables;
+			//	ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
 
-				ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Fragment );
+			//	string data = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
 
-				dataCollector.TemplateDataCollectorInstance.RegisterCustomInterpolatedData( varName, m_inputPorts[ 0 ].DataType, m_currentPrecisionType, data );
-				//return varName;
+			//	dataCollector.PortCategory = category;
+			//	if( !dirtyVertexVarsBefore && dataCollector.DirtyVertexVariables )
+			//	{
+			//		dataCollector.AddVertexInstruction( dataCollector.VertexLocalVariables, UniqueId, false );
+			//		dataCollector.ClearVertexLocalVariables();
+			//		ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
+			//	}
 
-				m_outputPorts[ 0 ].SetLocalValue( varName );
-				return m_outputPorts[ 0 ].LocalValue;
-			}
+			//	ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Fragment );
 
-			//SURFACE 
-			{
-				if( !dataCollector.IsFragmentCategory )
-				{
-					return m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
-				}
+			//	dataCollector.TemplateDataCollectorInstance.RegisterCustomInterpolatedData( varName, m_inputPorts[ 0 ].DataType, m_currentPrecisionType, data );
+			//	//return varName;
 
-				if( dataCollector.TesselationActive )
-				{
-					UIUtils.ShowMessage( "Unable to use Vertex to Frag when Tessellation is active" );
-					return m_outputPorts[ 0 ].ErrorValue;
-				}
+			//	m_outputPorts[ 0 ].SetLocalValue( varName );
+			//	return m_outputPorts[ 0 ].LocalValue;
+			//}
+
+			////SURFACE 
+			//{
+			//	if( !dataCollector.IsFragmentCategory )
+			//	{
+			//		return m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
+			//	}
+
+			//	if( dataCollector.TesselationActive )
+			//	{
+			//		UIUtils.ShowMessage( "Unable to use Vertex to Frag when Tessellation is active" );
+			//		return m_outputPorts[ 0 ].ErrorValue;
+			//	}
 
 
-				string interpName = "data" + OutputId;
-				dataCollector.AddToInput( UniqueId, interpName, m_inputPorts[ 0 ].DataType, m_currentPrecisionType );
+			//	string interpName = "data" + OutputId;
+			//	dataCollector.AddToInput( UniqueId, interpName, m_inputPorts[ 0 ].DataType, m_currentPrecisionType );
 
-				MasterNodePortCategory portCategory = dataCollector.PortCategory;
-				dataCollector.PortCategory = MasterNodePortCategory.Vertex;
+			//	MasterNodePortCategory portCategory = dataCollector.PortCategory;
+			//	dataCollector.PortCategory = MasterNodePortCategory.Vertex;
 
-				bool dirtyVertexVarsBefore = dataCollector.DirtyVertexVariables;
+			//	bool dirtyVertexVarsBefore = dataCollector.DirtyVertexVariables;
 
-				ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
+			//	ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
 
-				string vertexVarValue = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
-				dataCollector.AddLocalVariable( UniqueId, Constants.VertexShaderOutputStr + "." + interpName, vertexVarValue + ";" );
+			//	string vertexVarValue = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
+			//	dataCollector.AddLocalVariable( UniqueId, Constants.VertexShaderOutputStr + "." + interpName, vertexVarValue + ";" );
 
-				dataCollector.PortCategory = portCategory;
+			//	dataCollector.PortCategory = portCategory;
 
-				if( !dirtyVertexVarsBefore && dataCollector.DirtyVertexVariables )
-				{
-					dataCollector.AddVertexInstruction( dataCollector.VertexLocalVariables, UniqueId, false );
-					dataCollector.ClearVertexLocalVariables();
-					ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
-				}
+			//	if( !dirtyVertexVarsBefore && dataCollector.DirtyVertexVariables )
+			//	{
+			//		dataCollector.AddVertexInstruction( dataCollector.VertexLocalVariables, UniqueId, false );
+			//		dataCollector.ClearVertexLocalVariables();
+			//		ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Vertex );
+			//	}
 
-				ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Fragment );
+			//	ContainerGraph.ResetNodesLocalVariablesIfNot( this, MasterNodePortCategory.Fragment );
 
-				//return Constants.InputVarStr + "." + interpName;
+			//	//return Constants.InputVarStr + "." + interpName;
 
-				m_outputPorts[ 0 ].SetLocalValue( Constants.InputVarStr + "." + interpName );
-				return m_outputPorts[ 0 ].LocalValue;
-			}
+			//	m_outputPorts[ 0 ].SetLocalValue( Constants.InputVarStr + "." + interpName );
+			//	return m_outputPorts[ 0 ].LocalValue;
+			//}
 		}
 	}
 }

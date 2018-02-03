@@ -1,4 +1,4 @@
-Shader /*ase_name*/ "Particles Alpha Blended" /*end*/
+Shader /*ase_name*/ "ASETemplateShaders/Particles Alpha Blended" /*end*/
 {
 	Properties
 	{
@@ -10,11 +10,9 @@ Shader /*ase_name*/ "Particles Alpha Blended" /*end*/
 
 	Category 
 	{
-		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" "PreviewType"="Plane" /*ase_tags*/ }
-
-		
 		SubShader
 		{
+			Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" "PreviewType" = "Plane" }
 			Blend SrcAlpha OneMinusSrcAlpha
 			ColorMask RGB
 			Cull Off 

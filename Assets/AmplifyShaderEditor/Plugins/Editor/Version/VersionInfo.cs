@@ -1,4 +1,4 @@
-// Amplify Shader Editor - Advanced Bloom Post-Effect for Unity
+// Amplify Shader Editor - Visual Shader Editing Tool
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
@@ -12,8 +12,8 @@ namespace AmplifyShaderEditor
 	{
 		public const byte Major = 1;
 		public const byte Minor = 4;
-		public const byte Release = 2;
-		public const byte Revision = 5;
+		public const byte Release = 3;
+		public const byte Revision = 4;
 		
 		private static string StageSuffix = "_dev0"+Revision;
 

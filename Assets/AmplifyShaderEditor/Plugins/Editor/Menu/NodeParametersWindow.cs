@@ -300,6 +300,8 @@ namespace AmplifyShaderEditor
 			{
 				functionSwitchNodes.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 
+				UIUtils.UpdateFunctionSwitchArr();
+				
 				m_functionSwitchesReordableList = new ReorderableList( functionSwitchNodes, typeof( FunctionSwitch ), true, false, false, false );
 				m_functionSwitchesReordableList.headerHeight = 0;
 				m_functionSwitchesReordableList.footerHeight = 0;
@@ -312,10 +314,6 @@ namespace AmplifyShaderEditor
 
 				m_functionSwitchesReordableList.onChangedCallback = ( list ) =>
 				{
-					//for( int i = 0; i < functionSwitchNodes.Count; i++ )
-					//{
-					//	functionSwitchNodes[ i ].OrderIndex = i;
-					//}
 					ForceSwitchesReorder(ref functionSwitchNodes );
 				};
 
@@ -341,6 +339,8 @@ namespace AmplifyShaderEditor
 			{
 				functionSwitchNodes[ i ].OrderIndex = i;
 			}
+
+			UIUtils.UpdateFunctionSwitchArr();
 		}
 
 		public void DrawFunctionOutputs()

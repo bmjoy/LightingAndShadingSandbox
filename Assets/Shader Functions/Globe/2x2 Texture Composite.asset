@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: 2x2 Texture Composite
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity Asset
+    Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=14304\n1998;27;1796;1125;1571.605;87.44675;1;True;False\nNode;AmplifyShaderEditor.CommentaryNode;30;-967.1193,1002.234;Float;False;330.434;207.5344;Map
+    0 - Set other pixels to black;3;1;25;18;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.CommentaryNode;29;-968.1193,777.8262;Float;False;322.9119;216.9418;Map
+    2 - Set other pixels to black;3;17;3;24;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.CommentaryNode;28;-965.5189,565.7266;Float;False;321.9121;200.9415;Map
+    1 - Set other pixels to black;3;23;2;16;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.CommentaryNode;27;-964.1351,358.4222;Float;False;320.7909;196.9416;Map
+    3 - Set other pixels to black;3;22;4;14;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.CommentaryNode;26;-1019.475,-50.2084;Float;False;678.3699;228.0543;Constants;2;5;8;;1,1,1,1;0;0\nNode;AmplifyShaderEditor.BreakToComponentsNode;15;-877.796,249.976;Float;False;FLOAT2;1;0;FLOAT2;0,0;False;16;FLOAT;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT;5;FLOAT;6;FLOAT;7;FLOAT;8;FLOAT;9;FLOAT;10;FLOAT;11;FLOAT;12;FLOAT;13;FLOAT;14;FLOAT;15\nNode;AmplifyShaderEditor.GetLocalVarNode;22;-949.1351,475.3638;Float;False;8;0;1;COLOR;0\nNode;AmplifyShaderEditor.WireNode;31;-384.111,407.1458;Float;False;1;0;FLOAT;0.0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionInput;10;-1026.303,244.6712;Float;False;UV;2;0;False;1;0;FLOAT2;0,0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.TFHCCompareLowerEqual;12;-530.1916,914.7744;Float;False;4;0;FLOAT;0.0;False;1;FLOAT;0.5;False;2;FLOAT4;0,0,0;False;3;FLOAT4;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionInput;1;-932.7682,1052.234;Float;False;Map0;4;1;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.TFHCCompareGreaterEqual;13;-222.2178,637.061;Float;False;4;0;FLOAT;0.0;False;1;FLOAT;0.5;False;2;FLOAT4;0,0,0;False;3;FLOAT4;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionInput;3;-926.5491,838.8262;Float;False;Map2;4;3;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionInput;4;-929.5649,401.4222;Float;False;Map3;4;4;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionInput;2;-932.9491,609.7266;Float;False;Map1;4;2;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.SimpleAddOpNode;16;-772.6072,633.4283;Float;False;2;2;0;FLOAT4;0,0,0;False;1;COLOR;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.SimpleAddOpNode;14;-765.3442,431.1311;Float;False;2;2;0;FLOAT4;0,0,0;False;1;COLOR;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;8;-564.7061,-0.2084053;Fixed;False;BLACK;-1;True;1;0;COLOR;0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.GetLocalVarNode;23;-954.519,681.6681;Float;False;8;0;1;COLOR;0\nNode;AmplifyShaderEditor.SimpleAddOpNode;18;-772.6853,1082.395;Float;False;2;2;0;FLOAT4;0,0,0;False;1;COLOR;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.SimpleAddOpNode;17;-774.2074,864.5281;Float;False;2;2;0;FLOAT4;0,0,0;False;1;COLOR;0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.TFHCCompareLowerEqual;11;-529.7861,480.183;Float;False;4;0;FLOAT;0.0;False;1;FLOAT;0.5;False;2;FLOAT4;0,0,0;False;3;FLOAT4;0.0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.GetLocalVarNode;25;-958.1193,1124.768;Float;False;8;0;1;COLOR;0\nNode;AmplifyShaderEditor.ColorNode;5;-967.7049,-0.2084053;Fixed;False;Constant;_Color0;Color
+    0;22;0;Create;True;0,0,0,0;0,0,0,0;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.GetLocalVarNode;24;-950.1193,909.7679;Float;False;8;0;1;COLOR;0\nNode;AmplifyShaderEditor.FunctionOutput;0;-36,631;Float;True;True;Composite;0;True;1;0;FLOAT4;0,0,0;False;1;FLOAT4;0\nWireConnection;15;0;10;0\nWireConnection;31;0;15;0\nWireConnection;12;0;15;1\nWireConnection;12;2;17;0\nWireConnection;12;3;18;0\nWireConnection;13;0;31;0\nWireConnection;13;2;11;0\nWireConnection;13;3;12;0\nWireConnection;16;0;2;0\nWireConnection;16;1;23;0\nWireConnection;14;0;4;0\nWireConnection;14;1;22;0\nWireConnection;8;0;5;0\nWireConnection;18;0;1;0\nWireConnection;18;1;25;0\nWireConnection;17;0;3;0\nWireConnection;17;1;24;0\nWireConnection;11;0;15;1\nWireConnection;11;2;14;0\nWireConnection;11;3;16;0\nWireConnection;0;0;13;0\nASEEND*/\n//CHKSM=228C4CB6AB0CF42360478DE59D3E7E12F37921B9"
+  m_functionName: 
+  m_description: This function ensures that the 2x2 grid of texures won't overlap.
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_additionalPragmas:
+    m_additionalPragmas: []
+    m_outsidePragmas: []
+  m_nodeCategory: 3
+  m_customNodeCategory: 
+  m_previewPosition: 0

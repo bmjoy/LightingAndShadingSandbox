@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: Phong Fresnel ASE
   m_Shader: {fileID: 4800000, guid: 3c4766939d64e434cba06b9784d3ad35, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _SPECULARENABLE_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -39,10 +39,10 @@ Material:
     - _FresnelRimPower: 5
     - _NormalScale: 0.8
     - _RimPower: 4
-    - _SpecularEnable: 0
+    - _SpecularEnable: 1
     - _SpecularIntensity: 0.6
     - _SpecularPower: 0.2
-    - __dirty: 0
+    - __dirty: 1
     m_Colors:
     - _BaseTint: {r: 0, g: 0.17788236, b: 0.37800002, a: 1}
     - _FresnelColor: {r: 0, g: 1, b: 1, a: 1}

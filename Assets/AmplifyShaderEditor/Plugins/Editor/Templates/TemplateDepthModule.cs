@@ -94,11 +94,9 @@ namespace AmplifyShaderEditor
 
 			EditorGUI.EndDisabledGroup();
 		}
-
-
+		
 		public void ConfigureFromTemplateData( TemplateDepthData depthData )
 		{
-
 			m_validZTest = depthData.ValidZTest;
 			if( depthData.ValidZTest )
 			{

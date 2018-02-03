@@ -15,10 +15,11 @@ namespace AmplifyShaderEditor
 		public MasterNodePortCategory PortCategory;
 		public int PortUniqueId;
 		public int OrderId;
+		public int TagStartIdx;
 		public string TagId;
 		public string DefaultValue;
 
-		public TemplateInputData( string tagId, string portName, string defaultValue, WirePortDataType dataType, MasterNodePortCategory portCategory, int portUniqueId, int orderId )
+		public TemplateInputData( int tagStartIdx, string tagId, string portName, string defaultValue, WirePortDataType dataType, MasterNodePortCategory portCategory, int portUniqueId, int orderId )
 		{
 			DefaultValue = defaultValue;
 			PortName = portName;
@@ -27,6 +28,7 @@ namespace AmplifyShaderEditor
 			PortUniqueId = portUniqueId;
 			OrderId = orderId;
 			TagId = tagId;
+			TagStartIdx = tagStartIdx;
 		}
 	}
 
@@ -86,10 +88,19 @@ namespace AmplifyShaderEditor
 	[Serializable]
 	public class TemplateTagData
 	{
+		public int StartIdx;
 		public string Id;
 		public bool SearchIndentation;
 		public string CustomIndentation;
 
+
+		public TemplateTagData( int startIdx, string id, bool searchIndentation )
+		{
+			StartIdx = startIdx;
+			Id = id;
+			SearchIndentation = searchIndentation;
+			CustomIndentation = string.Empty;
+		}
 
 		public TemplateTagData( string id, bool searchIndentation)
 		{
@@ -144,7 +155,7 @@ namespace AmplifyShaderEditor
 		public static readonly string TemplateVertexDataTag = "/*ase_vdata:";
 
 		public static readonly string TemplateFunctionsTag = "/*ase_functions*/\n";
-		public static readonly string TemplateTagsTag = "/*ase_tags*/";
+		//public static readonly string TemplateTagsTag = "/*ase_tags*/";
 
 		//public static readonly string TemplateCullModeTag = "/*ase_cull_mode*/";
 		//public static readonly string TemplateBlendModeTag = "/*ase_blend_mode*/";
@@ -179,7 +190,7 @@ namespace AmplifyShaderEditor
 		public static readonly TemplateTagData[] CommonTags = { new TemplateTagData( TemplatePropertyTag,true),
 																new TemplateTagData( TemplateGlobalsTag,true),
 																new TemplateTagData( TemplateFunctionsTag,true),
-																new TemplateTagData( TemplateTagsTag,false," "),
+																//new TemplateTagData( TemplateTagsTag,false," "),
 																new TemplateTagData( TemplatePragmaTag,true),
 																new TemplateTagData( TemplatePassTag,true),
 																new TemplateTagData( TemplateInputsVertParamsTag,false),

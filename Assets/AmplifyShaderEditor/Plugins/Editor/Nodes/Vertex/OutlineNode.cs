@@ -45,6 +45,12 @@ namespace AmplifyShaderEditor
 		[NonSerialized]
 		private StandardSurfaceOutputNode m_masterNode = null;
 
+		[SerializeField]
+		private int m_zTestMode = 0;
+
+		[SerializeField]
+		private int m_zWriteMode = 0;
+
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -68,6 +74,9 @@ namespace AmplifyShaderEditor
 
 			if( GetInputPortByUniqueId( 1 ).IsConnected )
 				dataCollector.UsingCustomOutlineWidth = true;
+
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.ZWriteMode = m_zWriteMode;
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.OffsetMode = m_currentSelectedMode;
 		}
 
 		public override void AfterCommonInit()
@@ -158,6 +167,9 @@ namespace AmplifyShaderEditor
 						m_masterNode.ShowOpacityMaskValueUI();
 					}
 				}
+
+				m_zWriteMode = EditorGUILayoutPopup( ZBufferOpHelper.ZWriteModeStr, m_zWriteMode, ZBufferOpHelper.ZWriteModeValues );
+				m_zTestMode = EditorGUILayoutPopup( ZBufferOpHelper.ZTestModeStr, m_zTestMode, ZBufferOpHelper.ZTestModeLabels );
 				m_noFog = EditorGUILayoutToggle( "No Fog", m_noFog );
 
 			} );
@@ -255,9 +267,8 @@ namespace AmplifyShaderEditor
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Instructions = outlineDataCollector.Instructions;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Functions = outlineDataCollector.Functions;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.LocalFunctions = outlineDataCollector.LocalFunctions;
-
-
-
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.ZTestMode = m_zTestMode;
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.ZWriteMode = m_zWriteMode;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.OffsetMode = m_currentSelectedMode;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.CustomNoFog = m_noFog;
 			dataCollector.CustomOutlineSelectedAlpha = (int)m_currentAlphaMode;
@@ -278,6 +289,12 @@ namespace AmplifyShaderEditor
 			if( UIUtils.CurrentShaderVersion() > 14202 )
 				m_currentAlphaMode = (OutlineAlphaModes)Enum.Parse( typeof( OutlineAlphaModes ), GetCurrentParam( ref nodeParams ) );
 
+			if( UIUtils.CurrentShaderVersion() > 14302 )
+			{
+				m_zWriteMode = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
+				m_zTestMode = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
+			}
+
 			SetAdditonalTitleText( string.Format( Constants.SubTitleTypeFormatStr, AvailableOutlineModes[ m_currentSelectedMode ] ) );
 			UpdatePorts();
 			CheckAlphaPortVisibility();
@@ -289,6 +306,8 @@ namespace AmplifyShaderEditor
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_currentSelectedMode );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_noFog );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_currentAlphaMode );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_zWriteMode );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_zTestMode );
 		}
 	}
 }

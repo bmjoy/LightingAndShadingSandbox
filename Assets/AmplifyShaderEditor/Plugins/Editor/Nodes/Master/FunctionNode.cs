@@ -34,6 +34,10 @@ namespace AmplifyShaderEditor
 		private Dictionary<int, FunctionSwitch> m_allFunctionSwitchesDict = new Dictionary<int, FunctionSwitch>();
 
 		[SerializeField]
+		private List<FunctionSwitch> m_allFunctionSwitchesCopies;
+		private Dictionary<int, FunctionSwitch> m_allFunctionSwitchesCopiesDict = new Dictionary<int, FunctionSwitch>();
+
+		[SerializeField]
 		private ReordenatorNode m_reordenator;
 
 		[SerializeField]
@@ -63,7 +67,8 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private FunctionOutput m_mainPreviewNode;
 
-		[SerializeField]
+		bool m_portsChanged = false;
+		//[SerializeField]
 		bool m_initialGraphDraw = false;
 
 		private bool m_refreshIdsRequired = false;
@@ -134,12 +139,14 @@ namespace AmplifyShaderEditor
 			m_allFunctionInputs = UIUtils.FunctionInputList();
 			m_allFunctionOutputs = UIUtils.FunctionOutputList();
 			m_allFunctionSwitches = UIUtils.FunctionSwitchList();
+			m_allFunctionSwitchesCopies = UIUtils.FunctionSwitchCopyList();
 
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
 
 			m_allFunctionInputs.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 			m_allFunctionOutputs.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 			m_allFunctionSwitches.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
+			m_allFunctionSwitchesCopies.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
 
 			int inputCount = m_allFunctionInputs.Count;
 			for( int i = 0; i < inputCount; i++ )
@@ -214,7 +221,7 @@ namespace AmplifyShaderEditor
 				ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
 			}
 
-			m_textLabelWidth = 100;
+			m_textLabelWidth = 120;
 
 			UIUtils.RegisterFunctionNode( this );
 
@@ -350,7 +357,7 @@ namespace AmplifyShaderEditor
 
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
 
-			CheckPortVisibility();
+			m_portsChanged = true;
 		}
 
 		public void PortSwitchRestriction( WirePort port )
@@ -467,7 +474,7 @@ namespace AmplifyShaderEditor
 			if( Function == null )
 				return;
 
-			if( Function.Description.Length > 0 || m_allFunctionSwitches.Count > 0)
+			if( Function.Description.Length > 0 || m_allFunctionSwitches.Count > 0 )
 				NodeUtils.DrawPropertyGroup( ref m_parametersFoldout, "Parameters", DrawDescription );
 
 			DrawInternalDataGroup();
@@ -480,25 +487,14 @@ namespace AmplifyShaderEditor
 
 			ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
 			ContainerGraph.ParentWindow.CustomGraph = m_functionGraph;
-			bool portsChanged = false;
 			for( int i = 0; i < m_allFunctionSwitches.Count; i++ )
 			{
 				if( m_allFunctionSwitches[ i ].DrawOption( this ) )
 				{
-					portsChanged = true;
+					m_portsChanged = true;
 				}
 			}
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
-
-			if( portsChanged )
-			{
-				for( int i = 0; i < m_allFunctionOutputs.Count; i++ )
-				{
-					m_outputPorts[ i ].ChangeType( m_allFunctionOutputs[ i ].InputPorts[ 0 ].DataType, false );
-				}
-				
-				CheckPortVisibility();
-			}
 		}
 
 		public override void Destroy()
@@ -563,15 +559,40 @@ namespace AmplifyShaderEditor
 			m_allFunctionSwitchesDict.Clear();
 			m_allFunctionSwitchesDict = null;
 
+			m_allFunctionSwitchesCopiesDict.Clear();
+			m_allFunctionSwitchesCopiesDict = null;
+
 			m_allFunctionInputsDict.Clear();
 			m_allFunctionInputsDict = null;
 		}
 
+		public override void OnNodeLogicUpdate( DrawInfo drawInfo )
+		{
+			base.OnNodeLogicUpdate( drawInfo );
+			ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
+			ContainerGraph.ParentWindow.CustomGraph = m_functionGraph;
 
+			int nodeCount = m_functionGraph.AllNodes.Count;
+			for( int i = 0; i < nodeCount; i++ )
+			{
+				m_functionGraph.AllNodes[ i ].OnNodeLogicUpdate( drawInfo );
+			}
+
+			ContainerGraph.ParentWindow.CustomGraph = cachedGraph;
+			if( m_portsChanged )
+			{
+				m_portsChanged = false;
+				for( int i = 0; i < m_allFunctionOutputs.Count; i++ )
+				{
+					m_outputPorts[ i ].ChangeType( m_allFunctionOutputs[ i ].InputPorts[ 0 ].DataType, false );
+				}
+
+				CheckPortVisibility();
+			}
+		}
 
 		public override void Draw( DrawInfo drawInfo )
 		{
-			//CheckForChanges();
 			CheckForChangesRecursively();
 
 			if( !m_initialGraphDraw && drawInfo.CurrentEventType == EventType.Repaint )
@@ -649,7 +670,7 @@ namespace AmplifyShaderEditor
 
 			ParentNode newNode = ContainerGraph.CreateNode( m_function, false, Vec2Position );
 			newNode.ShowPreview = previewOpen;
-			(newNode as FunctionNode).ReadOptionsHelper = ReadOptionsHelper;
+			( newNode as FunctionNode ).ReadOptionsHelper = ReadOptionsHelper;
 			newNode.RefreshExternalReferences();
 			if( ( newNode as FunctionNode ).m_reordenator && m_reordenator )
 				( newNode as FunctionNode ).m_reordenator.OrderIndex = m_reordenator.OrderIndex;
@@ -743,6 +764,7 @@ namespace AmplifyShaderEditor
 			if( outputPort.IsLocalValue )
 				return outputPort.LocalValue;
 
+			m_functionGraph.CurrentPrecision = ContainerGraph.ParentWindow.CurrentGraph.CurrentPrecision;
 			ParentGraph cachedGraph = ContainerGraph.ParentWindow.CustomGraph;
 			m_outsideGraph = cachedGraph;
 			ContainerGraph.ParentWindow.CustomGraph = m_functionGraph;
@@ -850,7 +872,7 @@ namespace AmplifyShaderEditor
 			}
 			if( UIUtils.CurrentShaderVersion() > 14203 )
 			{
-				ReadOptionsHelper = GetCurrentParam( ref nodeParams ).Split(',');
+				ReadOptionsHelper = GetCurrentParam( ref nodeParams ).Split( ',' );
 			}
 		}
 

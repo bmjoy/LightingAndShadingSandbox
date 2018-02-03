@@ -75,7 +75,11 @@ namespace UnityEditor
 			if ( m_previewRenderUtility == null )
 			{
 				m_previewRenderUtility = new PreviewRenderUtility();
+#if UNITY_2017_1_OR_NEWER
 				m_cameraTransform = m_previewRenderUtility.camera.transform;
+#else
+				m_cameraTransform = m_previewRenderUtility.m_Camera.transform;
+#endif
 				m_cameraTransform.position = new Vector3( 0, 0, -4 );
 				m_cameraTransform.rotation = Quaternion.identity;
 			}
@@ -154,8 +158,11 @@ namespace UnityEditor
 				m_previewRenderUtility.DrawMesh( m_previewMesh, Matrix4x4.identity, m_material, 0 );
 				m_cameraTransform.rotation = Quaternion.Euler( new Vector3( -m_mouseDelta.y, -m_mouseDelta.x, 0 ) );
 				m_cameraTransform.position = m_cameraTransform.forward * -8f;
+#if UNITY_2017_1_OR_NEWER
 				m_previewRenderUtility.camera.Render();
-
+#else
+				m_previewRenderUtility.m_Camera.Render();
+#endif
 				GUI.DrawTexture( r, resultRender, ScaleMode.StretchToFill, false );
 			}
 		}

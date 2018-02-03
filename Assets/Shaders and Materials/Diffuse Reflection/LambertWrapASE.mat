@@ -36,7 +36,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _NormalScale: 2
-    - __dirty: 0
+    - __dirty: 1
     m_Colors:
     - _BaseTint: {r: 0.74264705, g: 0.40337184, b: 0.2020437, a: 1}
     - _Color0: {r: 0.9191176, g: 0.5205312, b: 0.2840074, a: 1}

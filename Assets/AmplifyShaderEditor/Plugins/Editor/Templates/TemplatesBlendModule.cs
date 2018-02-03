@@ -38,8 +38,9 @@ namespace AmplifyShaderEditor
             new CommonBlendTypes("Additive",            AvailableBlendFactor.One,               AvailableBlendFactor.One ),
             new CommonBlendTypes("Soft Additive",       AvailableBlendFactor.OneMinusDstColor,  AvailableBlendFactor.One ),
             new CommonBlendTypes("Multiplicative",      AvailableBlendFactor.DstColor,          AvailableBlendFactor.Zero ),
-            new CommonBlendTypes("2x Multiplicative",   AvailableBlendFactor.DstColor,          AvailableBlendFactor.SrcColor )
-        };
+            new CommonBlendTypes("2x Multiplicative",   AvailableBlendFactor.DstColor,          AvailableBlendFactor.SrcColor ),
+			new CommonBlendTypes("Particle Additive",   AvailableBlendFactor.SrcAlpha,          AvailableBlendFactor.One )
+		};
 
         [SerializeField]
         private bool m_blendModeEnabled = false;

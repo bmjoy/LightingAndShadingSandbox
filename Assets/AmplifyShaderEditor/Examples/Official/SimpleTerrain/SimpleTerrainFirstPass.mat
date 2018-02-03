@@ -111,7 +111,7 @@ Material:
       second: 2.5
     - first:
         name: __dirty
-      second: 0
+      second: 1
     m_Colors:
     - first:
         name: _Color

@@ -98,7 +98,7 @@ namespace AmplifyShaderEditor
 		private List<PropertyDataCollector> m_instancedPropertiesList;
 		private List<PropertyDataCollector> m_uniformsList;
 		private List<PropertyDataCollector> m_includesList;
-		private List<PropertyDataCollector> m_tagsList;
+		//private List<PropertyDataCollector> m_tagsList;
 		private List<PropertyDataCollector> m_pragmasList;
 		private List<PropertyDataCollector> m_definesList;
 		private List<PropertyDataCollector> m_instructionsList;
@@ -119,7 +119,7 @@ namespace AmplifyShaderEditor
 		private Dictionary<string, PropertyDataCollector> m_instancedPropertiesDict;
 		private Dictionary<string, PropertyDataCollector> m_uniformsDict;
 		private Dictionary<string, PropertyDataCollector> m_includesDict;
-		private Dictionary<string, PropertyDataCollector> m_tagsDict;
+		//private Dictionary<string, PropertyDataCollector> m_tagsDict;
 		private Dictionary<string, PropertyDataCollector> m_pragmasDict;
 		private Dictionary<string, PropertyDataCollector> m_definesDict;
 		private Dictionary<string, int> m_virtualCoordinatesDict;
@@ -226,7 +226,7 @@ namespace AmplifyShaderEditor
 			m_instancedPropertiesList = new List<PropertyDataCollector>();
 			m_uniformsList = new List<PropertyDataCollector>();
 			m_includesList = new List<PropertyDataCollector>();
-			m_tagsList = new List<PropertyDataCollector>();
+			//m_tagsList = new List<PropertyDataCollector>();
 			m_pragmasList = new List<PropertyDataCollector>();
 			m_definesList = new List<PropertyDataCollector>();
 			m_instructionsList = new List<PropertyDataCollector>();
@@ -248,7 +248,7 @@ namespace AmplifyShaderEditor
 			m_instancedPropertiesDict = new Dictionary<string, PropertyDataCollector>();
 			m_uniformsDict = new Dictionary<string, PropertyDataCollector>();
 			m_includesDict = new Dictionary<string, PropertyDataCollector>();
-			m_tagsDict = new Dictionary<string, PropertyDataCollector>();
+			//m_tagsDict = new Dictionary<string, PropertyDataCollector>();
 			m_pragmasDict = new Dictionary<string, PropertyDataCollector>();
 			m_definesDict = new Dictionary<string, PropertyDataCollector>();
 			m_virtualCoordinatesDict = new Dictionary<string, int>();
@@ -708,18 +708,18 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public void AddToTags( int nodeId, string name, string value )
-		{
-			if( string.IsNullOrEmpty( name ) || string.IsNullOrEmpty( value ) )
-				return;
+		//public void AddToTags( int nodeId, string name, string value )
+		//{
+		//	if( string.IsNullOrEmpty( name ) || string.IsNullOrEmpty( value ) )
+		//		return;
 
-			if( !m_tagsDict.ContainsKey( name ) )
-			{
-				string finalResult = string.Format( "\"{0}\"=\"{1}\"", name, value );
-				m_tagsDict.Add( name, new PropertyDataCollector( nodeId, finalResult ) );
-				m_tagsList.Add( new PropertyDataCollector( nodeId, finalResult ) );
-			}
-		}
+		//	if( !m_tagsDict.ContainsKey( name ) )
+		//	{
+		//		string finalResult = string.Format( "\"{0}\"=\"{1}\"", name, value );
+		//		m_tagsDict.Add( name, new PropertyDataCollector( nodeId, finalResult ) );
+		//		m_tagsList.Add( new PropertyDataCollector( nodeId, finalResult ) );
+		//	}
+		//}
 
 		public void AddToPragmas( int nodeId, string value )
 		{
@@ -1039,7 +1039,7 @@ namespace AmplifyShaderEditor
 			if( !m_localFunctions.ContainsKey( header ) )
 			{
 				m_localFunctions.Add( header, body );
-				m_functionsList.Add( new PropertyDataCollector( -1, body ) );
+				m_functionsList.Add( new PropertyDataCollector( -1, body.Replace( "\t\t", string.Empty ) ) );
 				m_functions += "\n" + body + "\n";
 				m_dirtyFunctions = true;
 			}
@@ -1270,8 +1270,8 @@ namespace AmplifyShaderEditor
 			m_includesList.Clear();
 			m_includesList = null;
 
-			m_tagsList.Clear();
-			m_tagsList = null;
+			//m_tagsList.Clear();
+			//m_tagsList = null;
 
 			m_pragmasList.Clear();
 			m_pragmasList = null;
@@ -1327,8 +1327,8 @@ namespace AmplifyShaderEditor
 			m_includesDict.Clear();
 			m_includesDict = null;
 
-			m_tagsDict.Clear();
-			m_tagsDict = null;
+			//m_tagsDict.Clear();
+			//m_tagsDict = null;
 
 			m_pragmasDict.Clear();
 			m_pragmasDict = null;
@@ -1404,6 +1404,19 @@ namespace AmplifyShaderEditor
 		public string LocalVariables { get { return m_localVariables; } }
 		public string SpecialLocalVariables { get { return m_specialLocalVariables; } }
 		public string VertexLocalVariables { get { return m_vertexLocalVariables; } }
+		public string VertexLocalVariablesFromList
+		{
+			get
+			{
+				string result = string.Empty;
+				int count = m_vertexLocalVariablesList.Count;
+				for( int i = 0; i < count; i++ )
+				{
+					result += m_vertexLocalVariablesList[ i ].PropertyName + "\n";
+				}
+				return result;
+			}
+		}
 		public string VertexData { get { return m_vertexData; } }
 		public string CustomOutput { get { return m_customOutput; } }
 		public string Functions { get { return m_functions; } }
@@ -1590,7 +1603,7 @@ namespace AmplifyShaderEditor
 		public List<PropertyDataCollector> InstancedPropertiesList { get { return m_instancedPropertiesList; } }
 		public List<PropertyDataCollector> UniformsList { get { return m_uniformsList; } }
 		public List<PropertyDataCollector> IncludesList { get { return m_includesList; } }
-		public List<PropertyDataCollector> TagsList { get { return m_tagsList; } }
+		//public List<PropertyDataCollector> TagsList { get { return m_tagsList; } }
 		public List<PropertyDataCollector> PragmasList { get { return m_pragmasList; } }
 		public List<PropertyDataCollector> DefinesList { get { return m_definesList; } }
 		public List<PropertyDataCollector> InstructionsList { get { return m_instructionsList; } }

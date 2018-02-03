@@ -1,4 +1,4 @@
-Shader /*ase_name*/"Sprites Default"/*end*/
+Shader /*ase_name*/"ASETemplateShaders/Sprites Default"/*end*/
 {
 	Properties
 	{
@@ -18,7 +18,6 @@ Shader /*ase_name*/"Sprites Default"/*end*/
 			"RenderType"="Transparent" 
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
-			/*ase_tags*/
 		}
 
 		Cull Off
@@ -32,7 +31,7 @@ Shader /*ase_name*/"Sprites Default"/*end*/
 		CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma target 2.0
+			#pragma target 3.0
 			#pragma multi_compile _ PIXELSNAP_ON
 			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 			#include "UnityCG.cginc"

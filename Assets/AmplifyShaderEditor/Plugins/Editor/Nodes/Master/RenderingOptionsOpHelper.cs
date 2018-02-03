@@ -68,6 +68,11 @@ namespace AmplifyShaderEditor
 			m_codeGenerationDataList.Add( new CodeGenerationData( " Add Pass", "noforwardadd" ) );
 		}
 
+		public bool IsOptionActive(string option)
+		{
+			return !m_codeGenerationDataList.Find( x => x.Name.Equals(option) ).IsActive;
+		}
+
 		public void Draw( ParentNode owner )
 		{
 			bool value = EditorVariablesManager.ExpandedRenderingOptions.Value;

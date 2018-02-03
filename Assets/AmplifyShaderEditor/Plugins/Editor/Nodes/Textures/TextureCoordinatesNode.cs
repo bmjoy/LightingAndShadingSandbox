@@ -223,11 +223,17 @@ namespace AmplifyShaderEditor
 			m_sizeIsDirty = true;
 		}
 
-		public override void Draw( DrawInfo drawInfo )
+		public override void OnNodeLogicUpdate( DrawInfo drawInfo )
 		{
-			base.Draw( drawInfo );
+			base.OnNodeLogicUpdate( drawInfo );
 			CheckReference();
 		}
+
+		//public override void Draw( DrawInfo drawInfo )
+		//{
+		//	base.Draw( drawInfo );
+		//	//CheckReference();
+		//}
 
 		void CheckReference()
 		{

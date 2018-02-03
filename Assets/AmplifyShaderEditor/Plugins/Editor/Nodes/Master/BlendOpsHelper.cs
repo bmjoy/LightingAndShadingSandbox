@@ -84,11 +84,12 @@ namespace AmplifyShaderEditor
 		private List<CommonBlendTypes> m_commonBlendTypes = new List<CommonBlendTypes> {    new CommonBlendTypes("<OFF>",               AvailableBlendFactor.Zero,              AvailableBlendFactor.Zero ),
 																							new CommonBlendTypes("Custom",              AvailableBlendFactor.Zero,              AvailableBlendFactor.Zero ) ,
 																							new CommonBlendTypes("Alpha Blend",         AvailableBlendFactor.SrcAlpha,          AvailableBlendFactor.OneMinusSrcAlpha ) ,
-																							new CommonBlendTypes("Premultiplied",      AvailableBlendFactor.One,               AvailableBlendFactor.OneMinusSrcAlpha ),
+																							new CommonBlendTypes("Premultiplied",       AvailableBlendFactor.One,               AvailableBlendFactor.OneMinusSrcAlpha ),
 																							new CommonBlendTypes("Additive",            AvailableBlendFactor.One,               AvailableBlendFactor.One ),
 																							new CommonBlendTypes("Soft Additive",       AvailableBlendFactor.OneMinusDstColor,  AvailableBlendFactor.One ),
 																							new CommonBlendTypes("Multiplicative",      AvailableBlendFactor.DstColor,          AvailableBlendFactor.Zero ),
-																							new CommonBlendTypes("2x Multiplicative",   AvailableBlendFactor.DstColor,          AvailableBlendFactor.SrcColor ) };
+																							new CommonBlendTypes("2x Multiplicative",   AvailableBlendFactor.DstColor,          AvailableBlendFactor.SrcColor ),
+																							new CommonBlendTypes("Particle Additive",   AvailableBlendFactor.SrcAlpha,          AvailableBlendFactor.One ),};
 
 		[SerializeField]
 		private bool m_enabled = false;
