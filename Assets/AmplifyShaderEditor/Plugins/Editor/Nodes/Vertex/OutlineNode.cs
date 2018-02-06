@@ -203,6 +203,8 @@ namespace AmplifyShaderEditor
 
 			m_outputPorts[ 0 ].SetLocalValue( "0" );
 
+			StandardSurfaceOutputNode masterNode = m_containerGraph.CurrentMasterNode as StandardSurfaceOutputNode;
+
 			MasterNodeDataCollector outlineDataCollector = new MasterNodeDataCollector();
 			outlineDataCollector.IsOutlineDataCollector = true;
 			InputPort colorPort = GetInputPortByUniqueId( 0 );
@@ -238,7 +240,6 @@ namespace AmplifyShaderEditor
 				if( m_currentAlphaMode == OutlineAlphaModes.Masked )
 				{
 					float maskClipValue = 0.5f;
-					StandardSurfaceOutputNode masterNode = ( m_containerGraph.CurrentMasterNode as StandardSurfaceOutputNode );
 
 					if( masterNode != null )
 						maskClipValue = masterNode.OpacityMaskClipValue;
@@ -257,10 +258,19 @@ namespace AmplifyShaderEditor
 			if( dataCollector.UsingWorldNormal )
 				outlineDataCollector.AddInstructions( ( addTabs ? "\n\t\t\t" : "" ) + "o.Normal = float3(0,0,-1);" );
 
+			if( masterNode != null )
+			{
+				masterNode.AdditionalIncludes.AddToDataCollector( ref outlineDataCollector );
+				masterNode.AdditionalPragmas.AddToDataCollector( ref outlineDataCollector );
+				masterNode.AdditionalDefines.AddToDataCollector( ref outlineDataCollector );
+			}
+
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.InputList = outlineDataCollector.InputList;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Inputs = outlineDataCollector.Inputs;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.DirtyInput = outlineDataCollector.DirtyInputs;
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.Includes = outlineDataCollector.Includes;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Pragmas = outlineDataCollector.Pragmas;
+			ContainerGraph.CurrentStandardSurface.OutlineHelper.Defines = outlineDataCollector.Defines;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.Uniforms = outlineDataCollector.Uniforms;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.UniformList = outlineDataCollector.UniformsList;
 			ContainerGraph.CurrentStandardSurface.OutlineHelper.VertexData = outlineDataCollector.VertexData;

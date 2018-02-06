@@ -60,7 +60,8 @@ namespace AmplifyShaderEditor
 		TreeTransparentCutout,
 		TreeBillboard,
 		Grass,
-		GrassBillboard
+		GrassBillboard,
+		Custom
 	}
 
 	public enum RenderQueue
@@ -216,6 +217,7 @@ namespace AmplifyShaderEditor
 		private const string DebugStr = "Debug";
 		private const string SpecularStr = "Specular";
 		private const string GlossStr = "Gloss";
+		private const string CustomRenderTypeStr = "Custom Type";
 		private readonly static GUIContent AlphaModeContent = new GUIContent( " Blend Mode", "Defines how the surface blends with the background\nDefault: Opaque" );
 		private const string OpacityMaskClipValueStr = "Mask Clip Value";
 		private readonly static GUIContent OpacityMaskClipValueContent = new GUIContent( "Mask Clip Value", "Default clip value to be compared with opacity alpha ( 0 = fully Opaque, 1 = fully Masked )\nDefault: 0.5" );
@@ -292,6 +294,9 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private RenderType m_renderType = RenderType.Opaque;
+
+		[SerializeField]
+		private string m_customRenderType = string.Empty;
 
 		[SerializeField]
 		private RenderQueue m_renderQueue = RenderQueue.Geometry;
@@ -828,7 +833,17 @@ namespace AmplifyShaderEditor
 					EditorGUILayout.Separator();
 					EditorGUI.BeginChangeCheck();
 
+
 					m_renderType = (RenderType)EditorGUILayoutEnumPopup( RenderTypeContent, m_renderType );
+					if( m_renderType == RenderType.Custom )
+					{
+						EditorGUI.BeginChangeCheck();
+						m_customRenderType = EditorGUILayoutTextField( CustomRenderTypeStr, m_customRenderType );
+						if( EditorGUI.EndChangeCheck() )
+						{
+							m_customRenderType = UIUtils.RemoveInvalidCharacters( m_customRenderType );
+						}
+					}
 
 					m_renderQueue = (RenderQueue)EditorGUILayoutEnumPopup( RenderQueueContent, m_renderQueue );
 
@@ -1291,7 +1306,8 @@ namespace AmplifyShaderEditor
 			//this.PropagateNodeData( nodeData );
 
 			string tags = "\"RenderType\" = \"{0}\"  \"Queue\" = \"{1}\"";
-			tags = string.Format( tags, m_renderType, ( m_renderQueue + ( ( m_queueOrder >= 0 ) ? "+" : string.Empty ) + m_queueOrder ) );
+			string finalRenderType = ( m_renderType == RenderType.Custom && m_customRenderType.Length > 0 ) ? m_customRenderType : m_renderType.ToString();
+			tags = string.Format( tags, finalRenderType, ( m_renderQueue + ( ( m_queueOrder >= 0 ) ? "+" : string.Empty ) + m_queueOrder ) );
 			//if ( !m_customBlendMode )
 			{
 				if( m_alphaMode == AlphaMode.Transparent || m_alphaMode == AlphaMode.Premultiply )
@@ -1924,7 +1940,7 @@ namespace AmplifyShaderEditor
 							OptionalParameters += "noshadow" + Constants.OptionalParametersSep;
 						}
 
-						if( m_renderingOptionsOpHelper.IsOptionActive( " Add Pass" ) )
+						if( m_renderingOptionsOpHelper.IsOptionActive( " Add Pass" ) && usingDebugPort)
 						{
 							OptionalParameters += "noforwardadd" + Constants.OptionalParametersSep;
 						}
@@ -2761,6 +2777,10 @@ namespace AmplifyShaderEditor
 				{
 					m_customBlendMode = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 					m_renderType = (RenderType)Enum.Parse( typeof( RenderType ), GetCurrentParam( ref nodeParams ) );
+					if( UIUtils.CurrentShaderVersion() > 14305 )
+					{
+						m_customRenderType = GetCurrentParam( ref nodeParams );
+					}
 					m_renderQueue = (RenderQueue)Enum.Parse( typeof( RenderQueue ), GetCurrentParam( ref nodeParams ) );
 				}
 				if( UIUtils.CurrentShaderVersion() > 2402 )
@@ -2904,6 +2924,7 @@ namespace AmplifyShaderEditor
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_queueOrder );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_customBlendMode );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_renderType );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_customRenderType );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_renderQueue );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_renderPath );
 			m_renderingPlatformOpHelper.WriteToString( ref nodeInfo );

@@ -47,10 +47,14 @@ namespace AmplifyShaderEditor
 			m_textLabelWidth = 85;
 			m_variableName += UIUtils.LocalVarNodeAmount();
 			m_oldName = m_variableName;
-			//m_autoWrapProperties = true;
-			UIUtils.RegisterLocalVarNode( this );
 			UpdateTitle();
 			m_previewShaderGUID = "5aaa1d3ea9e1fa64781647e035a82334";
+		}
+
+		protected override void OnUniqueIDAssigned()
+		{
+			base.OnUniqueIDAssigned();
+			UIUtils.RegisterLocalVarNode( this );
 		}
 
 		public override void OnInputPortConnected( int portId, int otherNodeId, int otherPortId, bool activateNode = true )
@@ -279,6 +283,8 @@ namespace AmplifyShaderEditor
 			}
 			m_registeredGetLocalVars.Clear();
 			m_registeredGetLocalVars = null;
+
+			UIUtils.UnregisterLocalVarNode( this );
 		}
 
 		public override void ActivateNode( int signalGenNodeId, int signalGenPortId, Type signalGenNodeType )

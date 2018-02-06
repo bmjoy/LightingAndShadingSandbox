@@ -649,6 +649,8 @@ namespace AmplifyShaderEditor
 				return "0";
 			}
 
+			m_code = m_code.Replace( "\r\n", "\n" );
+
 			bool codeContainsReturn = m_code.Contains( ReturnHelper );
 			if( !codeContainsReturn && outputId != 0 && !m_callMode )
 			{

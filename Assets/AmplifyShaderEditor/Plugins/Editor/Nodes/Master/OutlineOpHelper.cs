@@ -132,6 +132,7 @@ namespace AmplifyShaderEditor
 		private string m_functions = string.Empty;
 		private string m_includes = string.Empty;
 		private string m_pragmas = string.Empty;
+		private string m_defines = string.Empty;
 		private string m_vertexData = string.Empty;
 		private Dictionary<string, string> m_localFunctions;
 
@@ -263,14 +264,24 @@ namespace AmplifyShaderEditor
 			}
 		}
 
+		void AddMultibodyString( string body , List<string> list )
+		{
+			body = body.Replace( "\t\t", string.Empty );
+			string[] strArr = body.Split( '\n' );
+			for( int i = 0; i < strArr.Length; i++ )
+			{
+				list.Add( strArr[ i ] );
+			}
+
+		}
 		public string[] OutlineFunctionBody( ref MasterNodeDataCollector dataCollector, bool instanced, bool isShadowCaster, string shaderName, string[] billboardInfo, ref TessellationOpHelper tessOpHelper, string target )
 		{
 			List<string> body = new List<string>();
 			body.Add( ModeTags[ dataCollector.CustomOutlineSelectedAlpha ] );
 			if( m_zWriteMode != 0 )
-				body.Add( "ZWrite "+ ZBufferOpHelper.ZWriteModeValues[ m_zWriteMode ] );
+				body.Add( "ZWrite " + ZBufferOpHelper.ZWriteModeValues[ m_zWriteMode ] );
 			if( m_zTestMode != 0 )
-				body.Add( "ZTest "+ ZBufferOpHelper.ZTestModeValues[ m_zTestMode ] );
+				body.Add( "ZTest " + ZBufferOpHelper.ZTestModeValues[ m_zTestMode ] );
 			for( int i = 0; i < OutlineBodyBegin.Length; i++ )
 			{
 				body.Add( OutlineBodyBegin[ i ] );
@@ -299,6 +310,12 @@ namespace AmplifyShaderEditor
 				tessOpHelper.WriteToOptionalParams( ref surfConfig );
 
 			body.Add( surfConfig );
+			if( !isShadowCaster )
+			{
+				AddMultibodyString( m_defines, body );
+				AddMultibodyString( m_includes, body );
+				AddMultibodyString( m_pragmas, body );
+			}
 
 			if( instanced )
 			{
@@ -390,7 +407,7 @@ namespace AmplifyShaderEditor
 					body.Add( OutlineDefaultUniformWidth );
 
 				//Functions
-				if( customOutline && !isShadowCaster)
+				if( customOutline && !isShadowCaster )
 					body.Add( Functions );
 
 				if( tessOpHelper.EnableTesselation && !isShadowCaster )
@@ -477,6 +494,7 @@ namespace AmplifyShaderEditor
 		public string Functions { get { return m_functions; } set { m_functions = value; } }
 		public string Includes { get { return m_includes; } set { m_includes = value; } }
 		public string Pragmas { get { return m_pragmas; } set { m_pragmas = value; } }
+		public string Defines { get { return m_defines; } set { m_defines = value; } }
 		public string VertexData { get { return m_vertexData; } set { m_vertexData = value; } }
 		public List<PropertyDataCollector> InputList { get { return m_inputList; } set { m_inputList = value; } }
 		public List<PropertyDataCollector> UniformList { get { return m_uniformList; } set { m_uniformList = value; } }

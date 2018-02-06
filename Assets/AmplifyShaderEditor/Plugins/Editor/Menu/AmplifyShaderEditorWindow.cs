@@ -115,6 +115,7 @@ namespace AmplifyShaderEditor
 
 		private bool m_ctrlSCallback = false;
 
+		private bool m_altBoxSelection = false;
 		private bool m_altDragStarted = false;
 		private bool m_altPressDown = false;
 		private bool m_altAvailable = true;
@@ -1637,11 +1638,17 @@ namespace AmplifyShaderEditor
 			Focus();
 			m_mouseDownOnValidArea = true;
 			m_lmbPressed = true;
+			if( m_currentEvent.alt )
+			{
+				m_altBoxSelection = true;
+			}
+
 			UIUtils.ShowContextOnPick = true;
 			ParentNode node = ( m_mainGraphInstance.NodeClicked < 0 ) ? m_mainGraphInstance.CheckNodeAt( m_currentMousePos ) : m_mainGraphInstance.GetClickedNode();
 			if( node != null )
 			{
 				m_mainGraphInstance.NodeClicked = node.UniqueId;
+				m_altBoxSelection = false;
 
 				if( m_contextMenu.CheckShortcutKey() )
 				{
@@ -1697,23 +1704,6 @@ namespace AmplifyShaderEditor
 						if( node.InputPorts.Count > 0 && node.OutputPorts.Count > 0 && node.InputPorts[ 0 ].IsConnected && node.OutputPorts[ 0 ].IsConnected )
 						{
 							m_altDragStarted = true;
-
-							//OutputPort outputPort = node.InputPorts[ 0 ].GetOutputConnection( 0 );
-							//List<InputPort> inputPorts = new List<InputPort>();
-							//for ( int i = 0; i < node.OutputPorts[ 0 ].ConnectionCount; i++ )
-							//{
-							//	inputPorts.Add(node.OutputPorts[ 0 ].GetInputConnection( i ));
-							//}
-
-							//for ( int i = 0; i < inputPorts.Count; i++ )
-							//{
-							//	m_mainGraphInstance.CreateConnection( inputPorts[i].NodeId, inputPorts[i].PortId, outputPort.NodeId, outputPort.PortId );
-							//}
-
-							//UIUtils.DeleteConnection( true, node.UniqueId, node.InputPorts[0].PortId, false, true );
-
-							//SetSaveIsDirty();
-							//ForceRepaint();
 						}
 					}
 
@@ -1794,7 +1784,7 @@ namespace AmplifyShaderEditor
 				}
 			}
 
-			if( m_currentEvent.modifiers != EventModifiers.Shift && m_currentEvent.modifiers != EventModifiers.Control )
+			if( m_currentEvent.modifiers != EventModifiers.Shift && m_currentEvent.modifiers != EventModifiers.Control && !m_altBoxSelection )
 				m_mainGraphInstance.DeSelectAll();
 
 			if( m_wireReferenceUtils.ValidReferences() )
@@ -1803,7 +1793,7 @@ namespace AmplifyShaderEditor
 				return;
 			}
 
-			if( !m_contextMenu.CheckShortcutKey() && m_currentEvent.modifiers != EventModifiers.Shift && m_currentEvent.modifiers != EventModifiers.Control )
+			if( !m_contextMenu.CheckShortcutKey() && m_currentEvent.modifiers != EventModifiers.Shift && m_currentEvent.modifiers != EventModifiers.Control || m_altBoxSelection )
 			{
 				// Only activate multiple selection if no node is selected and shift key not pressed
 				m_multipleSelectionActive = true;
@@ -1828,7 +1818,7 @@ namespace AmplifyShaderEditor
 			{
 				m_altDragStarted = false;
 
-				if( m_currentEvent.alt && CurrentGraph.SelectedNodes.Count == 1 )
+				if( m_currentEvent.modifiers == EventModifiers.Alt && CurrentGraph.SelectedNodes.Count == 1 )
 				{
 					ParentNode node = CurrentGraph.SelectedNodes[ 0 ];
 					int lastId = 0;
@@ -1875,11 +1865,11 @@ namespace AmplifyShaderEditor
 				}
 			}
 
-			if( !m_wireReferenceUtils.ValidReferences() )
+			if( !m_wireReferenceUtils.ValidReferences() && !m_altBoxSelection)
 			{
 				if( m_mouseDownOnValidArea && m_insideEditorWindow )
 				{
-					if( m_currentEvent.control && m_currentEvent.shift )
+					if( m_currentEvent.control )
 					{
 						m_mainGraphInstance.MoveSelectedNodes( m_cameraZoom * m_currentEvent.delta, true );
 					}
@@ -1991,9 +1981,18 @@ namespace AmplifyShaderEditor
 			m_lmbPressed = false;
 			if( m_multipleSelectionActive )
 			{
-				m_multipleSelectionActive = false;
+				//m_multipleSelectionActive = false;
 				UpdateSelectionArea();
-				m_mainGraphInstance.MultipleSelection( m_multipleSelectionArea, ( m_currentEvent.modifiers == EventModifiers.Shift || m_currentEvent.modifiers == EventModifiers.Control ), true );
+				//m_mainGraphInstance.MultipleSelection( m_multipleSelectionArea, ( m_currentEvent.modifiers == EventModifiers.Shift || m_currentEvent.modifiers == EventModifiers.Control ), true );
+				if( m_currentEvent.alt && m_altBoxSelection )
+				{
+					m_mainGraphInstance.MultipleSelection( m_multipleSelectionArea, !m_currentEvent.shift );
+				}
+				else
+				{
+					m_mainGraphInstance.DeSelectAll();
+					m_mainGraphInstance.MultipleSelection( m_multipleSelectionArea );
+				}
 			}
 
 			if( m_wireReferenceUtils.ValidReferences() )
@@ -2179,7 +2178,7 @@ namespace AmplifyShaderEditor
 						m_wireReferenceUtils.InvalidateReferences();
 				}
 			}
-			else if( m_currentEvent.alt && m_altAvailable && CurrentGraph.SelectedNodes.Count == 1 )
+			else if( m_currentEvent.modifiers == EventModifiers.Alt && m_altAvailable && CurrentGraph.SelectedNodes.Count == 1 && !m_altBoxSelection && !m_multipleSelectionActive )
 			{
 				List<WireBezierReference> wireRefs = m_mainGraphInstance.GetWireBezierListInPos( m_currentMousePos2D );
 				if( wireRefs != null && wireRefs.Count > 0 )
@@ -2253,6 +2252,8 @@ namespace AmplifyShaderEditor
 				}
 			}
 			UIUtils.ShowContextOnPick = true;
+			m_altBoxSelection = false;
+			m_multipleSelectionActive = false;
 			UseCurrentEvent();
 		}
 
@@ -4291,7 +4292,7 @@ namespace AmplifyShaderEditor
 					}
 				}
 				m_cameraOffset += autoPanDir;
-				if( !m_wireReferenceUtils.ValidReferences() && m_insideEditorWindow )
+				if( !m_wireReferenceUtils.ValidReferences() && m_insideEditorWindow && !m_altBoxSelection )
 				{
 					m_mainGraphInstance.MoveSelectedNodes( -autoPanDir );
 				}

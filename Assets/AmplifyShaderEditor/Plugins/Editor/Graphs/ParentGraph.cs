@@ -26,10 +26,6 @@ namespace AmplifyShaderEditor
 		private GUIStyle nodeStyleOn;
 		private GUIStyle nodeTitle;
 		private GUIStyle commentaryBackground;
-		//private GUIStyle m_overlayThumbnail;
-
-		//[SerializeField]
-		//private AmplifyShaderFunction m_currentShaderFunction = null;
 
 		public delegate void EmptyGraphDetected( ParentGraph graph );
 		public event EmptyGraphDetected OnEmptyGraphDetectedEvt;
@@ -140,7 +136,6 @@ namespace AmplifyShaderEditor
 		private bool m_checkSelectedWireHighlights = false;
 
 		//private Rect m_auxRect = new Rect();
-
 		//private GUIStyle m_titleOverlay;
 		//private GUIStyle m_buttonOverlay;
 		//int m_tittleOverlayIndex = -1;
@@ -190,7 +185,6 @@ namespace AmplifyShaderEditor
 			nodeStyleOn = UIUtils.GetCustomStyle( CustomStyle.NodeWindowOn );
 			nodeTitle = UIUtils.GetCustomStyle( CustomStyle.NodeHeader );
 			commentaryBackground = UIUtils.GetCustomStyle( CustomStyle.CommentaryBackground );
-			//m_overlayThumbnail = GUI.skin.FindStyle( "ObjectFieldThumbOverlay2" );
 		}
 
 		public void UpdateRegisters()
@@ -2029,29 +2023,71 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public void MultipleSelection( Rect selectionArea, bool append, bool reorder )
-		{
-			if( !append )
-				DeSelectAll();
+		//public void MultipleSelection( Rect selectionArea, bool append, bool reorder )
+		//{
+		//	if( !append )
+		//		DeSelectAll();
 
-			for( int i = 0; i < m_nodes.Count; i++ )
+		//	for( int i = 0; i < m_nodes.Count; i++ )
+		//	{
+		//		if( !m_nodes[ i ].Selected && selectionArea.Overlaps( m_nodes[ i ].Position, true ) )
+		//		//if ( !m_nodes[ i ].Selected && selectionArea.Includes( m_nodes[ i ].Position ) )
+		//		{
+		//			m_nodes[ i ].Selected = true;
+		//			AddToSelectedNodes( m_nodes[ i ] );
+		//		}
+		//	}
+		//	if( reorder )
+		//	{
+		//		for( int i = 0; i < m_selectedNodes.Count; i++ )
+		//		{
+		//			if( !m_selectedNodes[ i ].ReorderLocked )
+		//			{
+		//				m_nodes.Remove( m_selectedNodes[ i ] );
+		//				m_nodes.Add( m_selectedNodes[ i ] );
+		//				m_markToReOrder = true;
+		//			}
+		//		}
+		//	}
+		//}
+
+		public void MultipleSelection( Rect selectionArea, bool appendSelection = true )
+		{
+			if( !appendSelection )
 			{
-				if( !m_nodes[ i ].Selected && selectionArea.Overlaps( m_nodes[ i ].Position, true ) )
-				//if ( !m_nodes[ i ].Selected && selectionArea.Includes( m_nodes[ i ].Position ) )
+				for( int i = 0; i < m_nodes.Count; i++ )
 				{
-					m_nodes[ i ].Selected = true;
-					AddToSelectedNodes( m_nodes[ i ] );
+					if( selectionArea.Overlaps( m_nodes[ i ].Position, true ) )
+					{
+						RemoveFromSelectedNodes( m_nodes[ i ] );
+					}
+				}
+
+				m_markedToDeSelect = false;
+				ResetHighlightedWires();
+			}
+			else
+			{
+				for( int i = 0; i < m_nodes.Count; i++ )
+				{
+					if( !m_nodes[ i ].Selected && selectionArea.Overlaps( m_nodes[ i ].Position, true ) )
+					{
+						AddToSelectedNodes( m_nodes[ i ] );
+					}
 				}
 			}
-			if( reorder )
+
+			// reorder nodes and highlight them
+			for( int i = 0; i < m_selectedNodes.Count; i++ )
 			{
-				for( int i = 0; i < m_selectedNodes.Count; i++ )
+				if( !m_selectedNodes[ i ].ReorderLocked )
 				{
-					if( !m_selectedNodes[ i ].ReorderLocked )
+					m_nodes.Remove( m_selectedNodes[ i ] );
+					m_nodes.Add( m_selectedNodes[ i ] );
+					m_markToReOrder = true;
+					if( m_selectedNodes[ i ].ConnStatus == NodeConnectionStatus.Connected )
 					{
-						m_nodes.Remove( m_selectedNodes[ i ] );
-						m_nodes.Add( m_selectedNodes[ i ] );
-						m_markToReOrder = true;
+						HighlightWiresStartingNode( m_selectedNodes[ i ] );
 					}
 				}
 			}

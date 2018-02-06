@@ -4,7 +4,6 @@ using System.Collections;
 public class AtmosphereController : MonoBehaviour
 {
 	public GameObject m_sun;
-	//public Material m_groundMaterial;
 	public Material m_skyMaterial;
 
 	public float m_hdrExposure = 0.6f;
@@ -15,6 +14,7 @@ public class AtmosphereController : MonoBehaviour
 	private float m_g = -0.995f;			// The Mie phase asymmetry factor, must be between 0.999 to -0.999
 	public float bleed = 1f;
 	public float scatter_strength = 1f;
+
 	//Don't change these
 	private const float m_outerScaleFactor = 1.025f; // Difference between inner and outer radius. Must be 2.5%
 	private float m_innerRadius;		 	// Radius of the ground sphere
@@ -29,11 +29,10 @@ public class AtmosphereController : MonoBehaviour
 
 		// Get the radius of the sphere. This presumes that the sphere mesh is a unit sphere (radius of 1)
 		// that has been scaled uniformly on the x, y and z axis
-		float radius = transform.localScale.x;
-		m_innerRadius = radius;
+		m_innerRadius = transform.localScale.x;
 
-		//The outer sphere must be 2.5% larger that the inner sphere
-		m_outerRadius = m_outerScaleFactor * radius;
+		// The outer sphere must be 2.5% larger that the inner sphere
+		m_outerRadius = m_outerScaleFactor * m_innerRadius;
 
 		m_scale = 1.0f / (m_outerRadius - m_innerRadius);
 		InitMaterial(m_skyMaterial);
@@ -47,7 +46,6 @@ public class AtmosphereController : MonoBehaviour
 	void InitMaterial(Material mat)
 	{
 		Vector3 invWaveLength4 = new Vector3(1.0f / Mathf.Pow(m_atmoColor.x, 4.0f), 1.0f / Mathf.Pow(m_atmoColor.y, 4.0f), 1.0f / Mathf.Pow(m_atmoColor.z, 4.0f));
-		//float scale = 1.0f / (m_outerRadius - m_innerRadius);
 
 		mat.SetVector("v3LightPos", m_sun.transform.forward*-1.0f);
 		mat.SetVector("v3InvWavelength", invWaveLength4);
@@ -71,8 +69,3 @@ public class AtmosphereController : MonoBehaviour
 		mat.SetVector("v3Translate", transform.localPosition);
 	}
 }
-
-
-
-
-

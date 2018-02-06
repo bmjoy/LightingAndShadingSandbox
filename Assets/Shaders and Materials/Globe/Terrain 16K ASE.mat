@@ -132,7 +132,7 @@ Material:
     - _NightLightBlue: 0.35
     - _NightLightGreen: 0.835
     - _NightLightRed: 1
-    - _NightLightsIntensity: 0.8
+    - _NightLightsIntensity: 0.95
     - _NightLightsSoftness: 0.3
     - _NormalScale: 1
     - _Shininess: 0.15

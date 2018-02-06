@@ -1,4 +1,17 @@
 Release Notes:
+v1.4.4 dev 01:
+* Improvements:
+    * Custom Pragmas, Includes and Defines are now also included on the Outline pass
+    * Automatically removing crlf from copy-pasted code over the 'Custom Expression' node
+    * Custom Render Type can now be specified on the Render Type dropdown over the Output node properties
+
+* Fixes:
+    * Fixed issues on 'Remainder' node
+
+v1.4.3 dev 05:
+* Fixes:
+    * Fixed issue on excluding Add Pass independently of Debug port connection
+
 v1.4.3 dev 04:
 * New Shader Function:
     * Radial UV Distortion
@@ -13,7 +26,7 @@ v1.4.3 dev 04:
 v1.4.3 dev 03:
 * Fixes:
     * Fixed issue on 'Vertex Tangent' node internally outputting float4 data in templates instead of float3
-    * Fixed Shader Function category typos
+    * Fixed shader function category typos
     * Fixed issue on ports accessing already destroyed nodes for previews
     * Fixed issue on precision type used in shader functions
 
