@@ -23,7 +23,23 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DispTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: dac132cf329edcd47aff14d54b8c1d61, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LSD0:
+        m_Texture: {fileID: 2800000, guid: bf5d46b668c52fc41974332823733e87, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LSD1:
+        m_Texture: {fileID: 2800000, guid: 1e30a81e8db4e0b4cbfd82f62bfa0124, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LSD2:
+        m_Texture: {fileID: 2800000, guid: 5bfe2db2bb58ccf44972e1706b5f8d12, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LSD3:
+        m_Texture: {fileID: 2800000, guid: 7b37853d92a4e734babeede00804bb33, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -90,15 +106,31 @@ Material:
         m_Texture: {fileID: 2800000, guid: 05f355c72668ac3478b983e3887d3f6e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SpecMap0:
+        m_Texture: {fileID: 2800000, guid: 74632a8fe6b741d418f65aab8ebc19a3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecMap1:
+        m_Texture: {fileID: 2800000, guid: dd798119f1cd5924cac4b9b55a57a471, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecMap2:
+        m_Texture: {fileID: 2800000, guid: 92b9d7a1b79d9a040ba49fdda6c3c78a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecMap3:
+        m_Texture: {fileID: 2800000, guid: 9bc2167feb84ecd47bda9b804c097545, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _texcoord:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AtmosphereFalloff: 0.66
-    - _DisplacementScale: 1
+    - _DisplacementScale: 0.002
     - _NightLightBlue: 0.35
-    - _NightLightGreen: 0.75
+    - _NightLightGreen: 0.835
     - _NightLightRed: 1
     - _NightLightsIntensity: 0.8
     - _NightLightsSoftness: 0.3
