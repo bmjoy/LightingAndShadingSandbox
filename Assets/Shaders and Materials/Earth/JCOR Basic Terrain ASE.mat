@@ -56,7 +56,7 @@ Material:
     - _TessMin: 1
     - _TessPhongStrength: 0.5
     - _TessValue: 15
-    - __dirty: 0
+    - __dirty: 1
     m_Colors:
     - _AtmosphereFar: {r: 0.359, g: 0.7974198, b: 1, a: 1}
     - _AtmosphereNear: {r: 0.7426471, g: 0.5287186, b: 0.4017721, a: 1}
