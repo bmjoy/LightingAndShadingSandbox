@@ -30,7 +30,7 @@ namespace AmplifyShaderEditor
 			if( dataCollector.IsTemplate )
 			{
 				//Template must have its Light Mode correctly configured on tags to work as intended
-				return GetOutputVectorItem( 0, outputId, dataCollector.TemplateDataCollectorInstance.GetObjectSpaceLightDir() );
+				return GetOutputVectorItem( 0, outputId, dataCollector.TemplateDataCollectorInstance.GetObjectSpaceLightDir( m_currentPrecisionType ) );
 			}
 
 			dataCollector.AddToIncludes( UniqueId, Constants.UnityCgLibFuncs );

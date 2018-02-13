@@ -19,7 +19,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseRGB:
-        m_Texture: {fileID: 2800000, guid: 6b2910686f14f5844bf4707db2d5e2ba, type: 3}
+        m_Texture: {fileID: 2800000, guid: 20a95d4641506bf4f9bac474dd5fd3fc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture0:
@@ -46,7 +46,7 @@ Material:
     - _UOffset: -1
     - _USlide: -0.5
     - _UTile: 4
-    - _UVRotation: 0
+    - _UVRotation: -4
     - _UVRotationPiRad: 0
     - _UVRotationRadians: 0.5
     - _UseMask: 1

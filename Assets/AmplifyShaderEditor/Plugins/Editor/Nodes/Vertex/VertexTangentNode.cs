@@ -31,7 +31,7 @@ namespace AmplifyShaderEditor
 		{
 			if ( dataCollector.IsTemplate )
 			{
-				return GetOutputVectorItem( 0, outputId, dataCollector.TemplateDataCollectorInstance.GetWorldTangent() );
+				return GetOutputVectorItem( 0, outputId, dataCollector.TemplateDataCollectorInstance.GetWorldTangent( m_currentPrecisionType ) );
 			}
 
 			if( dataCollector.PortCategory == MasterNodePortCategory.Fragment || dataCollector.PortCategory == MasterNodePortCategory.Debug )

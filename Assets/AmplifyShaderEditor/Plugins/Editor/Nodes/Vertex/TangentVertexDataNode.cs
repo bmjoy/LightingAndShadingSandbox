@@ -28,7 +28,7 @@ namespace AmplifyShaderEditor
 			string vertexTangent = string.Empty;
 			if ( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )
 			{
-				vertexTangent = dataCollector.TemplateDataCollectorInstance.GetVertexTangent() + ".xyz";
+				vertexTangent = dataCollector.TemplateDataCollectorInstance.GetVertexTangent( m_currentPrecisionType ) + ".xyz";
 				return GetOutputVectorItem( 0, outputId, vertexTangent );
 			}
 

@@ -210,7 +210,7 @@ namespace AmplifyShaderEditor
 				
 				if ( dataCollector.IsTemplate )
 				{
-					viewDirTan = dataCollector.TemplateDataCollectorInstance.GetTangentViewDir();
+					viewDirTan = dataCollector.TemplateDataCollectorInstance.GetTangentViewDir( m_currentPrecisionType );
 				}
 				else
 				{
@@ -227,7 +227,7 @@ namespace AmplifyShaderEditor
 			string normalWorld = string.Empty;
 			if ( dataCollector.IsTemplate )
 			{
-				normalWorld = dataCollector.TemplateDataCollectorInstance.GetWorldNormal();
+				normalWorld = dataCollector.TemplateDataCollectorInstance.GetWorldNormal( m_currentPrecisionType );
 			}
 			else
 			{

@@ -63,17 +63,17 @@ namespace AmplifyShaderEditor
 						return GetOutputVectorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue );
 
 
-					string value = dataCollector.TemplateDataCollectorInstance.GetWorldNormal( m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector ) );
+					string value = dataCollector.TemplateDataCollectorInstance.GetWorldNormal( m_currentPrecisionType, m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector ) );
 					if( m_normalize )
 					{
 						value = string.Format( NormalizeFunc, value );
 					}
 					RegisterLocalVariable( 0, value, ref dataCollector, "worldNormal" + OutputId );
-					return GetOutputVectorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue);
+					return GetOutputVectorItem( 0, outputId, m_outputPorts[ 0 ].LocalValue );
 				}
 				else
 				{
-					string value = dataCollector.TemplateDataCollectorInstance.GetWorldNormal();
+					string value = dataCollector.TemplateDataCollectorInstance.GetWorldNormal( m_currentPrecisionType );
 					string name;
 					if( m_normalize )
 					{
@@ -113,7 +113,7 @@ namespace AmplifyShaderEditor
 
 					if( connCount > 1 )
 					{
-						dataCollector.AddToLocalVariables( UniqueId, string.Format( NormalVecDecStr, NormalVecValStr + OutputId, result ) );						
+						dataCollector.AddToLocalVariables( UniqueId, string.Format( NormalVecDecStr, NormalVecValStr + OutputId, result ) );
 						return GetOutputVectorItem( 0, outputId, NormalVecValStr + OutputId );
 					}
 				}
@@ -126,7 +126,7 @@ namespace AmplifyShaderEditor
 					else
 					{
 						dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
-						result = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId , m_normalize );
+						result = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId, m_normalize );
 						dataCollector.ForceNormal = true;
 					}
 				}
@@ -148,12 +148,12 @@ namespace AmplifyShaderEditor
 					{
 						result = string.Format( NormalizeFunc, result );
 					}
-					dataCollector.AddToVertexLocalVariables( UniqueId, "float3 modWorldNormal" + OutputId + " = " + result +";" );
+					dataCollector.AddToVertexLocalVariables( UniqueId, "float3 modWorldNormal" + OutputId + " = " + result + ";" );
 					return GetOutputVectorItem( 0, outputId, "modWorldNormal" + OutputId );
 				}
 				else
 				{
-					string result = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId , m_normalize );
+					string result = GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId, m_normalize );
 					return GetOutputVectorItem( 0, outputId, result );
 				}
 			}
@@ -167,7 +167,7 @@ namespace AmplifyShaderEditor
 				m_normalize = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 			}
 		}
-		
+
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
 		{
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );

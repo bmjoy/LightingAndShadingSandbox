@@ -147,6 +147,8 @@ namespace AmplifyShaderEditor
         public static bool Initialized = false; 
         public static readonly string TemplateShaderNameBeginTag = "/*ase_name*/";
 
+		//public static readonly string TemplateLocalVarTag = "/*ase_local_var*/";
+
 		public static readonly string TemplatePragmaTag = "/*ase_pragma*/";
 		public static readonly string TemplatePassTag = "/*ase_pass*/";
 		public static readonly string TemplatePropertyTag = "/*ase_props*/\n";

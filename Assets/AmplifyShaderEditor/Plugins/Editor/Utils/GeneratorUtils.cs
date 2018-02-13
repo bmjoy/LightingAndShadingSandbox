@@ -78,7 +78,7 @@ namespace AmplifyShaderEditor
 		static public string GenerateWorldReflection( ref MasterNodeDataCollector dataCollector, int uniqueId, bool normalize = false )
 		{
 			if( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetWorldReflection( true, MasterNodePortCategory.Fragment, normalize );
+				return dataCollector.TemplateDataCollectorInstance.GetWorldReflection( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision, true, MasterNodePortCategory.Fragment, normalize );
 
 			string precisionType = UIUtils.PrecisionWirePortToCgType( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision, WirePortDataType.FLOAT3 );
 			string result = string.Empty;
@@ -102,7 +102,7 @@ namespace AmplifyShaderEditor
 		static public string GenerateWorldNormal( ref MasterNodeDataCollector dataCollector, int uniqueId, bool normalize = false )
 		{
 			if( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetWorldNormal( true, MasterNodePortCategory.Fragment, normalize );
+				return dataCollector.TemplateDataCollectorInstance.GetWorldNormal( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision,true, MasterNodePortCategory.Fragment, normalize );
 
 			string precisionType = UIUtils.PrecisionWirePortToCgType( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision, WirePortDataType.FLOAT3 );
 			string result = string.Empty;
@@ -127,7 +127,7 @@ namespace AmplifyShaderEditor
 		static public string GenerateWorldTangent( ref MasterNodeDataCollector dataCollector, int uniqueId )
 		{
 			if( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetWorldTangent();
+				return dataCollector.TemplateDataCollectorInstance.GetWorldTangent( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 
 			string precisionType = UIUtils.PrecisionWirePortToCgType( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision, WirePortDataType.FLOAT3 );
 			string result = "WorldNormalVector( " + Constants.InputVarStr + ", " + precisionType + "( 1, 0, 0 ) )";
@@ -143,7 +143,7 @@ namespace AmplifyShaderEditor
 		static public string GenerateWorldBitangent( ref MasterNodeDataCollector dataCollector, int uniqueId )
 		{
 			if( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetWorldBinormal();
+				return dataCollector.TemplateDataCollectorInstance.GetWorldBinormal( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 
 			string precisionType = UIUtils.PrecisionWirePortToCgType( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision, WirePortDataType.FLOAT3 );
 			string result = "WorldNormalVector( " + Constants.InputVarStr + ", " + precisionType + "( 0, 1, 0 ) )";
@@ -393,7 +393,7 @@ namespace AmplifyShaderEditor
 		{
 			if( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )
 			{
-				return dataCollector.TemplateDataCollectorInstance.GetVertexNormal();
+				return dataCollector.TemplateDataCollectorInstance.GetVertexNormal( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 			}
 
 			string value = Constants.VertexShaderInputStr + ".normal.xyz";
@@ -414,7 +414,7 @@ namespace AmplifyShaderEditor
 		{
 			if( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )
 			{
-				return dataCollector.TemplateDataCollectorInstance.GetVertexTangent();
+				return dataCollector.TemplateDataCollectorInstance.GetVertexTangent( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 			}
 
 			string value = Constants.VertexShaderInputStr + ".tangent.xyz";
@@ -435,7 +435,7 @@ namespace AmplifyShaderEditor
 		{
 			if( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )
 			{
-				return dataCollector.TemplateDataCollectorInstance.GetTangentSign();
+				return dataCollector.TemplateDataCollectorInstance.GetTangentSign( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 			}
 
 			string value = Constants.VertexShaderInputStr + ".tangent.w";
@@ -457,7 +457,7 @@ namespace AmplifyShaderEditor
 		{
 			if( dataCollector.MasterNodeCategory == AvailableShaderTypes.Template )
 			{
-				return dataCollector.TemplateDataCollectorInstance.GetVertexBitangent();
+				return dataCollector.TemplateDataCollectorInstance.GetVertexBitangent( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision );
 			}
 
 			if( dataCollector.PortCategory == MasterNodePortCategory.Fragment || dataCollector.PortCategory == MasterNodePortCategory.Debug )
@@ -502,7 +502,7 @@ namespace AmplifyShaderEditor
 		static public string GenerateViewDirection( ref MasterNodeDataCollector dataCollector, int uniqueId, ViewSpace space = ViewSpace.World )
 		{
 			if( dataCollector.IsTemplate )
-				return ( space == ViewSpace.Tangent ) ? dataCollector.TemplateDataCollectorInstance.GetTangentViewDir() : dataCollector.TemplateDataCollectorInstance.GetViewDir();
+				return ( space == ViewSpace.Tangent ) ? dataCollector.TemplateDataCollectorInstance.GetTangentViewDir( UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision ) : dataCollector.TemplateDataCollectorInstance.GetViewDir();
 
 			PrecisionType precision = UIUtils.CurrentWindow.CurrentGraph.CurrentPrecision;
 			string worldPos = GenerateWorldPosition( ref dataCollector, uniqueId );

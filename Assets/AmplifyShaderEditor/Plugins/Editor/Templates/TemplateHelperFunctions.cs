@@ -335,6 +335,8 @@ namespace AmplifyShaderEditor
 			{"samplerCUBE"      ,WirePortDataType.SAMPLERCUBE}
 		};
 
+		public static readonly string LocalVarPattern = @"\/\*ase_local_var\*\/\s*(\w*)\s+(\w*)";
+
 		public static readonly string TagsPattern = "\"(\\w +)\"\\s*=\\s*\"(\\w+\\+*\\w*)\"";
 		public static readonly string ZTestPattern = @"\s*ZTest\s+(\w+)";
 		public static readonly string ZWritePattern = @"\s*ZWrite\s+(\w+)";
@@ -738,6 +740,21 @@ namespace AmplifyShaderEditor
 					catch
 					{
 						depthDataObj.DataCheck = TemplateDataCheck.Unreadable;
+					}
+				}
+			}
+		}
+
+		public static void FetchLocalVars( string body , ref List<TemplateLocalVarData> localVarList )
+		{
+			foreach( Match match in Regex.Matches( body, LocalVarPattern ) )
+			{
+				if( match.Groups.Count == 3 )
+				{
+					if( CgToWirePortType.ContainsKey( match.Groups[ 1 ].Value ))
+					{
+						TemplateLocalVarData data = new TemplateLocalVarData( CgToWirePortType[ match.Groups[ 1 ].Value ], match.Groups[ 2 ].Value, match.Index );
+						localVarList.Add( data );
 					}
 				}
 			}

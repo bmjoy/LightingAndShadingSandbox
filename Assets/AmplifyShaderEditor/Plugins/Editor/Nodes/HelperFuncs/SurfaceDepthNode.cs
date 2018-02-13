@@ -84,7 +84,7 @@ namespace AmplifyShaderEditor
 				}
 				else
 				{
-					return dataCollector.TemplateDataCollectorInstance.GetEyeDepth( true, MasterNodePortCategory.Fragment,m_viewSpaceInt );
+					return dataCollector.TemplateDataCollectorInstance.GetEyeDepth( m_currentPrecisionType, true, MasterNodePortCategory.Fragment,m_viewSpaceInt );
 				}
 			}
 

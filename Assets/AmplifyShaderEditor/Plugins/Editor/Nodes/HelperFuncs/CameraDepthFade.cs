@@ -14,49 +14,49 @@ namespace AmplifyShaderEditor
 		{
 			base.CommonInit( uniqueId );
 			AddInputPort( WirePortDataType.FLOAT3, false, "Vertex Position", -1, MasterNodePortCategory.Fragment, 2 );
-			AddInputPort( WirePortDataType.FLOAT, false, "Length",-1,MasterNodePortCategory.Fragment,0 );
+			AddInputPort( WirePortDataType.FLOAT, false, "Length", -1, MasterNodePortCategory.Fragment, 0 );
 			AddInputPort( WirePortDataType.FLOAT, false, "Offset", -1, MasterNodePortCategory.Fragment, 1 );
-			GetInputPortByUniqueId(0).FloatInternalData = 1;
+			GetInputPortByUniqueId( 0 ).FloatInternalData = 1;
 			AddOutputPort( WirePortDataType.FLOAT, "Out" );
 			m_useInternalPortData = true;
 		}
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
-			if ( m_outputPorts[ 0 ].IsLocalValue )
+			if( m_outputPorts[ 0 ].IsLocalValue )
 				return m_outputPorts[ 0 ].LocalValue;
 
 			InputPort vertexPort = GetInputPortByUniqueId( 2 );
 			InputPort lengthPort = GetInputPortByUniqueId( 0 );
 			InputPort offsetPort = GetInputPortByUniqueId( 1 );
-				
+
 			string distance = lengthPort.GeneratePortInstructions( ref dataCollector );
 			string offset = offsetPort.GeneratePortInstructions( ref dataCollector );
 
 			string value = string.Empty;
 			string eyeDepth = string.Empty;
 
-			if ( dataCollector.IsTemplate )
+			if( dataCollector.IsTemplate )
 			{
 				if( vertexPort.IsConnected )
 				{
 					string varName = "customSurfaceDepth" + OutputId;
 					GenerateInputInVertex( ref dataCollector, 2, varName, false );
-					string eyeInstruction = "-UnityObjectToViewPos( " + varName + " ).z" ;
+					string eyeInstruction = "-UnityObjectToViewPos( " + varName + " ).z";
 					eyeDepth = "customEye" + OutputId;
 					dataCollector.TemplateDataCollectorInstance.RegisterCustomInterpolatedData( eyeDepth, WirePortDataType.FLOAT, m_currentPrecisionType, eyeInstruction );
 				}
 				else
 				{
-					eyeDepth = dataCollector.TemplateDataCollectorInstance.GetEyeDepth();
+					eyeDepth = dataCollector.TemplateDataCollectorInstance.GetEyeDepth( m_currentPrecisionType );
 				}
 
 				value = string.Format( CameraDepthFadeFormat, eyeDepth, offset, distance );
 				RegisterLocalVariable( 0, value, ref dataCollector, "cameraDepthFade" + OutputId );
 				return m_outputPorts[ 0 ].LocalValue;
 			}
-			
-			if ( dataCollector.PortCategory == MasterNodePortCategory.Vertex || dataCollector.PortCategory == MasterNodePortCategory.Tessellation )
+
+			if( dataCollector.PortCategory == MasterNodePortCategory.Vertex || dataCollector.PortCategory == MasterNodePortCategory.Tessellation )
 			{
 				string vertexVarName = string.Empty;
 				if( vertexPort.IsConnected )
@@ -69,7 +69,7 @@ namespace AmplifyShaderEditor
 				}
 
 				//dataCollector.AddVertexInstruction( "float cameraDepthFade" + UniqueId + " = (( -UnityObjectToViewPos( " + Constants.VertexShaderInputStr + ".vertex.xyz ).z -_ProjectionParams.y - " + offset + " ) / " + distance + ");", UniqueId );
-				value = string.Format( CameraDepthFadeFormat,  "-UnityObjectToViewPos( " + vertexVarName + " ).z", offset, distance );
+				value = string.Format( CameraDepthFadeFormat, "-UnityObjectToViewPos( " + vertexVarName + " ).z", offset, distance );
 				RegisterLocalVariable( 0, value, ref dataCollector, "cameraDepthFade" + OutputId );
 				return m_outputPorts[ 0 ].LocalValue;
 			}
@@ -99,7 +99,7 @@ namespace AmplifyShaderEditor
 					dataCollector.AddToInput( UniqueId, varName, WirePortDataType.FLOAT );
 					string vertexInstruction = "-UnityObjectToViewPos( " + varName + " ).z";
 					dataCollector.AddVertexInstruction( Constants.VertexShaderOutputStr + "." + varName + " = " + vertexInstruction, UniqueId );
-					eyeDepth = Constants.InputVarStr + "."+varName;
+					eyeDepth = Constants.InputVarStr + "." + varName;
 				}
 				else
 				{
@@ -109,12 +109,12 @@ namespace AmplifyShaderEditor
 					eyeDepth = Constants.InputVarStr + ".eyeDepth";
 				}
 			}
-			
+
 			value = string.Format( CameraDepthFadeFormat, eyeDepth, offset, distance );
 			RegisterLocalVariable( 0, value, ref dataCollector, "cameraDepthFade" + OutputId );
 			//dataCollector.AddToLocalVariables( UniqueId, "float cameraDepthFade" + UniqueId + " = (( " + Constants.InputVarStr + ".eyeDepth -_ProjectionParams.y - "+ offset + " ) / " + distance + ");" );
 
-			return m_outputPorts[0].LocalValue;
+			return m_outputPorts[ 0 ].LocalValue;
 		}
 	}
 }

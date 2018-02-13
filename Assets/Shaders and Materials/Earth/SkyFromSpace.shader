@@ -1,4 +1,4 @@
-Shader "JCOR/Atmosphere"
+Shader "JCOR/Sky From Space"
 {
 	SubShader
 	{

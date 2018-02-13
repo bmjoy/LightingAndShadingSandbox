@@ -47,16 +47,16 @@ public class AtmosphereController : MonoBehaviour
 	{
 		Vector3 invWaveLength4 = new Vector3(1.0f / Mathf.Pow(m_atmoColor.x, 4.0f), 1.0f / Mathf.Pow(m_atmoColor.y, 4.0f), 1.0f / Mathf.Pow(m_atmoColor.z, 4.0f));
 
-		mat.SetVector("v3LightPos", m_sun.transform.forward*-1.0f);
+		mat.SetVector("v3LightPos", m_sun.transform.forward * -1.0f);
 		mat.SetVector("v3InvWavelength", invWaveLength4);
 		mat.SetFloat("fOuterRadius", m_outerRadius);
-		mat.SetFloat("fOuterRadius2", m_outerRadius*m_outerRadius);
+		mat.SetFloat("fOuterRadius2", m_outerRadius * m_outerRadius);
 		mat.SetFloat("fInnerRadius", m_innerRadius);
-		mat.SetFloat("fInnerRadius2", m_innerRadius*m_innerRadius);
+		mat.SetFloat("fInnerRadius2", m_innerRadius * m_innerRadius);
 		mat.SetFloat("fKrESun", m_kr*m_ESun);
 		mat.SetFloat("fKmESun", m_km*m_ESun);
-		mat.SetFloat("fKr4PI", m_kr*4.0f*Mathf.PI);
-		mat.SetFloat("fKm4PI", m_km*4.0f*Mathf.PI);
+		mat.SetFloat("fKr4PI", m_kr * 4.0f * Mathf.PI);
+		mat.SetFloat("fKm4PI", m_km * 4.0f * Mathf.PI);
 		mat.SetFloat("fScale", m_scale);
 		mat.SetFloat("fScaleDepth", m_scaleDepth);
 		mat.SetFloat("fScaleOverScaleDepth", m_scale / m_scaleDepth);

@@ -3,7 +3,7 @@ using System;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "World To Tangent Matrix", "Matrix Transform", "World to tangent transform matrix")]
+	[NodeAttributes( "World To Tangent Matrix", "Matrix Transform", "World to tangent transform matrix" )]
 	public sealed class WorldToTangentMatrix : ParentNode
 	{
 		protected override void CommonInit( int uniqueId )
@@ -22,14 +22,14 @@ namespace AmplifyShaderEditor
 
 		public override void PropagateNodeData( NodeData nodeData, ref MasterNodeDataCollector dataCollector )
 		{
-			base.PropagateNodeData( nodeData , ref dataCollector );
+			base.PropagateNodeData( nodeData, ref dataCollector );
 			dataCollector.DirtyNormal = true;
 		}
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalVar )
 		{
-			if ( dataCollector.IsTemplate )
-				return dataCollector.TemplateDataCollectorInstance.GetWorldToTangentMatrix();
+			if( dataCollector.IsTemplate )
+				return dataCollector.TemplateDataCollectorInstance.GetWorldToTangentMatrix( m_currentPrecisionType );
 
 			if( dataCollector.IsFragmentCategory )
 			{

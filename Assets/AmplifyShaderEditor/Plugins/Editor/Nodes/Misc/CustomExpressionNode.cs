@@ -32,6 +32,7 @@ namespace AmplifyShaderEditor
 		private const string InputQualifierStr = "Qualifier";
 		private const string ExpressionNameLabel = "Name";
 		private const string FunctionCallMode = "Call Mode";
+		private const string GenerateUniqueName = "Set Unique";
 
 		private readonly string[] AvailableWireTypesStr =
 		{
@@ -138,6 +139,9 @@ namespace AmplifyShaderEditor
 
 		[SerializeField]
 		private string m_uniqueName;
+
+		[SerializeField]
+		private bool m_generateUniqueName = true;
 
 		private int m_markedToDelete = -1;
 		private const float ButtonLayoutWidth = 15;
@@ -399,7 +403,7 @@ namespace AmplifyShaderEditor
 			{
 				SetTitleText( m_customExpressionName );
 			}
-
+			m_generateUniqueName = EditorGUILayoutToggle( GenerateUniqueName, m_generateUniqueName );
 			DrawPrecisionProperty();
 
 			EditorGUI.BeginChangeCheck();
@@ -661,14 +665,22 @@ namespace AmplifyShaderEditor
 			if( outputPort.IsLocalValue )
 				return outputPort.LocalValue;
 
-			string expressionName = UIUtils.RemoveInvalidCharacters( m_customExpressionName ) + OutputId;
+			string expressionName = UIUtils.RemoveInvalidCharacters( m_customExpressionName );
+			string localVarName = "local" + expressionName;
+
+			if( m_generateUniqueName )
+			{
+				expressionName += OutputId;
+			}
+			localVarName += OutputId;
+
 			int count = m_inputPorts.Count;
 			if( count > 0 )
 			{
 				if( m_callMode )
 				{
 					string mainData = m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
-					RegisterLocalVariable( 0, string.Format( Constants.CodeWrapper, mainData ), ref dataCollector, "local" + expressionName + OutputId );
+					RegisterLocalVariable( 0, string.Format( Constants.CodeWrapper, mainData ), ref dataCollector, localVarName );
 				}
 
 				if( codeContainsReturn )
@@ -702,7 +714,7 @@ namespace AmplifyShaderEditor
 					}
 					else
 					{
-						RegisterLocalVariable( 0, functionCall, ref dataCollector, "local" + expressionName + OutputId );
+						RegisterLocalVariable( 0, functionCall, ref dataCollector, localVarName );
 					}
 				}
 				else
@@ -761,7 +773,7 @@ namespace AmplifyShaderEditor
 							}
 						}
 						functionCall += " )";
-						RegisterLocalVariable( 0, functionCall, ref dataCollector, "local" + expressionName + OutputId );
+						RegisterLocalVariable( 0, functionCall, ref dataCollector, localVarName );
 					}
 				}
 
@@ -774,11 +786,11 @@ namespace AmplifyShaderEditor
 					string function = WrapCodeInFunction( dataCollector.IsTemplate, expressionName, false );
 					dataCollector.AddFunction( expressionName, function );
 					string functionCall = expressionName + "()";
-					RegisterLocalVariable( 0, functionCall, ref dataCollector, "local" + expressionName + OutputId );
+					RegisterLocalVariable( 0, functionCall, ref dataCollector, localVarName );
 				}
 				else
 				{
-					RegisterLocalVariable( 0, string.Format( Constants.CodeWrapper, m_code ), ref dataCollector, "local" + expressionName + OutputId );
+					RegisterLocalVariable( 0, string.Format( Constants.CodeWrapper, m_code ), ref dataCollector, localVarName );
 				}
 
 				return m_outputPorts[ 0 ].LocalValue;
@@ -929,6 +941,11 @@ namespace AmplifyShaderEditor
 				SetTitleText( m_customExpressionName );
 			}
 
+			if( UIUtils.CurrentShaderVersion() > 14401 )
+			{
+				m_generateUniqueName =Convert.ToBoolean( GetCurrentParam( ref nodeParams ));
+			}
+
 			UpdateOutputPorts();
 
 			m_repopulateNameDictionary = true;
@@ -958,6 +975,7 @@ namespace AmplifyShaderEditor
 				IOUtils.AddFieldValueToString( ref nodeInfo, m_variableQualifiers[ i ] );
 			}
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_customExpressionName );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_generateUniqueName );
 		}
 
 		public override void RefreshExternalReferences()
@@ -972,5 +990,6 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
+
 	}
 }

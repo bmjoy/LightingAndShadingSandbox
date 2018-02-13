@@ -1,4 +1,16 @@
 Release Notes:
+v1.4.4 dev 02:
+* Fixes:
+    * Fixed issue on templates where vertex normal was being declared as a float4 on vertex data
+    * Fixed PS4 issue on billboards generated code
+        * Updated Orientation Based Sprite sample to include fix
+
+* Improvements:
+    * Changed texture array creator to support compressed formats 
+    * Added custom inspector for texture arrays to allows previewing their contents on the inspector window
+    * Added new Set Unique option into 'Custom Expression' node
+        * If toggled off, generated internal function doesn't use unique id on its name
+
 v1.4.4 dev 01:
 * Improvements:
     * Custom Pragmas, Includes and Defines are now also included on the Outline pass

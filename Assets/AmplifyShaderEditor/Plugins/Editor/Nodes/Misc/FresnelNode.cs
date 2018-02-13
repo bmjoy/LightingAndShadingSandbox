@@ -118,7 +118,7 @@ namespace AmplifyShaderEditor
 						dataCollector.AddToInput( UniqueId, SurfaceInputs.INTERNALDATA, addSemiColon: false );
 				}
 
-				normal = dataCollector.IsTemplate ? dataCollector.TemplateDataCollectorInstance.GetWorldNormal() : GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId );
+				normal = dataCollector.IsTemplate ? dataCollector.TemplateDataCollectorInstance.GetWorldNormal( m_currentPrecisionType ) : GeneratorUtils.GenerateWorldNormal( ref dataCollector, UniqueId );
 				normal = string.Format( "normalize( {0} )", normal );
 				if( dataCollector.DirtyNormal )
 					dataCollector.ForceNormal = true;

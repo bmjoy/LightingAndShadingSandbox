@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: JCOR Basic Terrain ASE
-  m_Shader: {fileID: 4800000, guid: fc860a32b680ebe418734ec4f5bab9bc, type: 3}
+  m_Name: JCOR Basic Terrain Scatter ASE
+  m_Shader: {fileID: 4800000, guid: a3592d2c47514054782e5257081a69cd, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -18,10 +18,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _DispTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: c205eb53136d7484eb4969665cda9906, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -44,7 +40,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AtmosphereFalloff: 0.66
-    - _DisplacementScale: 1
     - _NightLightBlue: 0.35
     - _NightLightGreen: 0.835
     - _NightLightRed: 1
@@ -52,13 +47,9 @@ Material:
     - _NightLightsSoftness: 0.3
     - _NormalScale: 1
     - _Shininess: 0.2
-    - _TessMax: 700
-    - _TessMin: 1
-    - _TessPhongStrength: 0.5
-    - _TessValue: 15
     - __dirty: 0
     m_Colors:
     - _AtmosphereFar: {r: 0.359, g: 0.7974198, b: 1, a: 1}
     - _AtmosphereNear: {r: 0.7426471, g: 0.5287186, b: 0.4017721, a: 1}
     - _BaseTint: {r: 0.915, g: 0.915, b: 0.915, a: 1}
-    - _SpecularColor: {r: 0.49268103, g: 0.5350211, b: 0.609, a: 1}
+    - _SpecularColor: {r: 0.492681, g: 0.5350211, b: 0.609, a: 1}

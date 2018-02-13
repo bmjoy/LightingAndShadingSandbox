@@ -84,6 +84,9 @@ namespace AmplifyShaderEditor
 		//private Dictionary<string, TemplateCodeSnippetBase> m_snippetElementsDict = new Dictionary<string, TemplateCodeSnippetBase>();
 
 		[SerializeField]
+		private List<TemplateLocalVarData> m_localVarsList = new List<TemplateLocalVarData>();
+
+		[SerializeField]
 		private VertexDataContainer m_vertexDataContainer = new VertexDataContainer();
 
 		[SerializeField]
@@ -206,6 +209,11 @@ namespace AmplifyShaderEditor
 			if( m_inputDataList != null )
 			{
 				m_inputDataList.Clear();
+			}
+
+			if( m_localVarsList != null )
+			{
+				m_localVarsList.Clear();
 			}
 
 			//if( m_snippetElementsDict != null )
@@ -491,6 +499,8 @@ namespace AmplifyShaderEditor
 				Debug.LogException( e );
 				m_isValid = false;
 			}
+
+			//TemplateHelperFunctions.FetchLocalVars( m_templateBody , ref m_localVarsList );
 
 			FetchSubShaderProperties();
 			// Vertex Data
@@ -950,24 +960,29 @@ namespace AmplifyShaderEditor
 				m_inputDataList = null;
 			}
 
+			if( m_localVarsList != null )
+			{
+				m_localVarsList.Clear();
+				m_localVarsList = null;
+			}
 			//if( m_snippetElementsDict != null )
 			//{
 			//	m_snippetElementsDict.Clear();
 			//	m_snippetElementsDict = null;
 			//}
 
-			//if( m_snippetElementsList != null )
-			//{
-			//	for( int i = 0; i < m_snippetElementsList.Count; i++ )
-			//	{
-			//		GameObject.DestroyImmediate( m_snippetElementsList[ i ] );
-			//		m_snippetElementsList[ i ] = null;
-			//	}
-			//	m_snippetElementsList.Clear();
-			//	m_snippetElementsList = null;
-			//}
+				//if( m_snippetElementsList != null )
+				//{
+				//	for( int i = 0; i < m_snippetElementsList.Count; i++ )
+				//	{
+				//		GameObject.DestroyImmediate( m_snippetElementsList[ i ] );
+				//		m_snippetElementsList[ i ] = null;
+				//	}
+				//	m_snippetElementsList.Clear();
+				//	m_snippetElementsList = null;
+				//}
 
-			m_cullModeData = null;
+				m_cullModeData = null;
 			m_blendData = null;
 			m_colorMaskData = null;
 			m_stencilData = null;
@@ -1144,6 +1159,7 @@ namespace AmplifyShaderEditor
 		public string Name { get { return m_name; } }
 		public string TemplateBody { get { return m_templateBody; } }
 		public List<TemplateInputData> InputDataList { get { return m_inputDataList; } }
+		public List<TemplateLocalVarData> LocalVarsList { get { return m_localVarsList; } }
 		public List<TemplateVertexData> VertexDataList { get { return m_vertexDataContainer.VertexData; } }
 		public TemplateInterpData InterpolatorData { get { return m_interpolatorDataContainer; } }
 		public TemplateFunctionData VertexFunctionData { get { return m_vertexFunctionData; } }
