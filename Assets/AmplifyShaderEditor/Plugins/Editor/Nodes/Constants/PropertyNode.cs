@@ -78,6 +78,17 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private bool m_autoRegister = false;
 
+		[SerializeField]
+		private List<string> m_enumNames = new List<string>();
+
+		[SerializeField]
+		private List<int> m_enumValues = new List<int>();
+
+		[SerializeField]
+		private int m_enumCount = 0;
+
+		private bool m_hasEnum = false;
+
 		protected bool m_showTitleWhenNotEditing = true;
 
 		private int m_orderIndexOffset = 0;
@@ -120,6 +131,7 @@ namespace AmplifyShaderEditor
 		private const float ButtonLayoutWidth = 15;
 
 		private bool m_visibleAttribsFoldout;
+		private bool m_visibleEnumsFoldout;
 		protected List<PropertyAttributes> m_availableAttribs = new List<PropertyAttributes>();
 		private string[] m_availableAttribsArr;
 
@@ -138,7 +150,8 @@ namespace AmplifyShaderEditor
 		{
 			base.CommonInit( uniqueId );
 			m_textLabelWidth = 105;
-			m_orderIndex = UIUtils.GetPropertyNodeAmount();
+			if( UIUtils.CurrentWindow != null && UIUtils.CurrentWindow.CurrentGraph != null )
+				m_orderIndex = UIUtils.GetPropertyNodeAmount();
 			m_currentParameterType = PropertyType.Constant;
 			m_freeType = true;
 			m_freeName = true;
@@ -287,7 +300,7 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		protected virtual void OnAtrributesChanged() { }
+		protected virtual void OnAtrributesChanged() { CheckEnumAttribute(); }
 		void DrawAttributesAddRemoveButtons()
 		{
 			if( m_availableAttribsArr == null )
@@ -312,6 +325,70 @@ namespace AmplifyShaderEditor
 					m_selectedAttribs.RemoveAt( attribCount - 1 );
 					OnAtrributesChanged();
 				}
+			}
+		}
+
+		void CheckEnumAttribute()
+		{
+			m_hasEnum = false;
+			foreach( var item in m_selectedAttribs )
+			{
+				if( m_availableAttribsArr[ item ].Equals("Enum") )
+					m_hasEnum = true;
+			}
+		}
+		void DrawEnumAddRemoveButtons()
+		{
+			// Add new port
+			if( GUILayout.Button( string.Empty, UIUtils.PlusStyle, GUILayout.Width( ButtonLayoutWidth ) ) )
+			{
+				m_enumNames.Add( "Option"+ (m_enumValues.Count+1) );
+				m_enumValues.Add( m_enumValues.Count );
+				m_enumCount++;
+				m_visibleEnumsFoldout = true;
+			}
+
+			//Remove port
+			if( GUILayout.Button( string.Empty, UIUtils.MinusStyle, GUILayout.Width( ButtonLayoutWidth ) ) )
+			{
+				m_enumNames.RemoveAt( m_enumNames.Count - 1 );
+				m_enumValues.RemoveAt( m_enumValues.Count - 1 );
+				m_enumCount--;
+			}
+		}
+
+		protected void DrawEnums()
+		{
+			if( m_enumNames.Count == 0 )
+				EditorGUILayout.HelpBox( "Your list is Empty!\nUse the plus button to add more.", MessageType.Info );
+
+			float cacheLabelSize = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = 50;
+
+			for( int i = 0; i < m_enumNames.Count; i++ )
+			{
+				EditorGUI.BeginChangeCheck();
+				EditorGUILayout.BeginHorizontal();
+				m_enumNames[ i ] = EditorGUILayout.TextField( "Name", m_enumNames[ i ] );
+				m_enumValues[ i ] = EditorGUILayout.IntField( "Value", m_enumValues[ i ], GUILayout.Width( 100 ) );
+				EditorGUILayout.EndHorizontal();
+				if( EditorGUI.EndChangeCheck() )
+				{
+					m_enumNames[ i ] = UIUtils.RemoveInvalidEnumCharacters( m_enumNames[ i ] );
+					if( string.IsNullOrEmpty( m_enumNames[ i ] ) )
+					{
+						m_enumNames[ i ] = "Option"+(i+1);
+					}
+				}
+			}
+
+			EditorGUIUtility.labelWidth = cacheLabelSize;
+			if( m_enumNames.Count > 0 )
+			{
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Label( " " );
+				DrawEnumAddRemoveButtons();
+				EditorGUILayout.EndHorizontal();
 			}
 		}
 
@@ -472,6 +549,9 @@ namespace AmplifyShaderEditor
 				NodeUtils.DrawPropertyGroup( ref m_propertiesFoldout, Constants.ParameterLabelStr, DrawMainPropertyBlock );
 				if ( m_drawAttributes )
 					NodeUtils.DrawPropertyGroup( ref m_visibleAttribsFoldout, Constants.AttributesLaberStr, DrawAttributes, DrawAttributesAddRemoveButtons );
+
+				if( m_hasEnum )
+					NodeUtils.DrawPropertyGroup( ref m_visibleEnumsFoldout, "Enums", DrawEnums, DrawEnumAddRemoveButtons );
 				CheckPropertyFromInspector();
 			}
 		}
@@ -872,6 +952,19 @@ namespace AmplifyShaderEditor
 			m_availableAttribs = null;
 		}
 
+		string BuildEnum()
+		{
+			string result = "[Enum(";
+			for( int i = 0; i < m_enumNames.Count; i++ )
+			{
+				result += m_enumNames[i] + "," + m_enumValues[i];
+				if( i + 1 < m_enumNames.Count )
+					result += ",";
+			}
+			result += ")]";
+			return result;
+		}
+
 		public string PropertyAttributes
 		{
 			get
@@ -884,7 +977,10 @@ namespace AmplifyShaderEditor
 				string attribs = string.Empty;
 				for ( int i = 0; i < attribCount; i++ )
 				{
-					attribs += m_availableAttribs[ m_selectedAttribs[ i ] ].Attribute;
+					if( m_availableAttribs[ m_selectedAttribs[ i ] ].Name.Equals( "Enum" ) )
+						attribs += BuildEnum();
+					else
+						attribs += m_availableAttribs[ m_selectedAttribs[ i ] ].Attribute;
 				}
 				return attribs;
 			}
@@ -939,6 +1035,14 @@ namespace AmplifyShaderEditor
 			}
             IOUtils.AddFieldValueToString( ref nodeInfo, m_variableMode );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_autoGlobalName );
+
+
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_enumCount );
+			for( int i = 0; i < m_enumCount; i++ )
+			{
+				IOUtils.AddFieldValueToString( ref nodeInfo, m_enumNames[ i ] );
+				IOUtils.AddFieldValueToString( ref nodeInfo, m_enumValues[ i ] );
+			}
 		}
 
 		int IdForAttrib( string name )
@@ -1009,6 +1113,18 @@ namespace AmplifyShaderEditor
 			{
 				m_autoGlobalName = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 			}
+			if( UIUtils.CurrentShaderVersion() > 14403 )
+			{
+				m_enumCount = Convert.ToInt32( GetCurrentParam( ref nodeParams ) );
+				for( int i = 0; i < m_enumCount; i++ )
+				{
+					m_enumNames.Add( GetCurrentParam( ref nodeParams ) );
+					m_enumValues.Add( Convert.ToInt32( GetCurrentParam( ref nodeParams ) ) );
+				}
+			}
+			CheckEnumAttribute();
+			if( m_enumCount > 0 )
+				m_visibleEnumsFoldout = true;
 
 			m_propertyNameIsDirty = true;
 			m_reRegisterName = false;

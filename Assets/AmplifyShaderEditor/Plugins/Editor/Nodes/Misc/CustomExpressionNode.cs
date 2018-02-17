@@ -661,6 +661,7 @@ namespace AmplifyShaderEditor
 				UIUtils.ShowMessage( "Attempting to get value from inexisting inout/out variable", MessageSeverity.Warning );
 				return "0";
 			}
+
 			OutputPort outputPort = GetOutputPortByUniqueId( outputId );
 			if( outputPort.IsLocalValue )
 				return outputPort.LocalValue;
@@ -686,8 +687,7 @@ namespace AmplifyShaderEditor
 				if( codeContainsReturn )
 				{
 					string function = WrapCodeInFunction( dataCollector.IsTemplate, expressionName, false );
-					dataCollector.AddFunction( expressionName, function );
-
+					
 					string functionCall = expressionName + "( ";
 					for( int i = m_firstAvailablePort; i < count; i++ )
 					{
@@ -716,6 +716,8 @@ namespace AmplifyShaderEditor
 					{
 						RegisterLocalVariable( 0, functionCall, ref dataCollector, localVarName );
 					}
+
+					dataCollector.AddFunction( expressionName, function );
 				}
 				else
 				{
@@ -752,8 +754,7 @@ namespace AmplifyShaderEditor
 					else
 					{
 						string function = WrapCodeInFunction( dataCollector.IsTemplate, expressionName, true );
-						dataCollector.AddFunction( expressionName, function );
-
+						
 						string functionCall = expressionName + "( ";
 						for( int i = m_firstAvailablePort; i < count; i++ )
 						{
@@ -774,6 +775,7 @@ namespace AmplifyShaderEditor
 						}
 						functionCall += " )";
 						RegisterLocalVariable( 0, functionCall, ref dataCollector, localVarName );
+						dataCollector.AddFunction( expressionName, function );
 					}
 				}
 

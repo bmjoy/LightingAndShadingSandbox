@@ -8,7 +8,7 @@ using System;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Get Local Var", "Miscellaneous", "Use a registered local variable" )]
+	[NodeAttributes( "Get Local Var", "Miscellaneous", "Use a registered local variable", null, KeyCode.G )]
 	public class GetLocalVarNode : ParentNode
 	{
 		[SerializeField]

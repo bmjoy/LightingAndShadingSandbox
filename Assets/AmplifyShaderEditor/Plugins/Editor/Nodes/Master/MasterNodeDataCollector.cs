@@ -653,6 +653,16 @@ namespace AmplifyShaderEditor
 				m_uniformsDict.Add( dataName, new PropertyDataCollector( -1, dataName ) );
 			}
 		}
+
+		public void SoftRegisterUniform( TemplateShaderPropertyData data )
+		{
+			string uniformName = UIUtils.GenerateUniformName( data.PropertyDataType, data.PropertyName );
+			if( !m_uniformsDict.ContainsKey( uniformName ) )
+			{
+				m_uniformsDict.Add( uniformName, new PropertyDataCollector( -1, uniformName ) );
+			}
+		}
+
 		public void AddToUniforms( int nodeId, string dataType, string dataName )
 		{
 			if( string.IsNullOrEmpty( dataName ) || string.IsNullOrEmpty( dataType ) )

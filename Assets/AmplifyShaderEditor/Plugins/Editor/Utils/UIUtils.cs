@@ -347,7 +347,11 @@ namespace AmplifyShaderEditor
 		{
 			"Custom",
 			"ETC1_EXTERNAL_ALPHA",
-			"PIXELSNAP_ON"
+			"PIXELSNAP_ON",
+			"UNITY_PASS_FORWARDBASE",
+			"UNITY_PASS_FORWARDADD",
+			"UNITY_PASS_DEFERRED",
+			"UNITY_PASS_SHADOWCASTER"
 		};
 
 		public static readonly string[] CategoryPresets =
@@ -1586,6 +1590,7 @@ namespace AmplifyShaderEditor
 			return WirePortDataType.FLOAT;
 		}
 
+		public static string GenerateUniformName( WirePortDataType dataType, string dataName ) { return string.Format( Constants.UniformDec, WirePortToCgType( dataType ), dataName ); }
 		public static string GenerateUniformName( string dataType, string dataName ) { return string.Format( Constants.UniformDec, dataType, dataName ); }
 
 		public static string GeneratePropertyName( string name, PropertyType propertyType, bool forceUnderscore = false )

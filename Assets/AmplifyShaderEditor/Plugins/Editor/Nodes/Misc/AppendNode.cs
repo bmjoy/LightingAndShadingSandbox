@@ -8,7 +8,7 @@ using System;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "[Old]Append", "Vector Operators", "Append channels to create a new component",null,KeyCode.None,true,true,"Append",typeof(DynamicAppendNode))]
+	[NodeAttributes( "[Old]Append", "Vector Operators", "Append channels to create a new component",null,KeyCode.V,true,true,"Append",typeof(DynamicAppendNode))]
 	public sealed class AppendNode : ParentNode
 	{
 		private const string OutputTypeStr = "Output type";

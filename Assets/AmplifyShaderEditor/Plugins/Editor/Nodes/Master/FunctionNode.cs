@@ -15,7 +15,7 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private AmplifyShaderFunction m_function;
 
-		//[SerializeField]
+		[SerializeField]
 		private ParentGraph m_functionGraph;
 
 		[SerializeField]
@@ -62,6 +62,7 @@ namespace AmplifyShaderEditor
 		private List<string> m_pragmas = new List<string>();
 
 		private bool m_parametersFoldout = true;
+		[SerializeField]
 		private ParentGraph m_outsideGraph = null;
 
 		[SerializeField]
@@ -114,9 +115,12 @@ namespace AmplifyShaderEditor
 				SetTitleText( Function.FunctionName );
 			}
 			m_tooltipText = Function.Description;
+			m_hasTooltipLink = false;
 			if( m_functionGraph == null )
 			{
-				m_functionGraph = new ParentGraph();
+				//m_functionGraph = new ParentGraph();
+				m_functionGraph = CreateInstance<ParentGraph>();
+				m_functionGraph.Init();
 				m_functionGraph.ParentWindow = ContainerGraph.ParentWindow;
 			}
 

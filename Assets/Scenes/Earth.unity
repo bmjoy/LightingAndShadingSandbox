@@ -113,6 +113,33 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &231880090 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 145776, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+  m_PrefabInternal: {fileID: 737174260}
+--- !u!114 &231880091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 231880090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ea964ca8c2b9a54e95a9eb3b80002f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_sun: {fileID: 404188766}
+  m_groundMaterial: {fileID: 2100000, guid: 93ae29c1e8b1ade4c85f20f6d08d6c09, type: 2}
+  m_skyMaterial: {fileID: 2100000, guid: b4620d2bbad484a45bc3c8fc54349998, type: 2}
+  m_hdrExposure: 1
+  m_waveLength: {x: 0.95, y: 0.87, z: 0.73}
+  m_ESun: 3
+  m_kr: 0.0025
+  m_krPhaseBias: 1
+  m_km: 0.001
+  m_g: -0.99
+  bleed: 1
+  scatter_strength: 8
 --- !u!1 &322797652
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,6 +430,35 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_terrainMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: aedfb4f52edb3034b897d06cf9ee3001, type: 2}
+    - target: {fileID: 157698, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 119726, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 137358, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_hdrExposure
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
+      propertyPath: m_groundMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: aedfb4f52edb3034b897d06cf9ee3001, type: 2}
+    m_RemovedComponents:
+    - {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
   m_IsPrefabParent: 0

@@ -2,10 +2,11 @@
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
+using UnityEngine;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Dot", "Vector Operators", "Scalar dot product of two vectors ( A . B )" )]
+	[NodeAttributes( "Dot", "Vector Operators", "Scalar dot product of two vectors ( A . B )", null, KeyCode.Period )]
 	public sealed class DotProductOpNode : DynamicTypeNode
 	{
 		protected override void CommonInit( int uniqueId )

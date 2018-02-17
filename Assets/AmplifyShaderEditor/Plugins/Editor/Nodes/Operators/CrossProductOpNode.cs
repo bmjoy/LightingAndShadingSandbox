@@ -2,11 +2,12 @@
 // Copyright (c) Amplify Creations, Lda <info@amplify.pt>
 
 using System;
+using UnityEngine;
 
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Cross", "Vector Operators", "Cross product of two three-component vectors ( A x B )" )]
+	[NodeAttributes( "Cross", "Vector Operators", "Cross product of two three-component vectors ( A x B )", null, KeyCode.X )]
 	public sealed class CrossProductOpNode : ParentNode
 	{
 		protected override void CommonInit( int uniqueId )

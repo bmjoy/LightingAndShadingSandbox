@@ -52,6 +52,7 @@ namespace AmplifyShaderEditor
 			m_precisionString = UIUtils.FinalPrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType );
 			m_availableAttribs.Add( new PropertyAttributes( "Toggle", "[Toggle]" ) );
 			m_availableAttribs.Add( new PropertyAttributes( "Int Range", "[IntRange]" ) );
+			m_availableAttribs.Add( new PropertyAttributes( "Enum", "[Enum]" ) );
 			m_previewShaderGUID = "d9ca47581ac157145bff6f72ac5dd73e";
 		}
 

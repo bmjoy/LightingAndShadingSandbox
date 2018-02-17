@@ -279,11 +279,11 @@ namespace AmplifyShaderEditor
 				RenderTexture.active = rt;
 
 				bool cachedsrgb = GL.sRGBWrite;
-				GL.sRGBWrite = true;
+				GL.sRGBWrite = !m_linearMode;
 				Graphics.Blit( m_allTextures[ i ], rt );
 				GL.sRGBWrite = cachedsrgb;
 
-				Texture2D t2d = new Texture2D( sizeX, sizeY, TextureFormat.ARGB32, m_mipMaps );
+				Texture2D t2d = new Texture2D( sizeX, sizeY, TextureFormat.ARGB32, m_mipMaps, m_linearMode );
 				t2d.ReadPixels( new Rect( 0, 0, sizeX, sizeY ), 0, 0, m_mipMaps );
 				RenderTexture.active = null;
 

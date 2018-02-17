@@ -60,8 +60,9 @@ namespace AmplifyShaderEditor
 		private Vector3 m_previewInternalVec3 = Vector3.zero;
 		private Vector4 m_previewInternalVec4 = Vector4.zero;
 		private Color m_previewInternalColor = Color.clear;
+		private Matrix4x4 m_previewInternalMatrix4x4 = Matrix4x4.identity;
 
-		public InputPort() : base( -1, -1, WirePortDataType.FLOAT, string.Empty ) { m_typeLocked = true; UpdateInternalData(); }
+		public InputPort() : base( -1, -1, WirePortDataType.FLOAT, string.Empty ) { m_typeLocked = true; }
 		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment, PortGenType genType = PortGenType.NonCustomLighting ) : base( nodeId, portId, dataType, name, orderId )
 		{
 			m_dataName = name;
@@ -69,7 +70,6 @@ namespace AmplifyShaderEditor
 			m_typeLocked = typeLocked;
 			m_category = category;
 			m_genType = genType;
-			UpdateInternalData();
 		}
 
 		public InputPort( int nodeId, int portId, WirePortDataType dataType, string name, string dataName, bool typeLocked, int orderId = -1, MasterNodePortCategory category = MasterNodePortCategory.Fragment, PortGenType genType = PortGenType.NonCustomLighting ) : base( nodeId, portId, dataType, name, orderId )
@@ -79,7 +79,6 @@ namespace AmplifyShaderEditor
 			m_typeLocked = typeLocked;
 			m_category = category;
 			m_genType = genType;
-			UpdateInternalData();
 		}
 
 		public override bool CheckValidType( WirePortDataType dataType )
@@ -122,151 +121,225 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public void UpdateInternalData()
+		void UpdateVariablesFromInternalData()
 		{
 			string[] data = String.IsNullOrEmpty( m_internalData ) ? null : m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
+			bool reset = ( data == null || data.Length == 0 );
+
+			try
+			{
+				switch( m_dataType )
+				{
+					case WirePortDataType.OBJECT:
+					case WirePortDataType.FLOAT: m_previewInternalFloat = reset ? 0 : Convert.ToSingle( data[ 0 ] ); break;
+					case WirePortDataType.INT:
+					{
+						if( reset )
+						{
+							m_previewInternalInt = 0;
+						}
+						else
+						{
+							if( data[ 0 ].Contains( "." ) )
+							{
+								m_previewInternalInt = (int)Convert.ToSingle( data[ 0 ] );
+							}
+							else
+							{
+								m_previewInternalInt = Convert.ToInt32( data[ 0 ] );
+							}
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT2:
+					{
+						if( reset )
+						{
+							m_previewInternalVec2 = Vector2.zero;
+						}
+						else
+						{
+							if( data.Length < 2 )
+							{
+								m_previewInternalVec2.x = Convert.ToSingle( data[ 0 ] );
+								m_previewInternalVec2.y = 0;
+							}
+							else
+							{
+								m_previewInternalVec2.x = Convert.ToSingle( data[ 0 ] );
+								m_previewInternalVec2.y = Convert.ToSingle( data[ 1 ] );
+							}
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT3:
+					{
+						if( reset )
+						{
+							m_previewInternalVec3 = Vector3.zero;
+						}
+						else
+						{
+							int count = Mathf.Min( data.Length, 3 );
+							for( int i = 0; i < count; i++ )
+							{
+								m_previewInternalVec3[ i ] = Convert.ToSingle( data[ i ] );
+							}
+							if( count < 3 )
+							{
+								for( int i = count; i < 3; i++ )
+								{
+									m_previewInternalVec3[ i ] = 0;
+								}
+							}
+						}
+
+					}
+					break;
+					case WirePortDataType.FLOAT4:
+					{
+						if( reset )
+						{
+							m_previewInternalVec4 = Vector4.zero;
+						}
+						else
+						{
+							int count = Mathf.Min( data.Length, 4 );
+							for( int i = 0; i < count; i++ )
+							{
+								m_previewInternalVec4[ i ] = Convert.ToSingle( data[ i ] );
+							}
+							if( count < 4 )
+							{
+								for( int i = count; i < 4; i++ )
+								{
+									m_previewInternalVec4[ i ] = 0;
+								}
+							}
+						}
+					}
+					break;
+					case WirePortDataType.COLOR:
+					{
+						if( reset )
+						{
+							m_previewInternalColor = Color.black;
+						}
+						else
+						{
+							int count = Mathf.Min( data.Length, 4 );
+							for( int i = 0; i < count; i++ )
+							{
+								m_previewInternalColor[ i ] = Convert.ToSingle( data[ i ] );
+							}
+							if( count < 4 )
+							{
+								for( int i = count; i < 4; i++ )
+								{
+									m_previewInternalColor[ i ] = 0;
+								}
+							}
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT3x3:
+					case WirePortDataType.FLOAT4x4:
+					{
+						if( reset )
+						{
+							m_previewInternalMatrix4x4 = Matrix4x4.identity;
+						}
+						else
+						{
+							int count = Mathf.Min( data.Length, 16 );
+							int overallIdx = 0;
+							for( int i = 0; i < 4; i++ )
+							{
+								for( int j = 0; j < 4; j++ )
+								{
+									if( overallIdx < count )
+									{
+										m_previewInternalMatrix4x4[ i, j ] = Convert.ToSingle( data[ overallIdx ] );
+									}
+									else
+									{
+										m_previewInternalMatrix4x4[ i, j ] = (( i == j ) ? 1 : 0);
+									}
+									overallIdx++;
+								}
+							}
+						}
+					}
+					break;
+				}
+			}
+			catch( Exception e )
+			{
+				if( DebugConsoleWindow.DeveloperMode )
+					Debug.LogException( e );
+			}
+		}
+
+		void UpdateInternalDataFromVariables()
+		{
 			switch( m_dataType )
 			{
 				case WirePortDataType.OBJECT:
 				case WirePortDataType.FLOAT:
 				{
-					m_internalData = ( data == null ) ? "0.0" : data[ 0 ];
+					m_internalData = m_previewInternalFloat.ToString();
 					m_internalDataWrapper = string.Empty;
 				}
 				break;
 				case WirePortDataType.INT:
 				{
-					if( data == null )
-					{
-						m_internalData = "0";
-					}
-					else
-					{
-						string[] intData = data[ 0 ].Split( IOUtils.FLOAT_SEPARATOR );
-						m_internalData = ( intData.Length == 0 ) ? "0" : intData[ 0 ];
-					}
+					m_internalData = m_previewInternalInt.ToString();
 					m_internalDataWrapper = string.Empty;
 				}
 				break;
 				case WirePortDataType.FLOAT2:
 				{
-					if( data == null )
-					{
-						m_internalData = "0" + IOUtils.VECTOR_SEPARATOR + "0";
-					}
-					else
-					{
-						m_internalData = ( data.Length < 2 ) ? ( data[ 0 ] + IOUtils.VECTOR_SEPARATOR + "0" ) : ( data[ 0 ] + IOUtils.VECTOR_SEPARATOR + data[ 1 ] );
-					}
+					m_internalData = m_previewInternalVec2.x.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec2.y.ToString();
 					m_internalDataWrapper = "float2( {0} )";
 				}
 				break;
 				case WirePortDataType.FLOAT3:
 				{
-					if( data == null )
-					{
-						m_internalData = "0" + IOUtils.VECTOR_SEPARATOR +
-										"0" + IOUtils.VECTOR_SEPARATOR +
-										"0";
-					}
-					else
-					{
-						if( data.Length < 3 )
-						{
-							if( data.Length == 1 )
-							{
-								m_internalData = data[ 0 ] + IOUtils.VECTOR_SEPARATOR +
-												"0" + IOUtils.VECTOR_SEPARATOR +
-												"0";
-							}
-							else
-							{
-								m_internalData = data[ 0 ] + IOUtils.VECTOR_SEPARATOR +
-												data[ 1 ] + IOUtils.VECTOR_SEPARATOR +
-												"0";
-							}
-						}
-						else if( data.Length > 3 )
-						{
-							m_internalData = data[ 0 ] + IOUtils.VECTOR_SEPARATOR +
-											data[ 1 ] + IOUtils.VECTOR_SEPARATOR +
-											data[ 2 ];
-						}
-					}
-
+					m_internalData = m_previewInternalVec3.x.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec3.y.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec3.z.ToString();
 					m_internalDataWrapper = "float3( {0} )";
 				}
 				break;
 				case WirePortDataType.FLOAT4:
+				{
+					m_internalData = m_previewInternalVec4.x.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec4.y.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec4.z.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalVec4.w.ToString();
+
+					m_internalDataWrapper = "float4( {0} )";
+				}
+				break;
 				case WirePortDataType.COLOR:
 				{
-					if( data == null )
-					{
-						m_internalData = "0" + IOUtils.VECTOR_SEPARATOR +
-										"0" + IOUtils.VECTOR_SEPARATOR +
-										"0" + IOUtils.VECTOR_SEPARATOR +
-										"0";
-					}
-					else
-					{
-						if( data.Length > 4 )
-						{
-							m_internalData = string.Empty;
-							for( int i = 0; i < 3; i++ )
-							{
-								m_internalData += data[ i ] + IOUtils.VECTOR_SEPARATOR;
-							}
-							m_internalData += data[ 3 ];
-						}
-						else if( data.Length < 4 )
-						{
-							m_internalData = string.Empty;
-							int i;
-							for( i = 0; i < data.Length; i++ )
-							{
-								m_internalData += data[ i ] + IOUtils.VECTOR_SEPARATOR;
-							}
+					m_internalData = m_previewInternalColor.r.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalColor.g.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalColor.b.ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalColor.a.ToString();
 
-							for( ; i < 3; i++ )
-							{
-								m_internalData += "0" + IOUtils.VECTOR_SEPARATOR;
-							}
-							m_internalData += "0";
-						}
-					}
 					m_internalDataWrapper = "float4( {0} )";
 				}
 				break;
 				case WirePortDataType.FLOAT3x3:
 				case WirePortDataType.FLOAT4x4:
 				{
-					if( data == null )
-					{
-						for( int i = 0; i < 15; i++ )
-						{
-							m_internalData += "0" + IOUtils.VECTOR_SEPARATOR;
-						}
-						m_internalData += "0";
-					}
-					else
-					{
-						if( data.Length < 16 )
-						{
-							m_internalData = string.Empty;
-							int i;
+					m_internalData = m_previewInternalMatrix4x4[ 0, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 0, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 0, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 0, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalMatrix4x4[ 1, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 1, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 1, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 1, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalMatrix4x4[ 2, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 2, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 2, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 2, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+									 m_previewInternalMatrix4x4[ 3, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 3, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 3, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + m_previewInternalMatrix4x4[ 3, 3 ].ToString();
 
-							for( i = 0; i < data.Length; i++ )
-							{
-								m_internalData += data[ i ] + IOUtils.VECTOR_SEPARATOR;
-							}
-
-							for( ; i < 15; i++ )
-							{
-								m_internalData += "0" + IOUtils.VECTOR_SEPARATOR;
-							}
-							m_internalData += "0";
-						}
-					}
 					if( m_dataType == WirePortDataType.FLOAT3x3 )
 						m_internalDataWrapper = "float3x3( {0} )";
 					else
@@ -304,8 +377,8 @@ namespace AmplifyShaderEditor
 
 		private string SamplerWrappedData( ref MasterNodeDataCollector dataCollector )
 		{
-			m_internalData = "sampler"+ PortId + UIUtils.GetNode( m_nodeId ).OutputId;
-			dataCollector.AddToUniforms( m_nodeId, "uniform sampler2D "+ m_internalData + ";" );
+			m_internalData = "sampler" + PortId + UIUtils.GetNode( m_nodeId ).OutputId;
+			dataCollector.AddToUniforms( m_nodeId, "uniform sampler2D " + m_internalData + ";" );
 
 			return m_internalData;
 		}
@@ -325,7 +398,7 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				UpdateInternalData();
+				UpdateInternalDataFromVariables();
 				if( DataType == WirePortDataType.FLOAT3x3 )
 					result = Matrix3x3WrappedData();
 				else if( DataType == WirePortDataType.SAMPLER2D )
@@ -345,7 +418,7 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				UpdateInternalData();
+				UpdateInternalDataFromVariables();
 				if( !String.IsNullOrEmpty( m_internalDataWrapper ) )
 				{
 					if( DataType == WirePortDataType.FLOAT3x3 )
@@ -374,7 +447,7 @@ namespace AmplifyShaderEditor
 			}
 			else
 			{
-				UpdateInternalData();
+				UpdateInternalDataFromVariables();
 				if( !String.IsNullOrEmpty( m_internalDataWrapper ) )
 				{
 					if( DataType == WirePortDataType.FLOAT3x3 )
@@ -505,270 +578,50 @@ namespace AmplifyShaderEditor
 
 		public float FloatInternalData
 		{
-			set
-			{
-				InternalData = value.ToString();
-				if( value % 1 == 0 )
-				{
-					m_internalData += ".0";
-				}
-				m_previewInternalFloat = value;
-			}
-			get
-			{
-				float data = 0f;
-				try
-				{
-					data = Convert.ToSingle( m_internalData );
-				}
-				catch( Exception e )
-				{
-					data = 0f;
-					FloatInternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogException( e );
-				}
-				return data;
-			}
+			set { m_previewInternalFloat = value; }
+			get { return m_previewInternalFloat; }
 		}
 
 		public int IntInternalData
 		{
-			set { InternalData = value.ToString(); m_previewInternalInt = value; }
-			get
-			{
-				int data = 0;
-				try
-				{
-					data = Convert.ToInt32( m_internalData );
-				}
-				catch( Exception e )
-				{
-					data = 0;
-					IntInternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogException( e );
-				}
-				return data;
-			}
+			set { m_previewInternalInt = value; }
+			get { return m_previewInternalInt; }
 		}
 
 		public Vector2 Vector2InternalData
 		{
-			set { InternalData = value.x.ToString() + IOUtils.VECTOR_SEPARATOR + value.y.ToString(); m_previewInternalVec2 = value; }
-			get
-			{
-				Vector2 data = new Vector2();
-				string[] components = m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
-				if( components.Length >= 2 )
-				{
-					try
-					{
-						data.x = Convert.ToSingle( components[ 0 ] );
-						data.y = Convert.ToSingle( components[ 1 ] );
-					}
-					catch( Exception e )
-					{
-						data = Vector2.zero;
-						Vector2InternalData = data;
-						if( DebugConsoleWindow.DeveloperMode )
-							Debug.LogException( e );
-					}
-				}
-				else
-				{
-					Vector2InternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogError( "Length smaller than 2" );
-				}
-				return data;
-			}
-
+			set { m_previewInternalVec2 = value; }
+			get { return m_previewInternalVec2; }
 		}
 
 		public Vector3 Vector3InternalData
 		{
-			set
-			{
-				InternalData = value.x.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.y.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.z.ToString();
-
-				m_previewInternalVec3 = value;
-			}
-			get
-			{
-				Vector3 data = new Vector3();
-				string[] components = m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
-				if( components.Length >= 3 )
-				{
-					try
-					{
-						data.x = Convert.ToSingle( components[ 0 ] );
-						data.y = Convert.ToSingle( components[ 1 ] );
-						data.z = Convert.ToSingle( components[ 2 ] );
-					}
-					catch( Exception e )
-					{
-						data = Vector3.zero;
-						Vector3InternalData = data;
-						if( DebugConsoleWindow.DeveloperMode )
-							Debug.LogException( e );
-					}
-				}
-				else
-				{
-					Vector3InternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogError( "Length smaller than 3" );
-				}
-				return data;
-			}
+			set { m_previewInternalVec3 = value; }
+			get { return m_previewInternalVec3; }
 		}
 
 		public Vector4 Vector4InternalData
 		{
-			set
-			{
-				InternalData = value.x.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.y.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.z.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.w.ToString();
-				m_previewInternalVec4 = value;
-			}
-			get
-			{
-				Vector4 data = new Vector4();
-				string[] components = m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
-				if( components.Length >= 4 )
-				{
-					try
-					{
-						data.x = Convert.ToSingle( components[ 0 ] );
-						data.y = Convert.ToSingle( components[ 1 ] );
-						data.z = Convert.ToSingle( components[ 2 ] );
-						data.w = Convert.ToSingle( components[ 3 ] );
-					}
-					catch( Exception e )
-					{
-						data = Vector4.zero;
-						Vector4InternalData = data;
-						if( DebugConsoleWindow.DeveloperMode )
-							Debug.LogException( e );
-					}
-				}
-				else
-				{
-					Vector4InternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogError( "Length smaller than 4" );
-				}
-				return data;
-			}
+			set { m_previewInternalVec4 = value; }
+			get { return m_previewInternalVec4; }
 		}
 
 		public Color ColorInternalData
 		{
-			set
-			{
-				InternalData = value.r.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.g.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.b.ToString() + IOUtils.VECTOR_SEPARATOR +
-								value.a.ToString();
-				m_previewInternalColor = value;
-			}
-			get
-			{
-				Color data = new Color();
-				string[] components = m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
-				if( components.Length >= 4 )
-				{
-					try
-					{
-						data.r = Convert.ToSingle( components[ 0 ] );
-						data.g = Convert.ToSingle( components[ 1 ] );
-						data.b = Convert.ToSingle( components[ 2 ] );
-						data.a = Convert.ToSingle( components[ 3 ] );
-					}
-					catch( Exception e )
-					{
-						data = Color.clear;
-						ColorInternalData = data;
-						if( DebugConsoleWindow.DeveloperMode )
-							Debug.LogException( e );
-					}
-				}
-				else
-				{
-					ColorInternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogError( "Length smaller than 4" );
-				}
-				return data;
-			}
+			set { m_previewInternalColor = value; }
+			get { return m_previewInternalColor; }
 		}
 
 		public Matrix4x4 Matrix4x4InternalData
 		{
-			set
-			{
-				InternalData = value[ 0, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 0, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 0, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 0, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
-									value[ 1, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 1, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 1, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 1, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
-									value[ 2, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 2, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 2, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 2, 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
-									value[ 3, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 3, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 3, 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + value[ 3, 3 ].ToString();
-			}
-			get
-			{
-				Matrix4x4 data = new Matrix4x4();
-				string[] components = m_internalData.Split( IOUtils.VECTOR_SEPARATOR );
-				if( components.Length >= 16 )
-				{
-					try
-					{
-						data[ 0, 0 ] = Convert.ToSingle( components[ 0 ] );
-						data[ 0, 1 ] = Convert.ToSingle( components[ 1 ] );
-						data[ 0, 2 ] = Convert.ToSingle( components[ 2 ] );
-						data[ 0, 3 ] = Convert.ToSingle( components[ 3 ] );
-						data[ 1, 0 ] = Convert.ToSingle( components[ 4 ] );
-						data[ 1, 1 ] = Convert.ToSingle( components[ 5 ] );
-						data[ 1, 2 ] = Convert.ToSingle( components[ 6 ] );
-						data[ 1, 3 ] = Convert.ToSingle( components[ 7 ] );
-						data[ 2, 0 ] = Convert.ToSingle( components[ 8 ] );
-						data[ 2, 1 ] = Convert.ToSingle( components[ 9 ] );
-						data[ 2, 2 ] = Convert.ToSingle( components[ 10 ] );
-						data[ 2, 3 ] = Convert.ToSingle( components[ 11 ] );
-						data[ 3, 0 ] = Convert.ToSingle( components[ 12 ] );
-						data[ 3, 1 ] = Convert.ToSingle( components[ 13 ] );
-						data[ 3, 2 ] = Convert.ToSingle( components[ 14 ] );
-						data[ 3, 3 ] = Convert.ToSingle( components[ 15 ] );
-					}
-					catch( Exception e )
-					{
-						Matrix4x4InternalData = data;
-						if( DebugConsoleWindow.DeveloperMode )
-							Debug.LogException( e );
-					}
-				}
-				else
-				{
-					Matrix4x4InternalData = data;
-					if( DebugConsoleWindow.DeveloperMode )
-						Debug.LogError( "Length smaller than 16" );
-				}
-				return data;
-			}
+			set { m_previewInternalMatrix4x4 = value; }
+			get { return m_previewInternalMatrix4x4; }
 		}
 
 		public string SamplerInternalData
 		{
-			set
-			{
-				InternalData = UIUtils.RemoveInvalidCharacters( value );
-			}
-			get
-			{
-				return m_internalData;
-			}
+			set { InternalData = UIUtils.RemoveInvalidCharacters( value ); }
+			get { return m_internalData; }
 		}
 
 		public override void ForceClearConnection()
@@ -778,19 +631,25 @@ namespace AmplifyShaderEditor
 
 		public string InternalData
 		{
-			get { return m_internalData; }
+			get
+			{
+				UpdateInternalDataFromVariables();
+				return m_internalData;
+			}
 			set
 			{
-				if( !value.Equals( m_internalData ) )
-				{
-					m_internalData = value;
-				}
+				m_internalData = value;
+				UpdateVariablesFromInternalData();
 			}
 		}
 
 		public string WrappedInternalData
 		{
-			get { return string.IsNullOrEmpty( m_internalDataWrapper ) ? m_internalData : String.Format( m_internalDataWrapper, m_internalData ); }
+			get
+			{
+				UpdateInternalDataFromVariables();
+				return string.IsNullOrEmpty( m_internalDataWrapper ) ? m_internalData : String.Format( m_internalDataWrapper, m_internalData );
+			}
 		}
 
 		public override WirePortDataType DataType
@@ -799,12 +658,226 @@ namespace AmplifyShaderEditor
 			// must be set to update internal data. do not delete
 			set
 			{
-				if( base.DataType != value )
+				switch( DataType )
 				{
-					base.DataType = value;
-					if( m_externalReferences.Count == 0 )
-						UpdateInternalData();
+					case WirePortDataType.FLOAT:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT2: m_previewInternalVec2.x = m_previewInternalFloat; break;
+							case WirePortDataType.FLOAT3: m_previewInternalVec3.x = m_previewInternalFloat; break;
+							case WirePortDataType.FLOAT4: m_previewInternalVec4.x = m_previewInternalFloat; break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4: m_previewInternalMatrix4x4[ 0 ] = m_previewInternalFloat; break;
+							case WirePortDataType.COLOR: m_previewInternalColor.r = m_previewInternalFloat; break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalFloat; break;
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT2:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalVec2.x; break;
+							case WirePortDataType.FLOAT3:
+							{
+								m_previewInternalVec3.x = m_previewInternalVec2.x;
+								m_previewInternalVec3.y = m_previewInternalVec2.y;
+							}
+							break;
+							case WirePortDataType.FLOAT4:
+							{
+								m_previewInternalVec4.x = m_previewInternalVec2.x;
+								m_previewInternalVec4.y = m_previewInternalVec2.y;
+							}
+							break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4:
+							{
+								m_previewInternalMatrix4x4[ 0 ] = m_previewInternalVec2.x;
+								m_previewInternalMatrix4x4[ 1 ] = m_previewInternalVec2.y;
+							}
+							break;
+							case WirePortDataType.COLOR:
+							{
+								m_previewInternalColor.r = m_previewInternalVec2.x;
+								m_previewInternalColor.g = m_previewInternalVec2.y;
+							}
+							break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalVec2.x; break;
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT3:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalVec3.x; break;
+							case WirePortDataType.FLOAT2:
+							{
+								m_previewInternalVec2.x = m_previewInternalVec3.x;
+								m_previewInternalVec2.y = m_previewInternalVec3.y;
+							}
+							break;
+							case WirePortDataType.FLOAT4:
+							{
+								m_previewInternalVec4.x = m_previewInternalVec3.x;
+								m_previewInternalVec4.y = m_previewInternalVec3.y;
+								m_previewInternalVec4.z = m_previewInternalVec3.z;
+							}
+							break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4:
+							{
+								m_previewInternalMatrix4x4[ 0 ] = m_previewInternalVec3.x;
+								m_previewInternalMatrix4x4[ 1 ] = m_previewInternalVec3.y;
+								m_previewInternalMatrix4x4[ 2 ] = m_previewInternalVec3.z;
+							}
+							break;
+							case WirePortDataType.COLOR:
+							{
+								m_previewInternalColor.r = m_previewInternalVec3.x;
+								m_previewInternalColor.g = m_previewInternalVec3.y;
+								m_previewInternalColor.b = m_previewInternalVec3.z;
+							}
+							break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalVec3.x; break;
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT4:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalVec4.x; break;
+							case WirePortDataType.FLOAT2:
+							{
+								m_previewInternalVec2.x = m_previewInternalVec4.x;
+								m_previewInternalVec2.y = m_previewInternalVec4.y;
+							}
+							break;
+							case WirePortDataType.FLOAT3:
+							{
+								m_previewInternalVec3.x = m_previewInternalVec4.x;
+								m_previewInternalVec3.y = m_previewInternalVec4.y;
+								m_previewInternalVec3.z = m_previewInternalVec4.z;
+							}
+							break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4:
+							{
+								m_previewInternalMatrix4x4[ 0 ] = m_previewInternalVec4.x;
+								m_previewInternalMatrix4x4[ 1 ] = m_previewInternalVec4.y;
+								m_previewInternalMatrix4x4[ 2 ] = m_previewInternalVec4.z;
+								m_previewInternalMatrix4x4[ 3 ] = m_previewInternalVec4.w;
+							}
+							break;
+							case WirePortDataType.COLOR:
+							{
+								m_previewInternalColor.r = m_previewInternalVec4.x;
+								m_previewInternalColor.g = m_previewInternalVec4.y;
+								m_previewInternalColor.b = m_previewInternalVec4.z;
+								m_previewInternalColor.a = m_previewInternalVec4.w;
+							}
+							break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalVec4.x; break;
+						}
+					}
+					break;
+					case WirePortDataType.FLOAT3x3:
+					case WirePortDataType.FLOAT4x4:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalMatrix4x4[ 0 ]; break;
+							case WirePortDataType.FLOAT2:
+							{
+								m_previewInternalVec2.x = m_previewInternalMatrix4x4[ 0 ];
+								m_previewInternalVec2.y = m_previewInternalMatrix4x4[ 1 ];
+							}
+							break;
+							case WirePortDataType.FLOAT3:
+							{
+								m_previewInternalVec3.x = m_previewInternalMatrix4x4[ 0 ];
+								m_previewInternalVec3.y = m_previewInternalMatrix4x4[ 1 ];
+								m_previewInternalVec3.z = m_previewInternalMatrix4x4[ 2 ];
+							}
+							break;
+							case WirePortDataType.FLOAT4:
+							{
+								m_previewInternalVec4.x = m_previewInternalMatrix4x4[ 0 ];
+								m_previewInternalVec4.y = m_previewInternalMatrix4x4[ 1 ];
+								m_previewInternalVec4.z = m_previewInternalMatrix4x4[ 2 ];
+								m_previewInternalVec4.w = m_previewInternalMatrix4x4[ 3 ];
+							}
+							break;
+							case WirePortDataType.COLOR:
+							{
+								m_previewInternalColor.r = m_previewInternalMatrix4x4[ 0 ];
+								m_previewInternalColor.g = m_previewInternalMatrix4x4[ 1 ];
+								m_previewInternalColor.b = m_previewInternalMatrix4x4[ 2 ];
+								m_previewInternalColor.a = m_previewInternalMatrix4x4[ 3 ];
+							}
+							break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalMatrix4x4[ 0 ]; break;
+						}
+					}
+					break;
+					case WirePortDataType.COLOR:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalColor.r; break;
+							case WirePortDataType.FLOAT2:
+							{
+								m_previewInternalVec2.x = m_previewInternalColor.r;
+								m_previewInternalVec2.y = m_previewInternalColor.g;
+							}
+							break;
+							case WirePortDataType.FLOAT3:
+							{
+								m_previewInternalVec3.x = m_previewInternalColor.r;
+								m_previewInternalVec3.y = m_previewInternalColor.g;
+								m_previewInternalVec3.z = m_previewInternalColor.b;
+							}
+							break;
+							case WirePortDataType.FLOAT4:
+							{
+								m_previewInternalVec4.x = m_previewInternalColor.r;
+								m_previewInternalVec4.y = m_previewInternalColor.g;
+								m_previewInternalVec4.z = m_previewInternalColor.b;
+								m_previewInternalVec4.w = m_previewInternalColor.a;
+							}
+							break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4:
+							{
+								m_previewInternalMatrix4x4[ 0 ] = m_previewInternalColor.r;
+								m_previewInternalMatrix4x4[ 1 ] = m_previewInternalColor.g;
+								m_previewInternalMatrix4x4[ 2 ] = m_previewInternalColor.b;
+								m_previewInternalMatrix4x4[ 3 ] = m_previewInternalColor.a;
+							}
+							break;
+							case WirePortDataType.INT: m_previewInternalInt = (int)m_previewInternalColor.r; break;
+						}
+					}
+					break;
+					case WirePortDataType.INT:
+					{
+						switch( value )
+						{
+							case WirePortDataType.FLOAT: m_previewInternalFloat = m_previewInternalInt; break;
+							case WirePortDataType.FLOAT2: m_previewInternalVec2.x = m_previewInternalInt; break;
+							case WirePortDataType.FLOAT3: m_previewInternalVec3.x = m_previewInternalInt; break;
+							case WirePortDataType.FLOAT4: m_previewInternalVec4.x = m_previewInternalInt; break;
+							case WirePortDataType.FLOAT3x3:
+							case WirePortDataType.FLOAT4x4: m_previewInternalMatrix4x4[ 0 ] = m_previewInternalInt; break;
+							case WirePortDataType.COLOR: m_previewInternalColor.r = m_previewInternalInt; break;
+						}
+					}
+					break;
 				}
+				base.DataType = value;
 			}
 		}
 
@@ -1015,36 +1088,36 @@ namespace AmplifyShaderEditor
 			m_node.PreviewMaterial.SetTexture( m_propertyName, m_inputPreviewTexture );
 		}
 
-        public override void ChangePortId( int newPortId )
-        {
-            if( IsConnected )
-            {
-                int count = ExternalReferences.Count;
-                for( int connIdx = 0; connIdx < count; connIdx++ )
-                {
-                    int nodeId = ExternalReferences[ connIdx ].NodeId;
-                    int portId = ExternalReferences[ connIdx ].PortId;
-                    ParentNode node = UIUtils.GetNode( nodeId );
-                    if( node != null )
-                    {
-                        OutputPort outputPort = node.GetOutputPortByUniqueId( portId );
-                        int outputCount = outputPort.ExternalReferences.Count;
-                        for( int j = 0; j < outputCount; j++ )
-                        {
-                            if( outputPort.ExternalReferences[ j ].NodeId == NodeId &&
-                                outputPort.ExternalReferences[ j ].PortId == PortId )
-                            {
-                                outputPort.ExternalReferences[ j ].PortId = newPortId;
-                            }
-                        }
-                    }
-                }
-            }
+		public override void ChangePortId( int newPortId )
+		{
+			if( IsConnected )
+			{
+				int count = ExternalReferences.Count;
+				for( int connIdx = 0; connIdx < count; connIdx++ )
+				{
+					int nodeId = ExternalReferences[ connIdx ].NodeId;
+					int portId = ExternalReferences[ connIdx ].PortId;
+					ParentNode node = UIUtils.GetNode( nodeId );
+					if( node != null )
+					{
+						OutputPort outputPort = node.GetOutputPortByUniqueId( portId );
+						int outputCount = outputPort.ExternalReferences.Count;
+						for( int j = 0; j < outputCount; j++ )
+						{
+							if( outputPort.ExternalReferences[ j ].NodeId == NodeId &&
+								outputPort.ExternalReferences[ j ].PortId == PortId )
+							{
+								outputPort.ExternalReferences[ j ].PortId = newPortId;
+							}
+						}
+					}
+				}
+			}
 
-            PortId = newPortId;
-        }
+			PortId = newPortId;
+		}
 
-        private int m_propertyNameInt = 0;
+		private int m_propertyNameInt = 0;
 		private ParentNode m_node = null;
 
 		public override void Destroy()

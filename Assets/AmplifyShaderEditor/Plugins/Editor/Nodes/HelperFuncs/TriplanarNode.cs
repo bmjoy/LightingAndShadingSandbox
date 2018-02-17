@@ -232,34 +232,43 @@ namespace AmplifyShaderEditor
 		public void Init()
 		{
 			// Top
-			m_topTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
-			m_topTexture.ContainerGraph = ContainerGraph;
-			m_topTexture.CustomPrefix = "Top Texture ";
-			m_topTexture.UniqueId = UniqueId;
-			m_topTexture.DrawAutocast = false;
-			m_topTexture.CurrentParameterType = PropertyType.Property;
+			if( m_topTexture == null )
+			{
+				m_topTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
+				m_topTexture.ContainerGraph = ContainerGraph;
+				m_topTexture.CustomPrefix = "Top Texture ";
+				m_topTexture.UniqueId = UniqueId;
+				m_topTexture.DrawAutocast = false;
+				m_topTexture.CurrentParameterType = PropertyType.Property;
+			}
 
 			// Mid
-			m_midTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
-			m_midTexture.ContainerGraph = ContainerGraph;
-			m_midTexture.CustomPrefix = "Mid Texture ";
-			m_midTexture.UniqueId = UniqueId;
-			m_midTexture.DrawAutocast = false;
-			m_midTexture.CurrentParameterType = PropertyType.Property;
+			if( m_midTexture == null )
+			{
+				m_midTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
+				m_midTexture.ContainerGraph = ContainerGraph;
+				m_midTexture.CustomPrefix = "Mid Texture ";
+				m_midTexture.UniqueId = UniqueId;
+				m_midTexture.DrawAutocast = false;
+				m_midTexture.CurrentParameterType = PropertyType.Property;
+			}
 
 			// Bot
-			m_botTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
-			m_botTexture.ContainerGraph = ContainerGraph;
-			m_botTexture.CustomPrefix = "Bot Texture ";
-			m_botTexture.UniqueId = UniqueId;
-			m_botTexture.DrawAutocast = false;
-			m_botTexture.CurrentParameterType = PropertyType.Property;
+			if( m_botTexture == null )
+			{
+				m_botTexture = ScriptableObject.CreateInstance<TexturePropertyNode>();
+				m_botTexture.ContainerGraph = ContainerGraph;
+				m_botTexture.CustomPrefix = "Bot Texture ";
+				m_botTexture.UniqueId = UniqueId;
+				m_botTexture.DrawAutocast = false;
+				m_botTexture.CurrentParameterType = PropertyType.Property;
+			}
 
 			if( m_materialMode )
 				SetDelayedMaterialMode( ContainerGraph.CurrentMaterial );
 
 			if( m_nodeAttribs != null )
-				m_uniqueName = m_nodeAttribs.Name + OutputId;
+				m_uniqueName = m_nodeAttribs.Name + UniqueId;
 
 			ConfigurePorts();
 
@@ -539,31 +548,31 @@ namespace AmplifyShaderEditor
 		public override void OnEnable()
 		{
 			base.OnEnable();
-			if( !m_afterDeserialize )
+			//if( !m_afterDeserialize )
 				Init(); //Generate texture properties
-			else
-				m_afterDeserialize = false;
+			//else
+				//m_afterDeserialize = false;
 
-			//if ( m_topTexture != null )
+			//if( m_topTexture != null )
 			//	m_topTexture.ReRegisterName = true;
 
-			//if(m_selectedTriplanarType == TriplanarType.Cylindrical )
+			//if( m_selectedTriplanarType == TriplanarType.Cylindrical )
 			//{
-			//	if ( m_midTexture != null )
+			//	if( m_midTexture != null )
 			//		m_midTexture.ReRegisterName = true;
 
-			//	if ( m_botTexture != null )
+			//	if( m_botTexture != null )
 			//		m_botTexture.ReRegisterName = true;
 			//}
 		}
 
-		bool m_afterDeserialize = false;
+		//bool m_afterDeserialize = false;
 
-		public override void OnAfterDeserialize()
-		{
-			base.OnAfterDeserialize();
-			m_afterDeserialize = true;
-		}
+		//public override void OnAfterDeserialize()
+		//{
+		//	base.OnAfterDeserialize();
+		//	m_afterDeserialize = true;
+		//}
 
 		public override void OnNodeLayout( DrawInfo drawInfo )
 		{
@@ -1229,7 +1238,12 @@ namespace AmplifyShaderEditor
 		public override void RefreshExternalReferences()
 		{
 			base.RefreshExternalReferences();
+
+			//Init();
+
 			ReadPropertiesData();
+
+			ConfigurePorts();
 		}
 
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )

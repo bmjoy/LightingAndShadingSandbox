@@ -211,10 +211,18 @@ namespace AmplifyShaderEditor
 			string result = string.Empty;
 			string varName = string.Empty;
 
+			string indexStr = index > 0 ? ( index + 1 ).ToString() : "";
+
 			if( dataCollector.PortCategory == MasterNodePortCategory.Fragment || dataCollector.PortCategory == MasterNodePortCategory.Debug )
 			{
-				string dummyPropUV = "_texcoord" + ( index > 0 ? ( index + 1 ).ToString() : "" );
-				string dummyUV = "uv" + ( index > 0 ? ( index + 1 ).ToString() : "" ) + dummyPropUV;
+				string sizeDif = string.Empty;
+				if( size == WirePortDataType.FLOAT3 )
+					sizeDif = "3";
+				else if( size == WirePortDataType.FLOAT4 )
+					sizeDif = "4";
+
+				string dummyPropUV = "_tex"+ sizeDif + "coord" + indexStr;
+				string dummyUV = "uv" + indexStr + dummyPropUV;
 
 				dataCollector.AddToProperties( uniqueId, "[HideInInspector] " + dummyPropUV + "( \"\", 2D ) = \"white\" {}", 100 );
 				dataCollector.AddToInput( uniqueId, dummyUV, size );
@@ -246,7 +254,7 @@ namespace AmplifyShaderEditor
 				}
 			}
 
-			varName = "uv" + ( index > 0 ? ( index + 1 ).ToString() : "" ) + "_TexCoord" + outputId;
+			varName = "uv" + indexStr + "_TexCoord" + outputId;
 
 			if( !string.IsNullOrEmpty( propertyName ) )
 			{

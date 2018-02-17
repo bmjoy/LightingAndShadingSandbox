@@ -35,6 +35,7 @@ namespace AmplifyShaderEditor
 			m_selectedLocation = PreviewLocation.BottomCenter;
 			m_precisionString = UIUtils.PrecisionWirePortToCgType( m_currentPrecisionType, m_outputPorts[ 0 ].DataType );
 			m_drawPrecisionUI = false;
+			m_availableAttribs.Add( new PropertyAttributes( "Enum", "[Enum]" ) );
 			m_previewShaderGUID = "0f64d695b6ffacc469f2dd31432a232a";
 		}
 

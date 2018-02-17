@@ -110,7 +110,6 @@ namespace AmplifyShaderEditor
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
 		{
-			m_inputPorts[ 0 ].UpdateInternalData();
 			return m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector );
 		}
 

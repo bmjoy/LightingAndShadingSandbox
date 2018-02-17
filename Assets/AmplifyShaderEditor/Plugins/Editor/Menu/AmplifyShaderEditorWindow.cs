@@ -32,6 +32,8 @@ namespace AmplifyShaderEditor
 		private bool m_initialized = false;
 		private bool m_checkInvalidConnections = false;
 		private bool m_afterDeserializeFlag = true;
+
+		[SerializeField]
 		private ParentGraph m_customGraph = null;
 
 		// UI 
@@ -533,6 +535,20 @@ namespace AmplifyShaderEditor
 		public override void OnEnable()
 		{
 			base.OnEnable();
+			if( m_mainGraphInstance == null )
+			{
+				m_mainGraphInstance = CreateInstance<ParentGraph>();
+				m_mainGraphInstance.Init();
+				m_mainGraphInstance.ParentWindow = this;
+				m_mainGraphInstance.SetGraphId( 0 );
+			}
+			m_mainGraphInstance.OnNodeEvent += OnNodeStoppedMovingEvent;
+			m_mainGraphInstance.OnMaterialUpdatedEvent += OnMaterialUpdated;
+			m_mainGraphInstance.OnShaderUpdatedEvent += OnShaderUpdated;
+			m_mainGraphInstance.OnEmptyGraphDetectedEvt += OnEmptyGraphDetected;
+			m_mainGraphInstance.OnNodeRemovedEvent += m_toolsWindow.OnNodeRemovedFromGraph;
+			GraphCount = 1;
+
 			IOUtils.Init();
 			IOUtils.AllOpenedWindows.Add( this );
 
@@ -551,12 +567,10 @@ namespace AmplifyShaderEditor
 			if( CurrentSelection == ASESelectionMode.ShaderFunction )
 			{
 				IsShaderFunctionWindow = true;
-				//m_mainGraphInstance.CurrentCanvasMode = NodeAvailability.ShaderFunction;
 			}
 			else
 			{
 				IsShaderFunctionWindow = false;
-				//m_mainGraphInstance.SetModeFromMasterNode();
 			}
 
 			m_optionsWindow = new OptionsWindow( this );
@@ -637,11 +651,11 @@ namespace AmplifyShaderEditor
 				ForceRepaint();
 			} );
 
-			m_shortcutManager.RegisterEditorShortcut( true, EventModifiers.None, KeyCode.B, "New Master Node", () =>
-			{
-				OnToolButtonPressed( ToolButtonType.MasterNode );
-				ForceRepaint();
-			} );
+			//m_shortcutManager.RegisterEditorShortcut( true, EventModifiers.None, KeyCode.B, "New Master Node", () =>
+			//{
+			//	OnToolButtonPressed( ToolButtonType.MasterNode );
+			//	ForceRepaint();
+			//} );
 
 			m_shortcutManager.RegisterEditorShortcut( true, EventModifiers.None, KeyCode.Space, "Open Node Palette", null, () =>
 			{
@@ -689,16 +703,6 @@ namespace AmplifyShaderEditor
 			m_commentaryTypeNode = typeof( CommentaryNode );
 			titleContent = new GUIContent( "Shader Editor" );
 			autoRepaintOnSceneChange = true;
-			m_mainGraphInstance = new ParentGraph()
-			{
-				ParentWindow = this
-			};
-			m_mainGraphInstance.SetGraphId( 0 );
-			GraphCount = 1;
-			m_mainGraphInstance.OnNodeEvent += OnNodeStoppedMovingEvent;
-			m_mainGraphInstance.OnMaterialUpdatedEvent += OnMaterialUpdated;
-			m_mainGraphInstance.OnShaderUpdatedEvent += OnShaderUpdated;
-			m_mainGraphInstance.OnEmptyGraphDetectedEvt += OnEmptyGraphDetected;
 
 			m_currentMousePos = new Vector3( 0, 0, 0 );
 			m_keyEvtMousePos2D = new Vector2( 0, 0 );
@@ -727,8 +731,6 @@ namespace AmplifyShaderEditor
 			m_consoleLogWindow = new ConsoleLogWindow( this );
 
 			m_tipsWindow = new TipsWindow( this );
-
-			m_mainGraphInstance.OnNodeRemovedEvent += m_toolsWindow.OnNodeRemovedFromGraph;
 
 			m_registeredMenus.Add( m_toolsWindow );
 			m_registeredMenus.Add( m_consoleLogWindow );
@@ -1216,8 +1218,20 @@ namespace AmplifyShaderEditor
 
 		public void Reset()
 		{
-			m_mainGraphInstance.SetGraphId( 0 );
+			if( m_mainGraphInstance == null )
+			{
+				m_mainGraphInstance = CreateInstance<ParentGraph>();
+				m_mainGraphInstance.Init();
+				m_mainGraphInstance.ParentWindow = this;
+				m_mainGraphInstance.SetGraphId( 0 );
+			}
+			m_mainGraphInstance.OnNodeEvent += OnNodeStoppedMovingEvent;
+			m_mainGraphInstance.OnMaterialUpdatedEvent += OnMaterialUpdated;
+			m_mainGraphInstance.OnShaderUpdatedEvent += OnShaderUpdated;
+			m_mainGraphInstance.OnEmptyGraphDetectedEvt += OnEmptyGraphDetected;
+			m_mainGraphInstance.OnNodeRemovedEvent += m_toolsWindow.OnNodeRemovedFromGraph;
 			GraphCount = 1;
+
 			FullCleanUndoStack();
 			m_performFullUndoRegister = true;
 			m_toolsWindow.BorderStyle = null;
@@ -4403,8 +4417,7 @@ namespace AmplifyShaderEditor
 			if( m_afterDeserializeFlag )
 			{
 				m_afterDeserializeFlag = false;
-				m_mainGraphInstance.ParentWindow = this;
-
+				//m_mainGraphInstance.ParentWindow = this;
 			}
 
 			if( IsShaderFunctionWindow && CurrentGraph.CurrentShaderFunction == null )
@@ -4714,7 +4727,7 @@ namespace AmplifyShaderEditor
 		{
 			m_afterDeserializeFlag = true;
 
-			m_customGraph = null;
+			//m_customGraph = null;
 			if( DebugConsoleWindow.UseShaderPanelsInfo )
 			{
 				if( m_nodeParametersWindow != null )

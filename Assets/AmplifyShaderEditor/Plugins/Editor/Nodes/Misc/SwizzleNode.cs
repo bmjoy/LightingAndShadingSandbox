@@ -12,7 +12,7 @@ using UnityEngine;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Swizzle", "Vector Operators", "Swizzle components of vector types", null, KeyCode.None, true, false, null, null, "Tobias Pott - @TobiasPott" )]
+	[NodeAttributes( "Swizzle", "Vector Operators", "Swizzle components of vector types", null, KeyCode.Z, true, false, null, null, "Tobias Pott - @TobiasPott" )]
 	public sealed class SwizzleNode : SingleInputOp
 	{
 

@@ -192,6 +192,9 @@ namespace AmplifyShaderEditor
 
 		protected void DrawCurrentShaderType()
 		{
+			if( m_availableCategories == null )
+				InitAvailableCategories();
+
 			int oldType = m_masterNodeCategory;
 			m_masterNodeCategory = EditorGUILayoutPopup( m_categoryLabel, m_masterNodeCategory, m_availableCategoryLabels );
 			if( oldType != m_masterNodeCategory )

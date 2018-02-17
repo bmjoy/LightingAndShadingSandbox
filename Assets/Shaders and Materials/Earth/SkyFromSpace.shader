@@ -47,7 +47,7 @@ Shader "JCOR/Sky From Space"
 			float scale(float fCos)
 			{
 				float x = 1 - fCos;
-				return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25)))) * bleeding;
+				return 0.25 * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25)))) * bleeding;
 			}
 
 
@@ -74,8 +74,8 @@ Shader "JCOR/Sky From Space"
 				float3 v3Start = v3CameraPos + v3Ray * fNear;
 				fFar -= fNear;
 				float fStartAngle = (dot(v3Ray, v3Start) / fOuterRadius);
-				float fStartDepth = exp(-1.0/fScaleDepth);
-				float fStartOffset = fStartDepth*scale(fStartAngle);
+				float fStartDepth = exp(-1.0 / fScaleDepth);
+				float fStartOffset = fStartDepth * scale(fStartAngle);
 
 				const float fSamples = 2.0;
 
@@ -93,7 +93,7 @@ Shader "JCOR/Sky From Space"
 					float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
 					float fLightAngle = dot(v3LightPos, v3SamplePoint) / fHeight ;
 					float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight ;
-					float fScatter = (fStartOffset-scatter_strength+ fDepth*(scale(fLightAngle) - scale(fCameraAngle)));
+					float fScatter = (fStartOffset - scatter_strength + fDepth * (scale(fLightAngle) - scale(fCameraAngle)));
 					float3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 					v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
 					v3SamplePoint += v3SampleRay;
@@ -114,19 +114,19 @@ Shader "JCOR/Sky From Space"
 			// Calculates the Mie phase function
 			float getMiePhase(float fCos, float fCos2, float g, float g2)
 			{
-				return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(1.0 + g2 - 2.0*g*fCos, 1.5);
+				return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(1.0 + g2 - 2.0 * g * fCos, 1.5);
 			}
 
 			// Calculates the Rayleigh phase function
 			float getRayleighPhase(float fCos2)
 			{
-				return 0.75 + 0.75*fCos2;
+				return 0.75 + 0.75 * fCos2;
 			}
 
 			half4 frag(v2f IN) : COLOR
 			{
 				float fCos = dot(v3LightPos, IN.t0) / length(IN.t0);
-				float fCos2 = fCos*fCos;
+				float fCos2 = fCos * fCos;
 				float3 col = getRayleighPhase(fCos2) * IN.c0 + getMiePhase(fCos, fCos2, g, g2) * IN.c1 ;
 
 				col = 1 - exp(col * -fHdrExposure);

@@ -34,7 +34,7 @@ namespace AmplifyShaderEditor
 			m_hasLeftDropdown = true;
 			m_previewShaderGUID = "a5e7295278a404175b732f1516fb68a6";
 
-			if( UIUtils.CurrentShaderVersion() <= 2400 )
+			if( UIUtils.CurrentWindow != null && UIUtils.CurrentWindow.CurrentGraph != null && UIUtils.CurrentShaderVersion() <= 2400 )
 				m_outputTypeInt = 1;
 
 			ConfigureHeader();

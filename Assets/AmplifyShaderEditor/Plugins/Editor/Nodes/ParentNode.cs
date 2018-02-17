@@ -40,8 +40,8 @@ namespace AmplifyShaderEditor
 		public delegate void OnNodeReOrder( ParentNode node, int index );
 		public delegate void DrawPropertySection();
 
-		[NonSerialized]
-		protected ParentGraph m_containerGraph = null;
+		[SerializeField]
+		protected ParentGraph m_containerGraph;
 
 		[SerializeField]
 		protected PrecisionType m_currentPrecisionType = PrecisionType.Float;
@@ -203,6 +203,8 @@ namespace AmplifyShaderEditor
 		protected int m_textLabelWidth = -1;
 
 		private bool m_linkVisibility = false;
+		[SerializeField]
+		protected bool m_hasTooltipLink = true;
 
 		protected int m_category = 0;
 
@@ -239,6 +241,7 @@ namespace AmplifyShaderEditor
 		protected bool m_drawPreviewMaskButtons = true;
 		private int m_channelNumber = 0;
 		protected bool m_firstPreviewDraw = true;
+		[SerializeField]
 		protected bool m_drawPreview = true;
 		protected bool m_drawPreviewExpander = true;
 		private bool m_spherePreview = false;
@@ -324,12 +327,6 @@ namespace AmplifyShaderEditor
 			m_tooltipTimestamp = Time.realtimeSinceStartup;
 
 			hideFlags = HideFlags.DontSave;
-
-			if( m_containerGraph == null )
-				m_containerGraph = UIUtils.CurrentWindow.CurrentGraph;
-
-			if( m_containerGraph.ParentWindow == null )
-				m_containerGraph.ParentWindow = UIUtils.CurrentWindow;
 		}
 
 		protected virtual void CommonInit( int uniqueId )
@@ -1700,6 +1697,40 @@ namespace AmplifyShaderEditor
 						}
 						else
 						{
+							//if( m_autoDrawInternalPortData && !m_inputPorts[ i ].IsConnected && m_inputPorts[ i ].AutoDrawInternalData )
+							//{
+							//	if( m_inputPorts[ i ].DataType == WirePortDataType.FLOAT || m_inputPorts[ i ].DataType == WirePortDataType.FLOAT4 )
+							//	{
+							//		int boxAmount = m_inputPorts[ i ].DataType == WirePortDataType.FLOAT4 ? 4 : 1;
+							//		Color c = GUI.color;
+							//		GUI.color = new Color(0.8f, 0.82f,0.9f, 0.75f );
+							//		GUIStyle backstyle = new GUIStyle( UIUtils.TooltipBox );
+									
+							//		Rect internalBox = m_inputPorts[ i ].LabelPosition;
+							//		internalBox.width = 26 * drawInfo.InvertedZoom * boxAmount;
+							//		internalBox.x = GlobalPosition.x - 26 * drawInfo.InvertedZoom * boxAmount - 1 ;
+							//		internalBox.height += 2 * drawInfo.InvertedZoom;
+							//		internalBox.y -= 1 * drawInfo.InvertedZoom;
+							//		//GUI.Label( internalBox, string.Empty, backstyle );
+							//		GUI.color = c;
+							//		internalBox.width = 26 * drawInfo.InvertedZoom;
+
+							//		for( int b = 0; b < boxAmount; b++ )
+							//		{
+							//			GUIStyle internalStyle = new GUIStyle( UIUtils.TooltipBox/*inputPortStyle*//*UIUtils.MainSkin.textField*/ );
+							//			internalStyle.padding = new RectOffset(1,1,2,2);
+							//			internalStyle.border = new RectOffset( 1, 1, 1, 1 );
+							//			internalStyle.margin = new RectOffset( 0, 0, 0, 0 );
+							//			internalStyle.overflow = new RectOffset( 1, 1, 1, 1 );
+							//			internalStyle.fontSize = (int)(9 * drawInfo.InvertedZoom);
+							//			internalStyle.clipping = TextClipping.Clip;
+							//			string finalval = m_inputPorts[ i ].DataType == WirePortDataType.FLOAT4 ? m_inputPorts[ i ].Vector4InternalData[ b ].ToString() : m_inputPorts[ i ].FloatInternalData.ToString();
+							//			GUI.Label( internalBox, finalval, internalStyle );
+							//			internalBox.x += internalBox.width;
+							//		}
+							//		//GUI.color = c;
+							//	}
+							//}
 							GUI.Label( m_inputPorts[ i ].LabelPosition, m_inputPorts[ i ].Name, inputPortStyle );
 						}
 					}
@@ -2024,7 +2055,7 @@ namespace AmplifyShaderEditor
 					globalTooltipPos.height = optimal.y;
 					globalTooltipPos.center = m_globalPosition.center;
 
-					if( !errorTooltip )
+					if( !errorTooltip && m_hasTooltipLink )
 						globalTooltipPos.height += 16;
 
 					if( errorTooltip )
@@ -2047,7 +2078,7 @@ namespace AmplifyShaderEditor
 
 					GUI.Label( globalTooltipPos, temp, UIUtils.TooltipBox );
 
-					if( !errorTooltip )
+					if( !errorTooltip && m_hasTooltipLink )
 					{
 						Rect link = globalTooltipPos;
 						link.y = globalTooltipPos.yMax - 16;
@@ -2745,6 +2776,7 @@ namespace AmplifyShaderEditor
 				m_inputPorts[ i ].ResetWireReferenceStatus();
 			}
 			m_repopulateDictionaries = true;
+			m_sizeIsDirty = true;
 		}
 
 		public virtual void ReadFromDeprecated( ref string[] nodeParams, Type oldType = null ) { }

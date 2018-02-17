@@ -1,4 +1,52 @@
 Release Notes:
+v1.4.4 dev 04:
+* Fixes:
+    * Fixed issue on Specular Highlights and Reflection toggle not being read/written into shader meta
+    * Fixed issue on not correctly taking templates global variables into account when building shader
+    * Fixed issue where 'Triplanar Sample' node wasn't being initialized properly
+    * Fixed Undo issues on create/delete nodes
+    * Fixed Undo issues on preview node resizing
+
+* Improvements:
+    * Added new Enum Property Attributes for both 'Float' and 'Int' nodes
+    * Added new Keyword Enums option to 'Static Switch' node Type option
+        * Improved its interface to better accommodate new options
+    * Added new keywords to 'Static Switch' Keyword dropdown
+    * Increase max port count for 'Function Switch' node to 9
+    * Added/Changed shortcuts for various nodes 
+        * R - Create 'Register Local Var' node 
+        * G - Create 'Get Local Var' node
+        * Z - Create 'Swizzle' node 
+        * X - Create 'Cross' product node
+        * Period(.) - Create 'Dot' product node
+        * B - Create 'Break to Components' node
+        * K - Create 'Component Mask' node
+        * V - Create 'Append' node
+
+v1.4.4 dev 03:
+* New Sample:
+    * Skybox - Cubemap Extended by Cristian Pop
+
+* New Shader Functions:
+    * Step Antialiasing
+    * Create Orthogonal Vector
+
+* Improvements:
+    * Node graph is now a ScriptableObject to better deal with automatic serialization
+    * Templates can now register and use local variables
+        * Use /*ase_local_var*/ before the variable declaration over the template
+        * Access the local variable through the new 'Template Local Var Data' node over the graph
+    * Added new Normal Space option into 'Standard Surface Light' node
+    * Optimized nodes port internal data usage
+    * Node tooltip no longer shown online link for shader function nodes
+    * Small optimizations to node previews
+
+* Fixes:
+    * Fixed function registry on 'Custom Expression' node to correctly deal with dependencies
+    * Fixed issue on linear textures over the texture creator tool
+    * Fixed issue where the editor was being called on play mode but no window was present
+    * Fixed issue on texture coordinates of different sizes being created with the same name
+
 v1.4.4 dev 02:
 * Fixes:
     * Fixed issue on templates where vertex normal was being declared as a float4 on vertex data

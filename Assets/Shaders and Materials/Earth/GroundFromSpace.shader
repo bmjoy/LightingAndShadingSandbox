@@ -45,14 +45,14 @@ Shader "Atmosphere/GroundFromSpace"
 			float scale(float fCos)
 			{
 				float x = 1.0 - fCos;
-				return fScaleHeight * exp(-0.00287 + x * (0.459 + x*(3.83 + x*(-6.80 + x * 5.25))));
+				return fScaleHeight * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
 			}
 
 			v2f vert(appdata_base v)
 			{
 			    float3 v3CameraPos = _WorldSpaceCameraPos - v3Translate;	// The camera's current position
 				float fCameraHeight = length(v3CameraPos);					// The camera's current height
-				float fCameraHeight2 = fCameraHeight*fCameraHeight;			// fCameraHeight^2
+				float fCameraHeight2 = fCameraHeight * fCameraHeight;		// fCameraHeight^2
 
 				// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
 				float3 v3Pos = mul(unity_ObjectToWorld, v.vertex).xyz - v3Translate;
@@ -92,7 +92,7 @@ Shader "Atmosphere/GroundFromSpace"
 				{
 					float fHeight = length(v3SamplePoint);
 					float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
-					float fScatter = fDepth*fTemp - fCameraOffset;
+					float fScatter = fDepth * fTemp - fCameraOffset;
 					v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 					v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
 					v3SamplePoint += v3SampleRay;
@@ -114,11 +114,9 @@ Shader "Atmosphere/GroundFromSpace"
 				//Adjust color from HDR
 				col = 1.0 - exp(col * -fHdrExposure);
 				texel *= col.b;
-				return half4(texel+col, 1.0);
+				return half4(texel + col, 1.0);
 			}
-
 			ENDCG
-
     	}
 	}
 }

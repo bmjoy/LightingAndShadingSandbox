@@ -271,6 +271,11 @@ namespace AmplifyShaderEditor
 			//Fetching inputs
 			FetchInputs( MasterNodePortCategory.Fragment );
 			FetchInputs( MasterNodePortCategory.Vertex );
+
+
+			//Fetch local variables must be done after fetching code areas as it needs them to see is variable is on vertex or fragment
+			TemplateHelperFunctions.FetchLocalVars( m_templateBody , ref m_localVarsList , m_inputDataList );
+			
 			//Fetch snippets
 		}
 
@@ -499,8 +504,6 @@ namespace AmplifyShaderEditor
 				Debug.LogException( e );
 				m_isValid = false;
 			}
-
-			//TemplateHelperFunctions.FetchLocalVars( m_templateBody , ref m_localVarsList );
 
 			FetchSubShaderProperties();
 			// Vertex Data
@@ -912,7 +915,9 @@ namespace AmplifyShaderEditor
 
 		public void AddInput( int tagStartIdx, string tagId, string portName, string defaultValue, WirePortDataType dataType, MasterNodePortCategory portCategory, int portUniqueId, int portOrderId )
 		{
-			m_inputDataList.Add( new TemplateInputData( tagStartIdx, tagId, portName, defaultValue, dataType, portCategory, portUniqueId, portOrderId ) );
+			TemplateInputData inputData = new TemplateInputData( tagStartIdx, tagId, portName, defaultValue, dataType, portCategory, portUniqueId, portOrderId );
+			m_inputDataList.Add( inputData );
+			m_inputDataDict.Add( inputData.PortUniqueId, inputData );
 			AddId( tagId, false );
 		}
 
@@ -995,6 +1000,7 @@ namespace AmplifyShaderEditor
 
 		public void FillEmptyTags( ref string body )
 		{
+			body = body.Replace( TemplatesManager.TemplateLocalVarTag, string.Empty );
 			for( int i = 0; i < m_propertyList.Count; i++ )
 			{
 				if( !m_propertyList[ i ].Used )

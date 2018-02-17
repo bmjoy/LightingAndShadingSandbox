@@ -44,5 +44,5 @@ Material:
     - _BlendSoftness: 0.4
     - _MapANormalsScale: 3
     - _MapBNormalsScale: 0.66
-    - __dirty: 1
+    - __dirty: 0
     m_Colors: []

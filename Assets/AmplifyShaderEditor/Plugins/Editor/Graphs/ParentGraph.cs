@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	public class ParentGraph : ISerializationCallbackReceiver
+	public class ParentGraph : ScriptableObject, ISerializationCallbackReceiver
 	{
 		public enum NodeLOD
 		{
@@ -49,41 +49,41 @@ namespace AmplifyShaderEditor
 		private int m_validNodeId;
 
 		[SerializeField]
-		private List<ParentNode> m_nodes;
+		private List<ParentNode> m_nodes = new List<ParentNode>();
 
 		// Sampler Nodes registry
 		[SerializeField]
-		private UsageListSamplerNodes m_samplerNodes;
+		private UsageListSamplerNodes m_samplerNodes = new UsageListSamplerNodes();
 
 		[SerializeField]
-		private UsageListTexturePropertyNodes m_texturePropertyNodes;
+		private UsageListTexturePropertyNodes m_texturePropertyNodes = new UsageListTexturePropertyNodes();
 
 		[SerializeField]
-		private UsageListTextureArrayNodes m_textureArrayNodes;
+		private UsageListTextureArrayNodes m_textureArrayNodes = new UsageListTextureArrayNodes();
 
 		[SerializeField]
-		private UsageListPropertyNodes m_propertyNodes;
+		private UsageListPropertyNodes m_propertyNodes = new UsageListPropertyNodes();
 
 		[SerializeField]
-		private UsageListScreenColorNodes m_screenColorNodes;
+		private UsageListScreenColorNodes m_screenColorNodes = new UsageListScreenColorNodes();
 
 		[SerializeField]
-		private UsageListRegisterLocalVarNodes m_localVarNodes;
+		private UsageListRegisterLocalVarNodes m_localVarNodes = new UsageListRegisterLocalVarNodes();
 
 		[SerializeField]
-		private UsageListFunctionInputNodes m_functionInputNodes;
+		private UsageListFunctionInputNodes m_functionInputNodes = new UsageListFunctionInputNodes();
 
 		[SerializeField]
-		private UsageListFunctionNodes m_functionNodes;
+		private UsageListFunctionNodes m_functionNodes = new UsageListFunctionNodes();
 
 		[SerializeField]
-		private UsageListFunctionOutputNodes m_functionOutputNodes;
+		private UsageListFunctionOutputNodes m_functionOutputNodes = new UsageListFunctionOutputNodes();
 
 		[SerializeField]
-		private UsageListFunctionSwitchNodes m_functionSwitchNodes;
+		private UsageListFunctionSwitchNodes m_functionSwitchNodes = new UsageListFunctionSwitchNodes();
 
 		[SerializeField]
-		private UsageListFunctionSwitchCopyNodes m_functionSwitchCopyNodes;
+		private UsageListFunctionSwitchCopyNodes m_functionSwitchCopyNodes = new UsageListFunctionSwitchCopyNodes();
 
 		[SerializeField]
 		private int m_masterNodeId = Constants.INVALID_NODE_ID;
@@ -119,10 +119,16 @@ namespace AmplifyShaderEditor
 
 		private List<ParentNode> m_nodePreviewList = new List<ParentNode>();
 
-		private Dictionary<int, ParentNode> m_nodesDict;
-		private List<ParentNode> m_selectedNodes;
-		private List<ParentNode> m_markedForDeletion;
-		private List<WireReference> m_highlightedWires;
+		private Dictionary<int, ParentNode> m_nodesDict = new Dictionary<int, ParentNode>();
+
+		[SerializeField]
+		private List<ParentNode> m_selectedNodes = new List<ParentNode>();
+
+		[SerializeField]
+		private List<ParentNode> m_markedForDeletion = new List<ParentNode>();
+
+		[SerializeField]
+		private List<WireReference> m_highlightedWires = new List<WireReference>();
 		private System.Type m_masterNodeDefaultType;
 
 		private NodeGrid m_nodeGrid;
@@ -142,6 +148,7 @@ namespace AmplifyShaderEditor
 		//int m_buttonOverlayIndex = -1;
 
 		// Bezier info
+		[SerializeField]
 		private List<WireBezierReference> m_bezierReferences;
 		private const int MaxBezierReferences = 50;
 		private int m_wireBezierCount = 0;
@@ -149,10 +156,9 @@ namespace AmplifyShaderEditor
 		protected int m_normalDependentCount = 0;
 		private bool m_forceCategoryRefresh = false;
 
-		public ParentGraph()
+		public void Init()
 		{
 			m_normalDependentCount = 0;
-			m_nodeGrid = new NodeGrid();
 			m_nodes = new List<ParentNode>();
 			m_samplerNodes = new UsageListSamplerNodes();
 			m_texturePropertyNodes = new UsageListTexturePropertyNodes();
@@ -169,7 +175,6 @@ namespace AmplifyShaderEditor
 			m_selectedNodes = new List<ParentNode>();
 			m_markedForDeletion = new List<ParentNode>();
 			m_highlightedWires = new List<WireReference>();
-			m_nodesDict = new Dictionary<int, ParentNode>();
 			m_validNodeId = 0;
 			IsDirty = false;
 			SaveIsDirty = false;
@@ -180,7 +185,12 @@ namespace AmplifyShaderEditor
 			{
 				m_bezierReferences.Add( new WireBezierReference() );
 			}
+		}
 
+		private void OnEnable()
+		{
+			m_nodeGrid = new NodeGrid();
+			m_nodesDict = new Dictionary<int, ParentNode>();
 			nodeStyleOff = UIUtils.GetCustomStyle( CustomStyle.NodeWindowOff );
 			nodeStyleOn = UIUtils.GetCustomStyle( CustomStyle.NodeWindowOn );
 			nodeTitle = UIUtils.GetCustomStyle( CustomStyle.NodeHeader );
@@ -607,6 +617,7 @@ namespace AmplifyShaderEditor
 			{
 				UIUtils.MarkUndoAction();
 				Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoCreateNodeId );
+				Undo.RecordObject( this, Constants.UndoCreateNodeId );
 				Undo.RegisterCreatedObjectUndo( node, Constants.UndoCreateNodeId );
 			}
 
@@ -703,10 +714,10 @@ namespace AmplifyShaderEditor
 						OnEmptyGraphDetectedEvt( this );
 				}
 
-				for( int i = 0; i < m_nodes.Count; i++ )
-				{
-					m_nodes[ i ].SetContainerGraph( this );
-				}
+				//for( int i = 0; i < m_nodes.Count; i++ )
+				//{
+				//	m_nodes[ i ].SetContainerGraph( this );
+				//}
 			}
 
 			if( drawInfo.CurrentEventType == EventType.Repaint )
@@ -1569,6 +1580,7 @@ namespace AmplifyShaderEditor
 			{
 				UIUtils.MarkUndoAction();
 				Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteConnectionId );
+				Undo.RecordObject( this, Constants.UndoDeleteConnectionId );
 				Undo.RecordObject( node, Constants.UndoDeleteConnectionId );
 			}
 
@@ -1810,6 +1822,7 @@ namespace AmplifyShaderEditor
 			//Record deleted nodes
 			UIUtils.MarkUndoAction();
 			Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteNodeId );
+			Undo.RecordObject( this, Constants.UndoDeleteNodeId );
 			Undo.RecordObjects( selectedNodes, Constants.UndoDeleteNodeId );
 			Undo.RecordObjects( extraNodes.ToArray(), Constants.UndoDeleteNodeId );
 			//Record deleting connections
@@ -1951,6 +1964,7 @@ namespace AmplifyShaderEditor
 				{
 					UIUtils.MarkUndoAction();
 					Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteNodeId );
+					Undo.RecordObject( this, Constants.UndoDeleteNodeId );
 					Undo.RecordObject( node, Constants.UndoDeleteNodeId );
 				}
 
@@ -1963,7 +1977,7 @@ namespace AmplifyShaderEditor
 				if( registerUndo )
 					Undo.DestroyObjectImmediate( node );
 				else
-					ScriptableObject.DestroyImmediate( node );
+					DestroyImmediate( node );
 				IsDirty = true;
 				m_markToReOrder = true;
 			}

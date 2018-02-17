@@ -745,19 +745,65 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		public static void FetchLocalVars( string body , ref List<TemplateLocalVarData> localVarList )
+		public static void FetchLocalVars( string body, ref List<TemplateLocalVarData> localVarList, List<TemplateInputData> registeredInputs )
 		{
+			int inputCount = registeredInputs.Count;
+			if( inputCount == 0 )
+				return;
+
+			List<TemplateInputData> sortedList = new List<TemplateInputData>( registeredInputs );
+			sortedList.Sort( ( x, y ) => x.TagStartIdx.CompareTo( y.TagStartIdx ) );
+
 			foreach( Match match in Regex.Matches( body, LocalVarPattern ) )
 			{
 				if( match.Groups.Count == 3 )
 				{
-					if( CgToWirePortType.ContainsKey( match.Groups[ 1 ].Value ))
+					if( CgToWirePortType.ContainsKey( match.Groups[ 1 ].Value ) )
 					{
-						TemplateLocalVarData data = new TemplateLocalVarData( CgToWirePortType[ match.Groups[ 1 ].Value ], match.Groups[ 2 ].Value, match.Index );
-						localVarList.Add( data );
+						bool registerLocalVar = true;
+						int inputIdx = 0;
+						for( int i = 0; i < inputCount; i++ )
+						{
+							
+							if( i == ( inputCount - 1 ) )
+							{	
+								if( sortedList[ i ].TagStartIdx < match.Index )
+								{
+									registerLocalVar = false;
+									Debug.LogFormat( "Variable {0} could not be registered", match.Groups[ 2 ].Value );
+								}
+								else
+								{
+									inputIdx = i;
+								}
+							}
+							else
+							{
+								if( match.Index > sortedList[ i ].TagStartIdx &&
+									match.Index < sortedList[ i + 1 ].TagStartIdx )
+								{
+									inputIdx = i + 1;
+									break;
+								}
+								else if( match.Index < sortedList[ i ].TagStartIdx )
+								{
+									inputIdx = i;
+									break;
+								}
+							}
+						}
+
+						if( registerLocalVar )
+						{
+							TemplateLocalVarData data = new TemplateLocalVarData( CgToWirePortType[ match.Groups[ 1 ].Value ], match.Groups[ 2 ].Value, match.Index, sortedList[inputIdx] );
+							localVarList.Add( data );
+						}
 					}
 				}
 			}
+
+			sortedList.Clear();
+			sortedList = null;
 		}
 
 		public static void CreateTags( ref TemplateTagsModuleData tagsObj )
@@ -770,7 +816,7 @@ namespace AmplifyShaderEditor
 				{
 					if( matchColl[ i ].Groups.Count == 3 )
 					{
-						tagsObj.Tags.Add( new TemplatesTagData( matchColl[ i ].Groups[ 1 ].Value, matchColl[ i ].Groups[ 2 ].Value ));
+						tagsObj.Tags.Add( new TemplatesTagData( matchColl[ i ].Groups[ 1 ].Value, matchColl[ i ].Groups[ 2 ].Value ) );
 					}
 				}
 			}

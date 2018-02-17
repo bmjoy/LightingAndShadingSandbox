@@ -7,7 +7,7 @@ using UnityEngine;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Break To Components", "Vector Operators", "Breaks the input data into its individual components" )]
+	[NodeAttributes( "Break To Components", "Vector Operators", "Breaks the input data into its individual components", null, KeyCode.B )]
 	public sealed class BreakToComponentsNode : ParentNode
 	{
 		private WirePortDataType m_currentType = WirePortDataType.FLOAT;

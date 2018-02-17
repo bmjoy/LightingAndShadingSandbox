@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Register Local Var", "Miscellaneous", "Forces a local variable to be written with the given name. Can then be fetched at any place with a <b>Get Local Var</b> node." )]
+	[NodeAttributes( "Register Local Var", "Miscellaneous", "Forces a local variable to be written with the given name. Can then be fetched at any place with a <b>Get Local Var</b> node.", null, KeyCode.R )]
 	public sealed class RegisterLocalVarNode : ParentNode
 	{
 		private const string LocalDefaultNameStr = "myVarName";
@@ -45,7 +45,8 @@ namespace AmplifyShaderEditor
 			AddInputPort( WirePortDataType.FLOAT, false, Constants.EmptyPortValue );
 			AddOutputPort( WirePortDataType.FLOAT, Constants.EmptyPortValue );
 			m_textLabelWidth = 85;
-			m_variableName += UIUtils.LocalVarNodeAmount();
+			if( UIUtils.CurrentWindow != null && UIUtils.CurrentWindow.CurrentGraph != null )
+				m_variableName += UIUtils.LocalVarNodeAmount();
 			m_oldName = m_variableName;
 			UpdateTitle();
 			m_previewShaderGUID = "5aaa1d3ea9e1fa64781647e035a82334";

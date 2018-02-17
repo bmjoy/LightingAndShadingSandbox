@@ -8,7 +8,7 @@ using System;
 namespace AmplifyShaderEditor
 {
 	[Serializable]
-	[NodeAttributes( "Component Mask", "Vector Operators", "Mask certain channels from vectors/color components" )]
+	[NodeAttributes( "Component Mask", "Vector Operators", "Mask certain channels from vectors/color components", null, KeyCode.K )]
 	public sealed class ComponentMaskNode : ParentNode
 	{
 		private const string OutputLocalVarName = "componentMask";

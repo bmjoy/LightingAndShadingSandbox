@@ -456,7 +456,7 @@ namespace AmplifyShaderEditor
             int shaderPropertiesAmount = m_currentTemplate.AvailableShaderProperties.Count;
             for( int i = 0; i < shaderPropertiesAmount; i++ )
             {
-                m_currentDataCollector.SoftRegisterUniform( m_currentTemplate.AvailableShaderProperties[ i ].PropertyName );
+                m_currentDataCollector.SoftRegisterUniform( m_currentTemplate.AvailableShaderProperties[ i ] );
             }
 			m_containerGraph.CheckPropertiesAutoRegister( ref m_currentDataCollector );
 

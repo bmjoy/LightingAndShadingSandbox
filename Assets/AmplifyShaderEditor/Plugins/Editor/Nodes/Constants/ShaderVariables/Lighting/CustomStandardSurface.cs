@@ -23,6 +23,9 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		private ASEStandardSurfaceWorkflow m_workflow = ASEStandardSurfaceWorkflow.Metallic;
 
+		[SerializeField]
+		private ViewSpace m_normalSpace = ViewSpace.Tangent;
+
 		protected override void CommonInit( int uniqueId )
 		{
 			base.CommonInit( uniqueId );
@@ -36,7 +39,7 @@ namespace AmplifyShaderEditor
 			m_inputPorts[ 5 ].FloatInternalData = 1;
 			AddOutputPort( WirePortDataType.FLOAT3, "RGB" );
 			m_autoWrapProperties = true;
-			m_textLabelWidth = 75;
+			m_textLabelWidth = 100;
 			m_errorMessageTypeIsError = NodeMessageType.Warning;
 			m_errorMessageTooltip = "This node only returns correct information using a custom light model, otherwise returns 0";
 		}
@@ -44,7 +47,7 @@ namespace AmplifyShaderEditor
 		public override void PropagateNodeData( NodeData nodeData, ref MasterNodeDataCollector dataCollector )
 		{
 			base.PropagateNodeData( nodeData, ref dataCollector );
-			if( m_inputPorts[ 1 ].IsConnected )
+			if( m_inputPorts[ 1 ].IsConnected && m_normalSpace == ViewSpace.Tangent )
 				dataCollector.DirtyNormal = true;
 		}
 
@@ -57,6 +60,23 @@ namespace AmplifyShaderEditor
 			{
 				UpdateSpecularMetallicPorts();
 			}
+
+			EditorGUI.BeginChangeCheck();
+			m_normalSpace = (ViewSpace)EditorGUILayoutEnumPopup( "Normal Space", m_normalSpace );
+			if( EditorGUI.EndChangeCheck() )
+			{
+				UpdatePort();
+			}
+		}
+
+		private void UpdatePort()
+		{
+			if( m_normalSpace == ViewSpace.World )
+				m_inputPorts[ 1 ].Name = "World Normal";
+			else
+				m_inputPorts[ 1 ].Name = "Normal";
+
+			m_sizeIsDirty = true;
 		}
 
 		void UpdateSpecularMetallicPorts()
@@ -87,15 +107,22 @@ namespace AmplifyShaderEditor
 				dataCollector.ForceNormal = true;
 			}
 
-			//dataCollector.AddToInput( UniqueId, Constants.InternalData, false );
-			//dataCollector.ForceNormal = true;
-
 			dataCollector.AddLocalVariable( UniqueId, "SurfaceOutputStandard" + specularMode + " s" + OutputId + " = (SurfaceOutputStandard" + specularMode + " ) 0;" );
 			dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Albedo = " + m_inputPorts[ 0 ].GeneratePortInstructions( ref dataCollector ) + ";" );
+
+			string normal = string.Empty;
 			if( dataCollector.DirtyNormal )
-				dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Normal = WorldNormalVector( i, " + m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector ) + ");" );
-			else
-				dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Normal = i.worldNormal;" );
+			{
+				normal = "WorldNormalVector( " + Constants.InputVarStr + " , " + m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector ) + " )";
+			} else
+			{
+				if( m_inputPorts[ 1 ].IsConnected )
+					normal = m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector );
+				else
+					normal = "i.worldNormal";
+
+			}
+			dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Normal = "+ normal + ";" );
 			dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Emission = " + m_inputPorts[ 2 ].GeneratePortInstructions( ref dataCollector ) + ";" );
 			if( m_workflow == ASEStandardSurfaceWorkflow.Specular )
 				dataCollector.AddLocalVariable( UniqueId, "s" + OutputId + ".Specular = " + m_inputPorts[ 3 ].GeneratePortInstructions( ref dataCollector ) + ";" );
@@ -140,12 +167,19 @@ namespace AmplifyShaderEditor
 				m_workflow = (ASEStandardSurfaceWorkflow)Enum.Parse( typeof( ASEStandardSurfaceWorkflow ), GetCurrentParam( ref nodeParams ) );
 			}
 			UpdateSpecularMetallicPorts();
+
+			if( UIUtils.CurrentShaderVersion() >= 14402 )
+			{
+				m_normalSpace = (ViewSpace)Enum.Parse( typeof( ViewSpace ), GetCurrentParam( ref nodeParams ) );
+			}
+			UpdatePort();
 		}
 
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
 		{
 			base.WriteToString( ref nodeInfo, ref connectionsInfo );
 			IOUtils.AddFieldValueToString( ref nodeInfo, m_workflow );
+			IOUtils.AddFieldValueToString( ref nodeInfo, m_normalSpace );
 		}
 	}
 }

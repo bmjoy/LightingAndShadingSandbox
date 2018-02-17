@@ -30,6 +30,18 @@ namespace AmplifyShaderEditor
 			TagId = tagId;
 			TagStartIdx = tagStartIdx;
 		}
+
+		public TemplateInputData( TemplateInputData other )
+		{
+			DefaultValue = other.DefaultValue;
+			PortName = other.PortName;
+			DataType = other.DataType;
+			PortCategory = other.PortCategory;
+			PortUniqueId = other.PortUniqueId;
+			OrderId = other.OrderId;
+			TagId = other.TagId;
+			TagStartIdx = other.TagStartIdx;
+		}
 	}
 
 	[Serializable]
@@ -149,6 +161,7 @@ namespace AmplifyShaderEditor
 
 		//public static readonly string TemplateLocalVarTag = "/*ase_local_var*/";
 
+		public static readonly string TemplateLocalVarTag = "/*ase_local_var*/";
 		public static readonly string TemplatePragmaTag = "/*ase_pragma*/";
 		public static readonly string TemplatePassTag = "/*ase_pass*/";
 		public static readonly string TemplatePropertyTag = "/*ase_props*/\n";
