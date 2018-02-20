@@ -19,8 +19,6 @@ public class Atmosphere : MonoBehaviour
 	public float m_ESun = 20.0f;						// Sun brightness constant
 	[Tooltip("Rayleigh scattering constant, sky.")]
 	public float m_kr = 0.0025f;						// Rayleigh scattering constant, sky
-	//[Tooltip("Rayleigh scattering constant, ground.")]
-	//public float m_kr_ground = 0.175f;					// Rayleigh scattering constant, ground
 	[Tooltip("Rayleigh phase function bias.")]
 	[Range(0f, 3f)]
 	public float m_krPhaseBias;							// Tweaker for Rayleigh phase function calculation in shader fragment program
@@ -88,10 +86,8 @@ public class Atmosphere : MonoBehaviour
         mat.SetFloat("fInnerRadius", m_innerRadius);
         mat.SetFloat("fInnerRadius2", m_innerRadius * m_innerRadius);
         mat.SetFloat("fKrESun", m_kr * m_ESun);
-		//mat.SetFloat("fKrESun_ground", m_kr * 50f * m_ESun);
 		mat.SetFloat("fKmESun", m_km * m_ESun);
         mat.SetFloat("fKr4PI", m_kr * 4.0f * Mathf.PI);
-		//mat.SetFloat("fKr4PI_ground", m_kr * 50f * 4.0f * Mathf.PI);
 		mat.SetFloat("fKm4PI", m_km * 4.0f * Mathf.PI);
         mat.SetFloat("fScale", m_scale);
         mat.SetFloat("fScaleHeight", m_scaleHeight);
