@@ -35,7 +35,6 @@ namespace AmplifyShaderEditor
 		public void Destroy()
 		{
 			m_nodes.Clear();
-			m_nodes.Clear();
 			m_nodes = null;
 			m_nodesArr = null;
 		}

@@ -948,7 +948,9 @@ namespace AmplifyShaderEditor
 				UIUtils.UnregisterPropertyNode( this );
 			}
 
-			m_availableAttribs.Clear();
+			if( m_availableAttribs != null )
+				m_availableAttribs.Clear();
+
 			m_availableAttribs = null;
 		}
 

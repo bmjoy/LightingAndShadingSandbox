@@ -1855,15 +1855,15 @@ namespace AmplifyShaderEditor
 					ParentNode outputNode = m_mainGraphInstance.GetNode( outputPort.NodeId );
 
 					Undo.RegisterCompleteObjectUndo( this, Constants.UndoCreateConnectionId );
-					Undo.RecordObject( node, Constants.UndoCreateConnectionId );
-					Undo.RecordObject( outputNode, Constants.UndoCreateConnectionId );
+					node.RecordObject( Constants.UndoCreateConnectionId );
+					outputNode.RecordObject( Constants.UndoCreateConnectionId );
 
 					List<InputPort> inputPorts = new List<InputPort>();
 					for( int i = 0; i < node.OutputPorts[ 0 ].ConnectionCount; i++ )
 					{
 						InputPort inputPort = node.OutputPorts[ 0 ].GetInputConnection( i );
 						ParentNode inputNode = m_mainGraphInstance.GetNode( inputPort.NodeId );
-						Undo.RecordObject( inputNode, Constants.UndoCreateConnectionId );
+						inputNode.RecordObject( Constants.UndoCreateConnectionId );
 						inputPorts.Add( inputPort );
 					}
 
@@ -2027,8 +2027,8 @@ namespace AmplifyShaderEditor
 							InputPort inputPort = originNode.GetInputPortByUniqueId( m_wireReferenceUtils.InputPortReference.PortId );
 							UIUtils.MarkUndoAction();
 							Undo.RegisterCompleteObjectUndo( this, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( originNode, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( targetNode, Constants.UndoCreateConnectionId );
+							originNode.RecordObject( Constants.UndoCreateConnectionId );
+							targetNode.RecordObject( Constants.UndoCreateConnectionId );
 
 							if( !inputPort.CheckValidType( outputPort.DataType ) )
 							{
@@ -2096,8 +2096,8 @@ namespace AmplifyShaderEditor
 
 							UIUtils.MarkUndoAction();
 							Undo.RegisterCompleteObjectUndo( this, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( originNode, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( targetNode, Constants.UndoCreateConnectionId );
+							originNode.RecordObject( Constants.UndoCreateConnectionId );
+							targetNode.RecordObject( Constants.UndoCreateConnectionId );
 
 							if( !inputPort.CheckValidType( outputPort.DataType ) )
 							{
@@ -2252,9 +2252,9 @@ namespace AmplifyShaderEditor
 						if( selectedNode.InputPorts.Count > 0 && selectedNode.OutputPorts.Count > 0 )
 						{
 							Undo.RegisterCompleteObjectUndo( this, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( selectedNode, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( inNode, Constants.UndoCreateConnectionId );
-							Undo.RecordObject( outNode, Constants.UndoCreateConnectionId );
+							selectedNode.RecordObject( Constants.UndoCreateConnectionId );
+							inNode.RecordObject( Constants.UndoCreateConnectionId );
+							outNode.RecordObject( Constants.UndoCreateConnectionId );
 
 							m_mainGraphInstance.CreateConnection( selectedNode.UniqueId, selectedNode.InputPorts[ 0 ].PortId, outputPort.NodeId, outputPort.PortId );
 							m_mainGraphInstance.CreateConnection( inputPort.NodeId, inputPort.PortId, selectedNode.UniqueId, selectedNode.OutputPorts[ 0 ].PortId );
@@ -2284,11 +2284,11 @@ namespace AmplifyShaderEditor
 					if( registerUndo )
 					{
 						Undo.RegisterCompleteObjectUndo( this, Constants.UndoCreateConnectionId );
-						Undo.RecordObject( inNode, Constants.UndoCreateConnectionId );
-						Undo.RecordObject( outNode, Constants.UndoCreateConnectionId );
+						inNode.RecordObject( Constants.UndoCreateConnectionId );
+						outNode.RecordObject( Constants.UndoCreateConnectionId );
 					}
 
-					if( inPort.ConnectTo( outNodeId, outPortId, inPort.DataType, inPort.TypeLocked ) )
+					if( inPort.ConnectTo( outNodeId, outPortId, outPort.DataType, inPort.TypeLocked ) )
 					{
 						inNode.OnInputPortConnected( inPortId, outNodeId, outPortId );
 					}
@@ -2790,7 +2790,7 @@ namespace AmplifyShaderEditor
 			}
 
 			UIUtils.ClearUndoHelper();
-
+			Undo.IncrementCurrentGroup();
 			//Record deleted nodes
 			UIUtils.MarkUndoAction();
 			Undo.RegisterCompleteObjectUndo( this, Constants.UndoDeleteNodeId );

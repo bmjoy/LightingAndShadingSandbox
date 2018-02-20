@@ -504,9 +504,7 @@ namespace AmplifyShaderEditor
 		public override void Destroy()
 		{
 			m_mainPreviewNode = null;
-
 			base.Destroy();
-
 			if( ContainerGraph.ParentWindow.OutsideGraph.CurrentStandardSurface != null )
 			{
 				for( int i = 0; i < m_includes.Count; i++ )
@@ -551,7 +549,7 @@ namespace AmplifyShaderEditor
 			m_allFunctionOutputs = null;
 
 			if( m_functionGraph != null )
-				m_functionGraph.Destroy();
+				m_functionGraph.SoftDestroy();
 			m_functionGraph = null;
 
 			ContainerGraph.ParentWindow.CustomGraph = cachedGraph2;
@@ -568,6 +566,7 @@ namespace AmplifyShaderEditor
 
 			m_allFunctionInputsDict.Clear();
 			m_allFunctionInputsDict = null;
+			
 		}
 
 		public override void OnNodeLogicUpdate( DrawInfo drawInfo )
@@ -964,6 +963,22 @@ namespace AmplifyShaderEditor
 			set { m_function = value; }
 		}
 
+		public override void RecordObjectOnDestroy( string Id )
+		{
+			base.RecordObjectOnDestroy( Id );
+			if( m_reordenator != null )
+				m_reordenator.RecordObject( Id );
+
+			if( m_functionGraph != null )
+			{
+				Undo.RecordObject( m_functionGraph, Id );
+				for( int i = 0; i < m_functionGraph.AllNodes.Count; i++ )
+				{
+					m_functionGraph.AllNodes[ i ].RecordObject( Id );
+				}
+			}
+		}
+		
 		public override void SetContainerGraph( ParentGraph newgraph )
 		{
 			base.SetContainerGraph( newgraph );

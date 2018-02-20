@@ -189,6 +189,7 @@ namespace AmplifyShaderEditor
 
 		private void OnEnable()
 		{
+			hideFlags = HideFlags.HideAndDontSave;
 			m_nodeGrid = new NodeGrid();
 			m_nodesDict = new Dictionary<int, ParentNode>();
 			nodeStyleOff = UIUtils.GetCustomStyle( CustomStyle.NodeWindowOff );
@@ -437,6 +438,81 @@ namespace AmplifyShaderEditor
 				nodesList[ i ].CheckIfAutoRegister( ref dataCollector );
 			}
 			nodesList = null;
+		}
+
+		public void SoftDestroy()
+		{
+			OnNodeRemovedEvent = null;
+
+			m_masterNodeId = Constants.INVALID_NODE_ID;
+			m_validNodeId = 0;
+			m_instancePropertyCount = 0;
+
+			m_nodeGrid.Destroy();
+			//m_nodeGrid = null;
+
+			m_nodes.Clear();
+			//m_nodes = null;
+
+			m_nodesDict.Clear();
+			//m_nodesDict = null;
+
+			m_samplerNodes.Clear();
+			//m_samplerNodes = null;
+
+			m_propertyNodes.Clear();
+			//m_propertyNodes = null;
+
+			m_functionInputNodes.Clear();
+			//m_functionInputNodes = null;
+
+			m_functionNodes.Clear();
+			//m_functionNodes = null;
+
+			m_functionOutputNodes.Clear();
+			//m_functionOutputNodes = null;
+
+			m_functionSwitchNodes.Clear();
+			//m_functionSwitchNodes = null;
+
+			m_functionSwitchCopyNodes.Clear();
+			//m_functionSwitchCopyNodes = null;
+
+			m_texturePropertyNodes.Clear();
+			//m_texturePropertyNodes = null;
+
+			m_textureArrayNodes.Clear();
+			//m_textureArrayNodes = null;
+
+			m_screenColorNodes.Clear();
+			//m_screenColorNodes = null;
+
+			m_localVarNodes.Clear();
+			//m_localVarNodes = null;
+
+			m_selectedNodes.Clear();
+			//m_selectedNodes = null;
+
+			m_markedForDeletion.Clear();
+			//m_markedForDeletion = null;
+			
+			m_nodePreviewList.Clear();
+			//m_nodePreviewList = null;
+
+			IsDirty = true;
+
+			OnNodeEvent = null;
+			OnDuplicateEvent = null;
+			//m_currentShaderFunction = null;
+
+			OnMaterialUpdatedEvent = null;
+			OnShaderUpdatedEvent = null;
+			OnEmptyGraphDetectedEvt = null;
+
+			nodeStyleOff = null;
+			nodeStyleOn = null;
+			nodeTitle = null;
+			commentaryBackground = null;
 		}
 
 		public void Destroy()
@@ -1377,7 +1453,7 @@ namespace AmplifyShaderEditor
 				if( !m_selectedNodes[ i ].MovingInFrame )
 				{
 					if( performUndo )
-						Undo.RecordObject( m_selectedNodes[ i ], Constants.UndoMoveNodesId );
+						m_selectedNodes[ i ].RecordObject( Constants.UndoMoveNodesId );
 					m_selectedNodes[ i ].Move( delta, snap );
 				}
 			}
@@ -1581,7 +1657,7 @@ namespace AmplifyShaderEditor
 				UIUtils.MarkUndoAction();
 				Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteConnectionId );
 				Undo.RecordObject( this, Constants.UndoDeleteConnectionId );
-				Undo.RecordObject( node, Constants.UndoDeleteConnectionId );
+				node.RecordObject( Constants.UndoDeleteConnectionId );
 			}
 
 			if( isInput )
@@ -1602,7 +1678,7 @@ namespace AmplifyShaderEditor
 						WireReference inputReference = inputPort.ExternalReferences[ i ];
 						ParentNode outputNode = GetNode( inputReference.NodeId );
 						if( registerUndo )
-							Undo.RecordObject( outputNode, Constants.UndoDeleteConnectionId );
+							outputNode.RecordObject( Constants.UndoDeleteConnectionId );
 						outputNode.GetOutputPortByUniqueId( inputReference.PortId ).InvalidateConnection( inputPort.NodeId, inputPort.PortId );
 						if( propagateCallback )
 							outputNode.OnOutputPortDisconnected( inputReference.PortId );
@@ -1625,7 +1701,7 @@ namespace AmplifyShaderEditor
 						WireReference outputReference = outputPort.ExternalReferences[ i ];
 						ParentNode inputNode = GetNode( outputReference.NodeId );
 						if( registerUndo )
-							Undo.RecordObject( inputNode, Constants.UndoDeleteConnectionId );
+							inputNode.RecordObject( Constants.UndoDeleteConnectionId );
 						if( inputNode.ConnStatus == NodeConnectionStatus.Connected )
 						{
 							node.DeactivateNode( portId, false );
@@ -1823,8 +1899,13 @@ namespace AmplifyShaderEditor
 			UIUtils.MarkUndoAction();
 			Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteNodeId );
 			Undo.RecordObject( this, Constants.UndoDeleteNodeId );
-			Undo.RecordObjects( selectedNodes, Constants.UndoDeleteNodeId );
-			Undo.RecordObjects( extraNodes.ToArray(), Constants.UndoDeleteNodeId );
+
+			for( int i = 0; i < selectedNodes.Length; i++ )
+				selectedNodes[i].RecordObject( Constants.UndoDeleteNodeId );
+
+			for( int i = 0; i < extraNodes.Count; i++ )
+				extraNodes[i].RecordObject( Constants.UndoDeleteNodeId );
+
 			//Record deleting connections
 			for( int i = 0; i < selectedNodes.Length; i++ )
 			{
@@ -1884,7 +1965,7 @@ namespace AmplifyShaderEditor
 			DestroyNode( node );
 		}
 
-		public void DestroyNode( ParentNode node, bool registerUndo = true )
+		public void DestroyNode( ParentNode node, bool registerUndo = true,bool destroyMasterNode = false)
 		{
 			if( node == null )
 			{
@@ -1911,7 +1992,7 @@ namespace AmplifyShaderEditor
 			//	}
 			//}
 
-			if( node.UniqueId != m_masterNodeId )
+			if( destroyMasterNode || node.UniqueId != m_masterNodeId )
 			{
 				m_nodeGrid.RemoveNodeFromGrid( node, false );
 				//Send Deactivation signal if active
@@ -1965,7 +2046,7 @@ namespace AmplifyShaderEditor
 					UIUtils.MarkUndoAction();
 					Undo.RegisterCompleteObjectUndo( ParentWindow, Constants.UndoDeleteNodeId );
 					Undo.RecordObject( this, Constants.UndoDeleteNodeId );
-					Undo.RecordObject( node, Constants.UndoDeleteNodeId );
+					node.RecordObjectOnDestroy( Constants.UndoDeleteNodeId );
 				}
 
 				if( OnNodeRemovedEvent != null )

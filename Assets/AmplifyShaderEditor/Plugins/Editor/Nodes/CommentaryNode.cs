@@ -150,7 +150,7 @@ namespace AmplifyShaderEditor
 			{
 				if ( !m_nodesOnCommentary[ i ].Selected )
 				{
-					Undo.RecordObject( m_nodesOnCommentary[ i ], Constants.UndoMoveNodesId );
+					m_nodesOnCommentary[ i ].RecordObject( Constants.UndoMoveNodesId );
 					m_nodesOnCommentary[ i ].Move( delta, snap );
 				}
 			}
@@ -174,8 +174,8 @@ namespace AmplifyShaderEditor
 			if ( m_nodesOnCommentaryDict.ContainsKey( node.UniqueId ) )
 			{
 				UIUtils.MarkUndoAction();
-				Undo.RecordObject( this, Constants.UndoRemoveNodeFromCommentaryId );
-				Undo.RecordObject( node, Constants.UndoRemoveNodeFromCommentaryId );
+				RecordObject( Constants.UndoRemoveNodeFromCommentaryId );
+				node.RecordObject( Constants.UndoRemoveNodeFromCommentaryId );
 				m_nodesOnCommentary.Remove( node );
 				m_nodesOnCommentaryDict.Remove( node.UniqueId );
 				node.OnNodeStoppedMovingEvent -= NodeStoppedMoving;
@@ -189,8 +189,8 @@ namespace AmplifyShaderEditor
 			UIUtils.MarkUndoAction();
 			for ( int i = 0; i < m_nodesOnCommentary.Count; i++ )
 			{
-				Undo.RecordObject( this, Constants.UndoRemoveNodeFromCommentaryId );
-				Undo.RecordObject( m_nodesOnCommentary[ i ], Constants.UndoRemoveNodeFromCommentaryId );
+				RecordObject( Constants.UndoRemoveNodeFromCommentaryId );
+				m_nodesOnCommentary[ i ].RecordObject( Constants.UndoRemoveNodeFromCommentaryId );
 				m_nodesOnCommentary[ i ].OnNodeStoppedMovingEvent -= NodeStoppedMoving;
 				m_nodesOnCommentary[ i ].OnNodeDestroyedEvent -= NodeDestroyed;
 				m_nodesOnCommentary[ i ].CommentaryParent = -1;
@@ -239,8 +239,8 @@ namespace AmplifyShaderEditor
 				if ( addToNode )
 				{
 					UIUtils.MarkUndoAction();
-					Undo.RecordObject( this, Constants.UndoAddNodeToCommentaryId );
-					Undo.RecordObject( node, Constants.UndoAddNodeToCommentaryId );
+					RecordObject(  Constants.UndoAddNodeToCommentaryId );
+					node.RecordObject( Constants.UndoAddNodeToCommentaryId );
 
 					m_nodesOnCommentary.Add( node );
 					m_nodesOnCommentaryDict.Add( node.UniqueId, node );

@@ -523,6 +523,9 @@ namespace AmplifyShaderEditor
 			}
 #pragma warning restore 0618
 #endif
+
+			ConfigureInputPorts();
+			ConfigureOutputPorts();
 		}
 
 		public override void OnObjectDropped( UnityEngine.Object obj )

@@ -440,11 +440,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119726, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 137358, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11466128, guid: e8ca1842f2b5ebc49b6be4df42be167a, type: 2}
       propertyPath: m_Enabled

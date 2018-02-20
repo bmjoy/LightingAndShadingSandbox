@@ -19,6 +19,15 @@ namespace AmplifyShaderEditor
 			Undo.RecordObject( objectToUndo, name );
 		}
 
+		public virtual void RecordObject( string Id )
+		{
+			Undo.RecordObject( this, Id );
+		}
+		public virtual void RecordObjectOnDestroy( string Id )
+		{
+			Undo.RecordObject( this, Id );
+		}
+
 		public string EditorGUILayoutStringField( string name, string value, params GUILayoutOption[] options )
 		{
 			string newValue = EditorGUILayout.TextField( name, value, options );

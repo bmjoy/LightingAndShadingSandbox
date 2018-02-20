@@ -1,4 +1,15 @@
 Release Notes:
+v1.4.4 dev 06:
+* Fixes:
+    * Fixed issue on 'Texture Sample' nodes not automatically setting the texture type on AUTO
+    * Fixed connection type mismatch after CTRL + swap shortcut
+    * Fixed issue on 'Dither' node
+
+v1.4.4 dev 05:
+* Fixes:
+    * Fixed multiple Undo issues on shader functions
+    * Fixed serialization issue with both nodes and graph when hitting Unity play button
+
 v1.4.4 dev 04:
 * Fixes:
     * Fixed issue on Specular Highlights and Reflection toggle not being read/written into shader meta

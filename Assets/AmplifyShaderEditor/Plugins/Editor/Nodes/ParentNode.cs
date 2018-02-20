@@ -100,12 +100,12 @@ namespace AmplifyShaderEditor
 		[SerializeField]
 		protected List<InputPort> m_inputPorts = new List<InputPort>();
 
-		protected Dictionary<int, InputPort> m_inputPortsDict;
+		protected Dictionary<int, InputPort> m_inputPortsDict = new Dictionary<int, InputPort>();
 
 		[SerializeField]
 		protected List<OutputPort> m_outputPorts = new List<OutputPort>();
 
-		protected Dictionary<int, OutputPort> m_outputPortsDict;
+		protected Dictionary<int, OutputPort> m_outputPortsDict = new Dictionary<int, OutputPort>();
 
 		[SerializeField]
 		protected Rect m_globalPosition;
@@ -290,7 +290,11 @@ namespace AmplifyShaderEditor
 		protected bool m_dropdownEditing = false;
 
 		protected bool m_isNodeBeingCopied = false;
-		
+
+		protected string m_previousTitle = string.Empty;
+
+		protected string m_previousAdditonalTitle = string.Empty;
+
 		public ParentNode()
 		{
 			m_position = new Rect( 0, 0, 0, 0 );
@@ -309,6 +313,7 @@ namespace AmplifyShaderEditor
 
 		public virtual void OnEnable()
 		{
+			hideFlags = HideFlags.HideAndDontSave;
 			if( m_nodeAttribs != null )
 			{
 				if( UIUtils.HasColorCategory( m_nodeAttribs.Category ) )
@@ -408,17 +413,22 @@ namespace AmplifyShaderEditor
 			m_outputPorts.Clear();
 			m_outputPorts = null;
 
-			m_inputPortsDict.Clear();
+			if( m_inputPortsDict != null )
+				m_inputPortsDict.Clear();
+
 			m_inputPortsDict = null;
 
-			m_outputPortsDict.Clear();
-			m_outputPortsDict = null;
+			if( m_outputPortsDict != null )
+				m_outputPortsDict.Clear();
 
+			m_outputPortsDict = null;
+			
 			if( m_previewMaterial != null )
 				DestroyImmediate( m_previewMaterial );
 			m_previewMaterial = null;
 
 			m_previewShader = null;
+			//m_containerGraph = null;
 		}
 
 		public virtual void Move( Vector2 delta )
@@ -2180,10 +2190,12 @@ namespace AmplifyShaderEditor
 				} );
 		}
 
-		protected void PickInput( WirePort port )
+		protected void PickInput( InputPort port )
 		{
 			WireReference connection = port.GetConnection( 0 );
-			m_containerGraph.ParentWindow.WireReferenceUtils.OutputPortReference.SetReference( connection.NodeId, connection.PortId, connection.DataType, connection.TypeLocked );
+			OutputPort from = port.GetOutputConnection( 0 );
+
+			m_containerGraph.ParentWindow.WireReferenceUtils.OutputPortReference.SetReference( from.NodeId, from.PortId, from.DataType, connection.TypeLocked );
 			m_containerGraph.DeleteConnection( true, UniqueId, port.PortId, true, true );
 			//TODO: check if not necessary
 			Event.current.Use();
@@ -2230,7 +2242,7 @@ namespace AmplifyShaderEditor
 			}
 
 			if( isInput )
-				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( port.NodeId, port.PortId, port.DataType, false ); //always save last connection
+				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( port.NodeId, port.PortId, port.DataType, port.GetConnection( 0 ).TypeLocked ); //always save last connection
 			else
 				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( -1, -1, WirePortDataType.OBJECT, false ); //invalidate connection
 
@@ -3043,8 +3055,7 @@ namespace AmplifyShaderEditor
 				}
 			}
 		}
-
-		protected string m_previousTitle = string.Empty;
+		
 		public void SetTitleTextOnCallback( string compareTitle, Action<ParentNode, string> callback )
 		{
 			if( !m_previousTitle.Equals( compareTitle ) )
@@ -3055,7 +3066,6 @@ namespace AmplifyShaderEditor
 			}
 		}
 
-		protected string m_previousAdditonalTitle = string.Empty;
 		public void SetAdditonalTitleTextOnCallback( string compareTitle, Action<ParentNode, string> callback )
 		{
 			if( !m_previousAdditonalTitle.Equals( compareTitle ) )

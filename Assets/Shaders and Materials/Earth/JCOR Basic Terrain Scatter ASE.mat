@@ -9,7 +9,7 @@ Material:
   m_Name: JCOR Basic Terrain Scatter ASE
   m_Shader: {fileID: 4800000, guid: a3592d2c47514054782e5257081a69cd, type: 3}
   m_ShaderKeywords: _BLENDFAUXATMOSPHERE_ON _DISABLESCATTER_ON _ENABLEFAUXATMOSPHERE_ON
-    _ENABLESCATTER_ON
+    _ENABLESCATTER_ON _SCATTERENABLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -55,7 +55,12 @@ Material:
     - _NightLightsScale: 1
     - _NightLightsSoftness: 0.1
     - _NormalScale: 1
-    - _ScatterEnable: 0
+    - _RayleighScatterBias: 4.55
+    - _RayleighScatterMultiplier: 55
+    - _ScatterAttenTweaker: 0
+    - _ScatterBlend: 0
+    - _ScatterConstTweaker: 0.17
+    - _ScatterEnable: 1
     - _Shininess: 0.55
     - __dirty: 0
     m_Colors:

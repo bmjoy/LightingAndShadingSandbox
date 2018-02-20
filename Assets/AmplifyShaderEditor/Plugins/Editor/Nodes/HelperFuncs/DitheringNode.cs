@@ -187,11 +187,11 @@ namespace AmplifyShaderEditor
 				default:
 				case 0:
 				dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, WirePortDataType.FLOAT2, "clipScreen" + OutputId, surfInstruction );
-				functionResult = dataCollector.AddFunctions( m_functionHeader, m_functionBody, "fmod(" + "clipScreen" + OutputId + ".x, 4)", "fmod(" + "clipScreen" + UniqueId + ".y, 4)" );
+				functionResult = dataCollector.AddFunctions( m_functionHeader, m_functionBody, "fmod(" + "clipScreen" + OutputId + ".x, 4)", "fmod(" + "clipScreen" + OutputId + ".y, 4)" );
 				break;
 				case 1:
 				dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, WirePortDataType.FLOAT2, "clipScreen" + OutputId, surfInstruction );
-				functionResult = dataCollector.AddFunctions( m_functionHeader, m_functionBody, "fmod(" + "clipScreen" + OutputId + ".x, 8)", "fmod(" + "clipScreen" + UniqueId + ".y, 8)" );
+				functionResult = dataCollector.AddFunctions( m_functionHeader, m_functionBody, "fmod(" + "clipScreen" + OutputId + ".x, 8)", "fmod(" + "clipScreen" + OutputId + ".y, 8)" );
 				break;
 				case 2:
 				{

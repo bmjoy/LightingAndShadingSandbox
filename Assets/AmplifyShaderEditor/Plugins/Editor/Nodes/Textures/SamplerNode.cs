@@ -637,23 +637,6 @@ namespace AmplifyShaderEditor
 		{
 			base.OnNodeLogicUpdate( drawInfo );
 			CheckReference();
-		}
-
-		public override void OnNodeLayout( DrawInfo drawInfo )
-		{
-			base.OnNodeLayout( drawInfo );
-
-			if( m_drawPreview )
-			{
-				m_iconPos = m_globalPosition;
-				m_iconPos.width = InstanceIconWidth * drawInfo.InvertedZoom;
-				m_iconPos.height = InstanceIconHeight * drawInfo.InvertedZoom;
-
-				m_iconPos.y += 10 * drawInfo.InvertedZoom;
-				m_iconPos.x += m_globalPosition.width - m_iconPos.width - 5 * drawInfo.InvertedZoom;
-			}
-
-			//CheckReference();
 
 			if( SoftValidReference )
 			{
@@ -672,7 +655,21 @@ namespace AmplifyShaderEditor
 
 			if( m_previewTextProp == null )
 				m_previewTextProp = this;
+		}
 
+		public override void OnNodeLayout( DrawInfo drawInfo )
+		{
+			base.OnNodeLayout( drawInfo );
+
+			if( m_drawPreview )
+			{
+				m_iconPos = m_globalPosition;
+				m_iconPos.width = InstanceIconWidth * drawInfo.InvertedZoom;
+				m_iconPos.height = InstanceIconHeight * drawInfo.InvertedZoom;
+
+				m_iconPos.y += 10 * drawInfo.InvertedZoom;
+				m_iconPos.x += m_globalPosition.width - m_iconPos.width - 5 * drawInfo.InvertedZoom;
+			}
 		}
 
 		public override void OnNodeRepaint( DrawInfo drawInfo )
