@@ -47,7 +47,11 @@ Material:
     - _EnableScatter: 1
     - _FauxAtmosphere: 0
     - _Gloss: 0.525
+    - _Glossiness: 0.5
     - _LightLightsOffset: 0
+    - _MeiScatterBias: 0
+    - _MeiScatterMeultipler: 0
+    - _MeiScatterMultiplier: 1
     - _NightLightBlue: 0.35
     - _NightLightGreen: 0.835
     - _NightLightRed: 1
@@ -58,7 +62,7 @@ Material:
     - _RayleighScatterBias: 4.55
     - _RayleighScatterMultiplier: 55
     - _ScatterAttenTweaker: 0
-    - _ScatterBlend: 0
+    - _ScatterBlend: 0.5
     - _ScatterConstTweaker: 0.17
     - _ScatterEnable: 1
     - _Shininess: 0.55
