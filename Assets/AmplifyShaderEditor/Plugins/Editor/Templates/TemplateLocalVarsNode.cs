@@ -244,13 +244,7 @@ namespace AmplifyShaderEditor
 				UIUtils.ShowMessage( string.Format( "Local Var {0} can only work on ports of type {1}", m_localVarsData[ m_currentDataIdx ].LocalVarName, m_localVarsData[ m_currentDataIdx ].InputData.PortCategory ) );
 				return m_outputPorts[ 0 ].ErrorValue;
 			}
-
-			if( !dataCollector.IsFragmentCategory )
-			{
-				UIUtils.ShowMessage( "Template Data node node is only intended for fragment use use only" );
-				return m_outputPorts[ 0 ].ErrorValue;
-			}
-
+			
 			return GetOutputVectorItem( 0, outputId, m_dataName );
 		}
 

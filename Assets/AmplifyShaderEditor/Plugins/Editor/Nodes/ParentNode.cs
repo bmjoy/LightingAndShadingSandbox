@@ -1936,7 +1936,7 @@ namespace AmplifyShaderEditor
 							//{
 							//saveReference = false;
 							//}
-							if( !AppyModifierToPort( m_inputPorts[ i ], true ) )
+							if( !ApplyModifierToPort( m_inputPorts[ i ], true ) )
 							{
 								UIUtils.ShowContextOnPick = false;
 								PickInput( m_inputPorts[ i ] );
@@ -1969,7 +1969,7 @@ namespace AmplifyShaderEditor
 						bool saveReference = true;
 						if( m_outputPorts[ i ].IsConnected )
 						{
-							if( AppyModifierToPort( m_outputPorts[ i ], false ) )
+							if( ApplyModifierToPort( m_outputPorts[ i ], false ) )
 							{
 								saveReference = false;
 							}
@@ -2203,7 +2203,7 @@ namespace AmplifyShaderEditor
 			SetSaveIsDirty();
 		}
 
-		protected bool AppyModifierToPort( WirePort port, bool isInput )
+		protected bool ApplyModifierToPort( WirePort port, bool isInput )
 		{
 			bool modifierApplied = false;
 			switch( Event.current.modifiers )
@@ -2242,7 +2242,7 @@ namespace AmplifyShaderEditor
 			}
 
 			if( isInput )
-				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( port.NodeId, port.PortId, port.DataType, port.GetConnection( 0 ).TypeLocked ); //always save last connection
+				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( port.NodeId, port.PortId, port.DataType, false ); //always save last connection
 			else
 				m_containerGraph.ParentWindow.WireReferenceUtils.SwitchPortReference.SetReference( -1, -1, WirePortDataType.OBJECT, false ); //invalidate connection
 

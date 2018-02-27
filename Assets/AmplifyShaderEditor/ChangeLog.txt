@@ -1,4 +1,12 @@
 Release Notes:
+v1.4.5 dev 01:
+* New Shader Function:
+    * Constant Bias Scale
+
+* Fixes:
+    * Fixed null pointer issue with removing connections with Alt key
+    * Fixed issue on 'Template Local Var' node only working on fragment function
+
 v1.4.4 dev 06:
 * Fixes:
     * Fixed issue on 'Texture Sample' nodes not automatically setting the texture type on AUTO
